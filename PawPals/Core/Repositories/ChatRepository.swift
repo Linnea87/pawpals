@@ -1,6 +1,6 @@
 import Foundation
 
 protocol ChatRepository {
-    // code comming soon
+    func fetchConversations(for userId: String) async throws -> [Conversation]
 }
 
