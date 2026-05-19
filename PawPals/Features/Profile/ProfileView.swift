@@ -6,7 +6,7 @@ struct ProfileView: View {
     let user: User
     @State private var selectedPhoto: PhotosPickerItem?
     @State private var showSidebar = false
-    @State private var showEditSheet = false
+    @State private var showEditProfile = false
 
     var body: some View {
         NavigationStack {
@@ -67,7 +67,7 @@ struct ProfileView: View {
                             .contentShape(Rectangle())
                             .onTapGesture {
                                 showSidebar = false
-                                showEditSheet = true
+                                showEditProfile = true
                             }
 
                         Divider()
@@ -93,8 +93,8 @@ struct ProfileView: View {
                     }
                 }
             }
-            .sheet(isPresented: $showEditSheet) {
-                //AddProfileSheet()
+            .navigationDestination(isPresented: $showEditProfile) {
+                AddProfileSheet()
             }
         }
     }
