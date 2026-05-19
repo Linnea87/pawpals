@@ -1,8 +1,9 @@
 import Foundation
 
-// : Identifiable
-struct DogSize {
+enum DogSize: String, CaseIterable, Codable, Identifiable {
+    case small = "Small breed"
+    case medium = "Medium breed"
+    case large = "Big breed"
     
-    // code comming soon
+    var id: String { rawValue }
 }
-
