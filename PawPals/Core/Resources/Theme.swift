@@ -12,6 +12,7 @@ struct Theme {
     static let gradientTop = Color("Colors/GradientTop")
     static let gradientBottom = Color("Colors/GradientBottom")
     static let gradientMid = Color("Colors/GradientMid")
+    static let textPrimary = Color("Colors/TextPrimary")
 
     // ====== Gradients ======
 
