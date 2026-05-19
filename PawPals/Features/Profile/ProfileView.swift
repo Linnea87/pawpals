@@ -74,8 +74,8 @@ struct ProfileView: View {
 
                         Spacer()
                     }
-                    .padding(.top, Spacing.medium)
-                    .padding(.horizontal, Spacing.sidebarTop)
+                    .padding(.top, Spacing.sidebarTop)
+                    .padding(.horizontal, Spacing.medium)
                     .containerRelativeFrame(.horizontal, count: 3, span: 2, spacing: Spacing.none)
                     .frame(maxHeight: .infinity)
                     .background(Theme.background)
