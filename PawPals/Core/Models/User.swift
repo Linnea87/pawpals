@@ -1,9 +1,10 @@
 import Foundation
 
-// : Identifiable
-struct User {
+struct User: Identifiable {
     
-    // code comming soon
+    let id: String
+    var displayName: String
+    var photoURL: String?
+    var city: String
+    var bio: String
 }
-
-
