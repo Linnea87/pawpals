@@ -7,4 +7,5 @@ struct User: Identifiable {
     var photoURL: String?
     var city: String
     var bio: String
+    var dog: Dog?
 }

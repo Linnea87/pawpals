@@ -1,8 +1,8 @@
 import Foundation
 
-// : Identifiable
-struct DogSize {
+enum DogSize: String, CaseIterable {
     
-    // code comming soon
+    case small
+    case medium
+    case large
 }
-
