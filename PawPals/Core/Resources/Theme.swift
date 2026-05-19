@@ -4,10 +4,10 @@ import SwiftUI
 
 struct Theme {
 
-    static let primary = Color("Colors/Primary")
+    static let brand = Color("Colors/Brand")
     static let background = Color("Colors/Background")
     static let surface = Color("Colors/Surface")
-    static let secondary = Color("Colors/Secondary")
+    static let muted = Color("Colors/Muted")
     static let inputBackground = Color("Colors/InputBackground")
     static let gradientTop = Color("Colors/GradientTop")
     static let gradientBottom = Color("Colors/GradientBottom")
