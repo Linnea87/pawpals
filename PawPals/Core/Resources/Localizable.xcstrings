@@ -1,7 +1,50 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
-
+    "profile.about_us" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "About us"
+          }
+        }
+      }
+    },
+    "profile.dog_info" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dog info"
+          }
+        }
+      }
+    },
+    "profile.start_chat" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Start chat"
+          }
+        }
+      }
+    },
+    "profile.walk_preferences" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Walk preferences"
+          }
+        }
+      }
+    }
   },
   "version" : "1.2"
 }
