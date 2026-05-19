@@ -5,10 +5,12 @@ struct ProfileView: View {
 
     let user: User
     @State private var selectedPhoto: PhotosPickerItem?
+    @State private var showSidebar = false
+    @State private var showEditSheet = false
 
     var body: some View {
         NavigationStack {
-            ZStack {
+            ZStack(alignment: .trailing) {
                 Theme.appBackground
                     .ignoresSafeArea()
 
@@ -26,7 +28,7 @@ struct ProfileView: View {
                         }
 
                         VStack(alignment: .leading, spacing: Spacing.xSmall) {
-                            Text(user.displayName)
+                            Text(user.dog != nil ? "\(user.displayName) / \(user.dog!.name)" : user.displayName)
                                 .font(.title3)
                                 .fontWeight(.bold)
                                 .foregroundStyle(Theme.textPrimary)
@@ -57,6 +59,42 @@ struct ProfileView: View {
                 }
                 .listStyle(.insetGrouped)
                 .scrollContentBackground(.hidden)
+
+                if showSidebar {
+                    VStack(alignment: .leading, spacing: Spacing.medium) {
+                        Text("profile.editProfile")
+                            .foregroundStyle(Theme.textPrimary)
+                            .contentShape(Rectangle())
+                            .onTapGesture {
+                                showSidebar = false
+                                showEditSheet = true
+                            }
+
+                        Divider()
+
+                        Spacer()
+                    }
+                    .padding(.top, Spacing.medium)
+                    .padding(.horizontal, Spacing.sidebarTop)
+                    .containerRelativeFrame(.horizontal, count: 3, span: 2, spacing: Spacing.none)
+                    .frame(maxHeight: .infinity)
+                    .background(Theme.background)
+                    .ignoresSafeArea()
+                    .transition(.move(edge: .trailing))
+                }
+            }
+            .toolbar {
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button {
+                        withAnimation { showSidebar.toggle() }
+                    } label: {
+                        Label("menu", systemImage: showSidebar ? "xmark" : "line.3.horizontal")
+                            .labelStyle(.iconOnly)
+                    }
+                }
+            }
+            .sheet(isPresented: $showEditSheet) {
+                //AddProfileSheet()
             }
         }
     }
@@ -68,6 +106,7 @@ struct ProfileView: View {
         displayName: "Sara",
         photoURL: nil,
         city: "Gothenburg",
-        bio: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin metus odio, dapibus et ornare in, malesuada et mauris."
+        bio: "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
+        dog: Dog(id: "dog-1", name: "Bella", breed: "Golden Retriever", size: .large, ownerId: "preview-1")
     ))
 }
