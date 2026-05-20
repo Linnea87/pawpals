@@ -37,7 +37,7 @@ struct AddProfileSheet: View {
                         .font(.subheadline)
                         .foregroundStyle(Theme.textPrimary)
                 }
-                .padding(.top, Spacing.medium)
+                .padding(.top, Spacing.large)
 
                 Button {
                     guard isFormValid else { return }

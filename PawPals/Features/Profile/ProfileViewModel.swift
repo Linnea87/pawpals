@@ -16,7 +16,7 @@ final class ProfileViewModel {
     func saveOwnerInfo(name: String, photoURL: String?) async {
         isLoading = true
         errorMessage = nil
-        user.displayName = name
+        user.name = name
         user.photoURL = photoURL
         do {
             try await userRepository.updateProfile(user)
