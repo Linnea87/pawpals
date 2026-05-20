@@ -20,10 +20,10 @@ struct AddProfileSheet: View {
             List {
                 Section {
                     TextField("dog.name", text: $dogName)
-                        .listRowBackground(Color.white.opacity(0.6))
+                        .listRowBackground(Theme.offWhite.opacity(0.6))
 
                     TextField("dog.breed", text: $dogBreed)
-                        .listRowBackground(Color.white.opacity(0.6))
+                        .listRowBackground(Theme.offWhite.opacity(0.6))
 
                     Picker("dog.size", selection: $dogSize) {
                         Text("dog.size.placeholder").tag(Optional<DogSize>.none)
@@ -31,11 +31,11 @@ struct AddProfileSheet: View {
                             Text(size.rawValue.capitalized).tag(Optional(size))
                         }
                     }
-                    .listRowBackground(Color.white.opacity(0.6))
+                    .listRowBackground(Theme.offWhite.opacity(0.6))
                 } header: {
                     Text("dog.section")
                         .font(.subheadline)
-                        .foregroundStyle(Theme.textPrimary)
+                        .foregroundStyle(Theme.darkBrown)
                 }
                 .padding(.top, Spacing.large)
 
@@ -46,8 +46,8 @@ struct AddProfileSheet: View {
                     Text("dog.save")
                         .frame(maxWidth: .infinity)
                         .padding(Spacing.small)
-                        .background(isFormValid ? Theme.brand : Theme.muted)
-                        .foregroundStyle(Theme.background)
+                        .background(isFormValid ? Theme.terracotta : Theme.lightPeach)
+                        .foregroundStyle(Theme.offWhite)
                         .clipShape(RoundedRectangle(cornerRadius: 8))
                 }
                 .listRowBackground(Color.clear)

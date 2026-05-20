@@ -18,12 +18,12 @@ struct ProfileView: View {
                     HStack(spacing: Spacing.medium) {
                         PhotosPicker(selection: $selectedPhoto, matching: .images) {
                             Circle()
-                                .fill(Theme.muted)
+                                .fill(Theme.lightPeach)
                                 .frame(width: IconSize.avatar, height: IconSize.avatar)
                                 .overlay {
                                     Image(systemName: "person")
                                         .font(.system(size: IconSize.avatarIcon))
-                                        .foregroundStyle(.white)
+                                        .foregroundStyle(Theme.offWhite)
                                 }
                         }
 
@@ -31,7 +31,7 @@ struct ProfileView: View {
                             Text(user.dog != nil ? "\(user.name) / \(user.dog!.name)" : user.name)
                                 .font(.title3)
                                 .fontWeight(.bold)
-                                .foregroundStyle(Theme.textPrimary)
+                                .foregroundStyle(Theme.darkBrown)
 
                             HStack(spacing: Spacing.xSmall) {
                                 Image(systemName: "pawprint")
@@ -39,7 +39,7 @@ struct ProfileView: View {
                                 Text(user.city)
                                     .font(.subheadline)
                             }
-                            .foregroundStyle(Theme.textPrimary.opacity(0.5))
+                            .foregroundStyle(Theme.warmBrown)
                         }
                     }
                     .listRowBackground(Color.clear)
@@ -49,12 +49,12 @@ struct ProfileView: View {
                     Section {
                         Text(user.bio)
                             .font(.callout)
-                            .foregroundStyle(Theme.textPrimary)
-                            .listRowBackground(Color.white.opacity(0.6))
+                            .foregroundStyle(Theme.darkBrown)
+                            .listRowBackground(Theme.offWhite.opacity(0.6))
                     } header: {
                         Text("profile.aboutUs")
                             .font(.subheadline)
-                            .foregroundStyle(Theme.textPrimary)
+                            .foregroundStyle(Theme.darkBrown)
                     }
                 }
                 .listStyle(.insetGrouped)
@@ -63,7 +63,7 @@ struct ProfileView: View {
                 if showSidebar {
                     VStack(alignment: .leading, spacing: Spacing.large) {
                         Text("profile.editProfile")
-                            .foregroundStyle(Theme.textPrimary)
+                            .foregroundStyle(Theme.darkBrown)
                             .contentShape(Rectangle())
                             .onTapGesture {
                                 showSidebar = false
@@ -78,7 +78,7 @@ struct ProfileView: View {
                     .padding(.horizontal, Spacing.large)
                     .containerRelativeFrame(.horizontal, count: 3, span: 2, spacing: Spacing.none)
                     .frame(maxHeight: .infinity)
-                    .background(Theme.background)
+                    .background(Theme.offWhite)
                     .ignoresSafeArea()
                     .transition(.move(edge: .trailing))
                 }
