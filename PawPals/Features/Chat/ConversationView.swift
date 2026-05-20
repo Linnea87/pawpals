@@ -93,7 +93,7 @@ private struct DateSeparatorView: View {
     var body: some View {
         Text(label)
             .font(.caption)
-            .foregroundStyle(Theme.muted)
+            .foregroundStyle(Theme.warmBrown)
             .padding(.vertical, Spacing.small)
     }
 }
@@ -109,13 +109,13 @@ private struct MessageBubbleView: View {
                     Text(message.text)
                         .padding(.horizontal, Spacing.medium)
                         .padding(.vertical, Spacing.small)
-                        .background(Theme.surface)
-                        .foregroundStyle(Theme.textPrimary)
+                        .background(Theme.offWhite)
+                        .foregroundStyle(Theme.darkBrown)
                         .clipShape(RoundedRectangle(cornerRadius: Radius.medium))
 
                     Text(message.timestamp, style: .time)
                         .font(.caption2)
-                        .foregroundStyle(Theme.muted)
+                        .foregroundStyle(Theme.warmBrown)
                 }
                 Spacer()
             } else {
@@ -124,13 +124,13 @@ private struct MessageBubbleView: View {
                     Text(message.text)
                         .padding(.horizontal, Spacing.medium)
                         .padding(.vertical, Spacing.small)
-                        .background(Theme.brand)
+                        .background(Theme.terracotta)
                         .foregroundStyle(.white)
                         .clipShape(RoundedRectangle(cornerRadius: Radius.medium))
 
                     Text(message.timestamp, style: .time)
                         .font(.caption2)
-                        .foregroundStyle(Theme.muted)
+                        .foregroundStyle(Theme.warmBrown)
                 }
             }
         }
@@ -145,13 +145,13 @@ private struct MessageInputBar: View {
         HStack(spacing: Spacing.small) {
             HStack(spacing: Spacing.small) {
                 Image(systemName: "face.smiling")
-                    .foregroundStyle(Theme.muted)
+                    .foregroundStyle(Theme.warmBrown)
 
                 TextField("chat.messagePlaceholder", text: $text)
             }
             .padding(.horizontal, Spacing.medium)
             .padding(.vertical, Spacing.small)
-            .background(Theme.inputBackground)
+            .background(Theme.lightPeach)
             .clipShape(Capsule())
 
             Button(action: onSend) {
@@ -161,8 +161,8 @@ private struct MessageInputBar: View {
                     .padding(Spacing.medium)
                     .background(
                         text.trimmingCharacters(in: .whitespaces).isEmpty
-                            ? Theme.muted
-                            : Theme.brand
+                            ? Theme.sageGreen
+                            : Theme.terracotta
                     )
                     .clipShape(Circle())
             }
@@ -170,7 +170,7 @@ private struct MessageInputBar: View {
         }
         .padding(.horizontal, Spacing.medium)
         .padding(.vertical, Spacing.medium)
-        .background(Theme.surface)
+        .background(Theme.offWhite)
     }
 }
 
