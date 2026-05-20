@@ -1,59 +1,7 @@
 {
-    "sourceLanguage" : "en",
-    "strings" : {
-        "tab.profile" : {
-            "localizations" : {
-                "en" : {
-                    "stringUnit" : {
-                        "state" : "translated",
-                        "value" : "PROFILE"
-                    }
-                }
-            }
-        },
-        "tab.chat" : {
-            "localizations" : {
-                "en" : {
-                    "stringUnit" : {
-                        "state" : "translated",
-                        "value" : "CHAT"
-                    }
-                }
-            }
-        },
-        "tab.meet" : {
-            "localizations" : {
-                "en" : {
-                    "stringUnit" : {
-                        "state" : "translated",
-                        "value" : "MEET"
-                    }
-                }
-            }
-        }
-    },
-    "version" : "1.2"
   "sourceLanguage" : "en",
   "strings" : {
-    "chat.title" : {
-    "dog.breed" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Chat"
-          }
-        }
-      }
-    },
     "chat.noConversations" : {
-            "value" : "Breed"
-          }
-        }
-      }
-    },
-    "dog.name" : {
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
@@ -64,13 +12,18 @@
         }
       }
     },
-    "common.error" : {
-            "value" : "Dog name"
+    "chat.title" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Chat"
           }
         }
       }
     },
-    "dog.save" : {
+    "common.error" : {
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
@@ -82,6 +35,44 @@
       }
     },
     "common.ok" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "OK"
+          }
+        }
+      }
+    },
+    "dog.breed" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Breed"
+          }
+        }
+      }
+    },
+    "dog.name" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dog name"
+          }
+        }
+      }
+    },
+    "dog.save" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
             "value" : "Save"
           }
         }
@@ -93,7 +84,6 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "OK"
             "value" : "My dog"
           }
         }
@@ -143,8 +133,18 @@
         }
       }
     },
-    "profile.editProfile" : {
     "profile.dog_info" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dog info"
+          }
+        }
+      }
+    },
+    "profile.editProfile" : {
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
@@ -155,19 +155,12 @@
         }
       }
     },
-    "sheet.cancel" : {
-            "value" : "Dog info"
-          }
-        }
-      }
-    },
     "profile.start_chat" : {
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Cancel"
             "value" : "Start chat"
           }
         }
@@ -180,6 +173,47 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Walk preferences"
+          }
+        }
+      }
+    },
+    "sheet.cancel" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cancel"
+          }
+        }
+      }
+    },
+    "tab.chat" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "CHAT"
+          }
+        }
+      }
+    },
+    "tab.meet" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "MEET"
+          }
+        }
+      }
+    },
+    "tab.profile" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "PROFILE"
           }
         }
       }
