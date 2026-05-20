@@ -15,10 +15,10 @@ enum Height {
 }
 
 enum Radius {
-    static let small: CGFloat = 8  // tags, chips
-    static let medium: CGFloat = 16  // cards, bubbles, buttons
-    static let large: CGFloat = 20  // input fields, modals
-    static let pill: CGFloat = 999  // fully rounded — avatar circles, badges
+    static let small: CGFloat = 8
+    static let medium: CGFloat = 16
+    static let large: CGFloat = 20
+    static let pill: CGFloat = 999
 }
 
 enum FontSize {
@@ -27,8 +27,9 @@ enum FontSize {
 
 enum IconSize {
 
-    static let chatAvatar: CGFloat = 50
     static let avatar: CGFloat = 90
     static let avatarIcon: CGFloat = 30
+    static let chatAvatar: CGFloat = 50
+    static let messageAvatar: CGFloat = 32
 
 }
