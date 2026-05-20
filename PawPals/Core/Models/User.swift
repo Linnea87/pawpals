@@ -1,10 +1,12 @@
 import Foundation
 
-struct User: Identifiable {
-    
-    let id: String
-    var displayName: String
+struct User: Identifiable, Codable {
+    var id: String
+    var name: String
     var photoURL: String?
-    var city: String
     var bio: String
+    var city: String
+    var dogs: [Dog]
+    var preferences: UserPreferences
+    var distance: Double?
 }
