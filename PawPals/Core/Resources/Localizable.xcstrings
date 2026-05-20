@@ -1,4 +1,38 @@
 {
+    "sourceLanguage" : "en",
+    "strings" : {
+        "tab.profile" : {
+            "localizations" : {
+                "en" : {
+                    "stringUnit" : {
+                        "state" : "translated",
+                        "value" : "PROFILE"
+                    }
+                }
+            }
+        },
+        "tab.chat" : {
+            "localizations" : {
+                "en" : {
+                    "stringUnit" : {
+                        "state" : "translated",
+                        "value" : "CHAT"
+                    }
+                }
+            }
+        },
+        "tab.meet" : {
+            "localizations" : {
+                "en" : {
+                    "stringUnit" : {
+                        "state" : "translated",
+                        "value" : "MEET"
+                    }
+                }
+            }
+        }
+    },
+    "version" : "1.2"
   "sourceLanguage" : "en",
   "strings" : {
     "chat.title" : {
