@@ -90,6 +90,7 @@
       }
     },
     "profile.editProfile" : {
+    "profile.dog_info" : {
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
@@ -101,12 +102,30 @@
       }
     },
     "sheet.cancel" : {
+            "value" : "Dog info"
+          }
+        }
+      }
+    },
+    "profile.start_chat" : {
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Cancel"
+            "value" : "Start chat"
+          }
+        }
+      }
+    },
+    "profile.walk_preferences" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Walk preferences"
           }
         }
       }
