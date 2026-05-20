@@ -1,9 +1,7 @@
 import Foundation
 
-// : Identifiable
-struct UserPreferences {
-    
-    // code comming soon
+struct UserPreferences: Codable {
+    var walkTypes: [WalkType]
+    var dogSize: DogSize
+    var searchRadius: Double
 }
-
-
