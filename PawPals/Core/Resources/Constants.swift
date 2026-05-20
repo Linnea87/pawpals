@@ -1,7 +1,10 @@
 import Foundation
 
 enum Spacing {
-    // code comming soon
+    
+    static let xSmall: CGFloat = 4
+    static let small: CGFloat = 8
+    static let medium: CGFloat = 16
 }
 
 enum Height {
@@ -17,5 +20,7 @@ enum FontSize {
 }
 
 enum IconSize{
-    // code comming soon
+    
+    static let avatar: CGFloat = 90
+    static let avatarIcon: CGFloat = 30
 }
