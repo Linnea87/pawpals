@@ -5,6 +5,7 @@ struct User: Identifiable, Codable {
     var name: String
     var photoURL: String?
     var bio: String
+    var dog: Dog?
     var city: String
     var dogs: [Dog]
     var preferences: UserPreferences

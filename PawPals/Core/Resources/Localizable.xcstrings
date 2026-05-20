@@ -1,6 +1,83 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
+    "dog.breed" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Breed"
+          }
+        }
+      }
+    },
+    "dog.name" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dog name"
+          }
+        }
+      }
+    },
+    "dog.save" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Save"
+          }
+        }
+      }
+    },
+    "dog.section" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "My dog"
+          }
+        }
+      }
+    },
+    "dog.size" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Size"
+          }
+        }
+      }
+    },
+    "dog.size.placeholder" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Select size"
+          }
+        }
+      }
+    },
+    "dog.validation.required" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Name and breed are required"
+          }
+        }
+      }
+    },
     "profile.aboutUs" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -12,12 +89,19 @@
         }
       }
     },
+    "profile.editProfile" : {
     "profile.dog_info" : {
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
+            "value" : "Edit profile"
+          }
+        }
+      }
+    },
+    "sheet.cancel" : {
             "value" : "Dog info"
           }
         }
@@ -29,6 +113,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
+            "value" : "Cancel"
             "value" : "Start chat"
           }
         }

@@ -1,9 +1,8 @@
 import Foundation
 
-enum DogSize: String, CaseIterable, Codable, Identifiable {
-    case small = "Small breed"
-    case medium = "Medium breed"
-    case large = "Big breed"
+enum DogSize: String, CaseIterable {
     
-    var id: String { rawValue }
+    case small
+    case medium
+    case large
 }

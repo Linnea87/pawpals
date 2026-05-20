@@ -6,6 +6,6 @@ struct Dog: Identifiable, Codable {
     var breed: String
     var age: Int
     var size: DogSize
-    var photoURL: String?
+    
   
 }
