@@ -11,12 +11,12 @@ struct UserProfileView: View {
                 
                 VStack(spacing: 8) {
                     Circle()
-                        .fill(Theme.surface)
+                        .fill(Theme.offWhite)
                         .frame(width: 100, height: 100)
                         .overlay(
                             Image(systemName: "person.fill")
                                 .font(.system(size: 44))
-                                .foregroundStyle(Theme.brand)
+                                .foregroundStyle(Theme.terracotta)
                         )
                     
                     Text(user.name)
@@ -26,17 +26,17 @@ struct UserProfileView: View {
                     if let dog = user.dogs.first {
                         Text(dog.name)
                             .font(.subheadline)
-                            .foregroundStyle(Theme.inputBackground)
+                            .foregroundStyle(Theme.lightPeach)
                     }
                     
                     Text(user.city)
                         .font(.caption)
-                        .foregroundStyle(Theme.inputBackground)
+                        .foregroundStyle(Theme.lightPeach)
                     
                     if let distance = user.distance {
                         Text(String(format: "%.1f km away", distance))
                             .font(.caption)
-                            .foregroundStyle(Theme.inputBackground)
+                            .foregroundStyle(Theme.lightPeach)
                     }
                 }
                 
@@ -46,7 +46,7 @@ struct UserProfileView: View {
                             .font(.headline)
                         Text(user.bio)
                             .font(.body)
-                            .foregroundStyle(Theme.inputBackground)
+                            .foregroundStyle(Theme.lightPeach)
                     }
                     .frame(maxWidth: .infinity, alignment: .leading)
                     .padding(.horizontal)
@@ -58,7 +58,7 @@ struct UserProfileView: View {
                             .font(.headline)
                         Text("\(dog.breed) · \(dog.age) years · \(dog.size.rawValue)")
                             .font(.body)
-                            .foregroundStyle(Theme.inputBackground)
+                            .foregroundStyle(Theme.lightPeach)
                     }
                     .frame(maxWidth: .infinity, alignment: .leading)
                     .padding(.horizontal)
@@ -75,8 +75,8 @@ struct UserProfileView: View {
                                         .font(.caption)
                                         .padding(.horizontal, 12)
                                         .padding(.vertical, 6)
-                                        .background(Theme.brand)
-                                        .foregroundStyle(Theme.background)
+                                        .background(Theme.terracotta)
+                                        .foregroundStyle(Theme.offWhite)
                                         .clipShape(Capsule())
                                 }
                             }
@@ -90,10 +90,10 @@ struct UserProfileView: View {
                 } label: {
                     Text("profile.start_chat")
                         .fontWeight(.bold)
-                        .foregroundStyle(Theme.background)
+                        .foregroundStyle(Theme.offWhite)
                         .frame(maxWidth: .infinity)
                         .padding()
-                        .background(Theme.brand)
+                        .background(Theme.terracotta)
                         .clipShape(RoundedRectangle(cornerRadius: 12))
                 }
                 .padding(.horizontal)
@@ -108,7 +108,7 @@ struct UserProfileView: View {
                     dismiss()
                 } label: {
                     Image(systemName: "xmark.circle.fill")
-                        .foregroundStyle(Theme.muted)
+                        .foregroundStyle(Theme.warmBrown)
                 }
             }
         }
