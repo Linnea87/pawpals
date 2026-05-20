@@ -10,7 +10,7 @@ struct ChatView: View {
                     ProgressView()
                 } else if chatViewModel.conversations.isEmpty {
                     ContentUnavailableView(
-                        "No Conversation yet",
+                        String(localized: "chat.noConversations"),
                         systemImage: "bubble.left.and.bubble.right"
                     )
                 } else {
@@ -20,12 +20,12 @@ struct ChatView: View {
                     .listStyle(.plain)
                 }
             }
-            .navigationTitle(Text("Chat"))
+            .navigationTitle(Text("chat.title"))
             .alert(
-                "Error",
+                String(localized: "common.error"),
                 isPresented: .constant(chatViewModel.errorMessage != nil)
             ) {
-                Button("OK") {}
+                Button(String(localized: "common.ok")) {}
             } message: {
                 Text(chatViewModel.errorMessage ?? "")
             }
