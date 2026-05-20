@@ -33,4 +33,157 @@
         }
     },
     "version" : "1.2"
+  "sourceLanguage" : "en",
+  "strings" : {
+    "chat.title" : {
+    "dog.breed" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Chat"
+          }
+        }
+      }
+    },
+    "chat.noConversations" : {
+            "value" : "Breed"
+          }
+        }
+      }
+    },
+    "dog.name" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No conversations yet"
+          }
+        }
+      }
+    },
+    "common.error" : {
+            "value" : "Dog name"
+          }
+        }
+      }
+    },
+    "dog.save" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Error"
+          }
+        }
+      }
+    },
+    "common.ok" : {
+            "value" : "Save"
+          }
+        }
+      }
+    },
+    "dog.section" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "OK"
+            "value" : "My dog"
+          }
+        }
+      }
+    },
+    "dog.size" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Size"
+          }
+        }
+      }
+    },
+    "dog.size.placeholder" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Select size"
+          }
+        }
+      }
+    },
+    "dog.validation.required" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Name and breed are required"
+          }
+        }
+      }
+    },
+    "profile.aboutUs" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "About us"
+          }
+        }
+      }
+    },
+    "profile.editProfile" : {
+    "profile.dog_info" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Edit profile"
+          }
+        }
+      }
+    },
+    "sheet.cancel" : {
+            "value" : "Dog info"
+          }
+        }
+      }
+    },
+    "profile.start_chat" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cancel"
+            "value" : "Start chat"
+          }
+        }
+      }
+    },
+    "profile.walk_preferences" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Walk preferences"
+          }
+        }
+      }
+    }
+  },
+  "version" : "1.2"
 }

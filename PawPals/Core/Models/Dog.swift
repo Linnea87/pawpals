@@ -1,7 +1,11 @@
 import Foundation
 
-// : Identifiable
-struct Dog {
+struct Dog: Identifiable, Codable {
+    var id: String
+    var name: String
+    var breed: String
+    var age: Int
+    var size: DogSize
     
-    // code comming soon
+  
 }
