@@ -28,7 +28,7 @@ struct ProfileView: View {
                         }
 
                         VStack(alignment: .leading, spacing: Spacing.xSmall) {
-                            Text(user.dog != nil ? "\(user.displayName) / \(user.dog!.name)" : user.displayName)
+                            Text(user.dog != nil ? "\(user.name) / \(user.dog!.name)" : user.name)
                                 .font(.title3)
                                 .fontWeight(.bold)
                                 .foregroundStyle(Theme.textPrimary)
@@ -61,7 +61,7 @@ struct ProfileView: View {
                 .scrollContentBackground(.hidden)
 
                 if showSidebar {
-                    VStack(alignment: .leading, spacing: Spacing.medium) {
+                    VStack(alignment: .leading, spacing: Spacing.large) {
                         Text("profile.editProfile")
                             .foregroundStyle(Theme.textPrimary)
                             .contentShape(Rectangle())
@@ -75,7 +75,7 @@ struct ProfileView: View {
                         Spacer()
                     }
                     .padding(.top, Spacing.sidebarTop)
-                    .padding(.horizontal, Spacing.medium)
+                    .padding(.horizontal, Spacing.large)
                     .containerRelativeFrame(.horizontal, count: 3, span: 2, spacing: Spacing.none)
                     .frame(maxHeight: .infinity)
                     .background(Theme.background)
@@ -101,12 +101,5 @@ struct ProfileView: View {
 }
 
 #Preview {
-    ProfileView(user: User(
-        id: "preview-1",
-        displayName: "Sara",
-        photoURL: nil,
-        city: "Gothenburg",
-        bio: "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
-        dog: Dog(id: "dog-1", name: "Bella", breed: "Golden Retriever", size: .large, ownerId: "preview-1")
-    ))
+    ProfileView(user: .mock)
 }

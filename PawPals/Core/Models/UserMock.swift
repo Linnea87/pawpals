@@ -13,8 +13,7 @@ extension User {
                 name: "Bella",
                 breed: "Golden Retriever",
                 age: 3,
-                size: .large,
-                photoURL: nil
+                size: .large
             )
         ],
         preferences: UserPreferences(
