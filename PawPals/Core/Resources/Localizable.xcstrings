@@ -1,12 +1,19 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
+    "chat.title" : {
     "dog.breed" : {
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
+            "value" : "Chat"
+          }
+        }
+      }
+    },
+    "chat.noConversations" : {
             "value" : "Breed"
           }
         }
@@ -18,6 +25,12 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
+            "value" : "No conversations yet"
+          }
+        }
+      }
+    },
+    "common.error" : {
             "value" : "Dog name"
           }
         }
@@ -29,6 +42,12 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
+            "value" : "Error"
+          }
+        }
+      }
+    },
+    "common.ok" : {
             "value" : "Save"
           }
         }
@@ -40,6 +59,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
+            "value" : "OK"
             "value" : "My dog"
           }
         }

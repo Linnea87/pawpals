@@ -1,9 +1,12 @@
 import Foundation
 
-// : Identifiable
-struct Message {
-    
-    // code comming soon
+struct Message: Identifiable, Codable{
+    var id: String
+    var senderId: String
+    var receiverId: String
+    var text: String
+    var timestamp: Date 
+  
 }
 
 
