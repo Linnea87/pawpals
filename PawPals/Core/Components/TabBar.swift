@@ -28,7 +28,7 @@ struct TabBarView: View {
             Group {
                 switch selectedTab {
                 case .profile:
-                    NavigationStack { ProfileView(user: .mock) }
+                    NavigationStack { ProfileView(user: .mock, isOwner: true) }
                 case .chat:
                     NavigationStack { ChatView() }
                 case .meet:

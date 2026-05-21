@@ -69,7 +69,7 @@ struct MeetView: View {
             }
             .task { await vm.loadNearbyUsers() }
             .sheet(item: $vm.selectedUser) { user in
-                NavigationStack { UserProfileView(user: user) }
+                NavigationStack { ProfileView(user: user, isOwner: false) }
             }
         }
     }
