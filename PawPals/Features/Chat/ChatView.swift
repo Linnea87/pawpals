@@ -1,30 +1,76 @@
 import SwiftUI
 
+private enum ChatFilter: CaseIterable {
+    case all, unread, favorite
+
+    var label: LocalizedStringKey {
+        switch self {
+        case .all: return "chat.filter.all"
+        case .unread: return "chat.filter.unread"
+        case .favorite: return "chat.filter.favorite"
+        }
+    }
+}
+
 struct ChatView: View {
     @Environment(ChatViewModel.self) private var chatViewModel
+    @State private var selectedFilter: ChatFilter = .all
     var currentUserID: String = ""
 
+    private var filteredConversations: [Conversation] {
+        switch selectedFilter {
+        case .all: return chatViewModel.conversations
+        case .unread:
+            return chatViewModel.conversations.filter { $0.unreadCount > 0 }
+        case .favorite: return []
+        }
+    }
+
     var body: some View {
-        Group {
-            if chatViewModel.isLoading {
-                ProgressView()
-            } else if chatViewModel.conversations.isEmpty {
-                ContentUnavailableView(
-                    String(localized: "chat.noConversations"),
-                    systemImage: "bubble.left.and.bubble.right"
-                )
-            } else {
-                List(chatViewModel.conversations) { conversation in
-                    NavigationLink {
+        ZStack {
+            Theme.appBackground
+                .ignoresSafeArea()
+
+            VStack(spacing: Spacing.none) {
+                filterTabs
+
+                if chatViewModel.isLoading {
+                    ProgressView()
+                        .frame(maxWidth: .infinity, maxHeight: .infinity)
+                } else if filteredConversations.isEmpty {
+                    ContentUnavailableView(
+                        String(localized: "chat.noConversations"),
+                        systemImage: "bubble.left.and.bubble.right"
+                    )
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                } else {
+                    List(filteredConversations) { conversation in
+                        ZStack {
+                            NavigationLink(value: conversation) { EmptyView() }
+                                .opacity(0)
+                            ConversationRowView(conversation: conversation)
+                        }
+                        .listRowBackground(Color.clear)
+                        .listRowSeparator(.hidden)
+                        .listRowInsets(
+                            EdgeInsets(
+                                top: Spacing.small,
+                                leading: Spacing.medium,
+                                bottom: Spacing.small,
+                                trailing: Spacing.medium
+                            )
+                        )
+                    }
+                    .scrollContentBackground(.hidden)
+                    .navigationDestination(for: Conversation.self) {
+                        conversation in
                         ConversationView(
                             conversation: conversation,
                             currentUserID: currentUserID
                         )
-                    } label: {
-                        ConversationRowView(conversation: conversation)
                     }
+
                 }
-                .listStyle(.plain)
             }
         }
         .navigationTitle(Text("chat.title"))
@@ -36,7 +82,32 @@ struct ChatView: View {
         } message: {
             Text(chatViewModel.errorMessage ?? "")
         }
+    }
 
+    private var filterTabs: some View {
+        HStack(spacing: Spacing.small) {
+            ForEach(ChatFilter.allCases, id: \.self) { filter in
+                Button {
+                    selectedFilter = filter
+                } label: {
+                    Text(filter.label)
+                        .font(.subheadline)
+                        .fontWeight(.medium)
+                        .foregroundStyle(
+                            selectedFilter == filter ? .white : Theme.darkBrown
+                        )
+                        .padding(.horizontal, Spacing.large)
+                        .padding(.vertical, Spacing.small)
+                        .background(
+                            selectedFilter == filter
+                                ? Theme.sageGreen : Theme.offWhite
+                        )
+                        .clipShape(Capsule())
+                }
+            }
+        }
+        .padding(.horizontal, Spacing.medium)
+        .padding(.vertical, Spacing.medium)
     }
 }
 

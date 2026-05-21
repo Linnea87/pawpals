@@ -39,7 +39,7 @@ struct ConversationRowView: View {
                     .clipShape(Circle())
             }
         }
-        .padding(Spacing.medium)
+        .padding(Spacing.large)
         .background(Theme.offWhite)
         .clipShape(RoundedRectangle(cornerRadius: Radius.large))
     }
