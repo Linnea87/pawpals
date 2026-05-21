@@ -7,6 +7,7 @@ final class ChatViewModel {
     var messageText: String = ""
     var isLoading: Bool = false
     var errorMessage: String?
+    var activeConversation: Conversation?
 
     private let repository: ChatRepository
     private var stopObserving: (() -> Void)?
@@ -32,6 +33,23 @@ final class ChatViewModel {
         isLoading = false
 
     }
+    
+    func startConversation(with user: User) async {
+            isLoading = true
+            errorMessage = nil
+            do {
+                // PP-020: Replace "currentUserId" with real userId from AuthViewModel when Firebase is ready
+                let conversation = try await repository.createOrFetchConversation(
+                    between: "currentUserId",
+                    and: user.id
+                )
+                activeConversation = conversation
+            } catch {
+                errorMessage = error.localizedDescription
+            }
+            isLoading = false
+        }
+
 
     func observeMessages(conversationID: String) {
         isLoading = true
