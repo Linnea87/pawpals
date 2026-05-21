@@ -1,4 +1,5 @@
 import Foundation
+import FirebaseFirestore
 
 final class UserService: UserRepository {
 
@@ -8,5 +9,9 @@ final class UserService: UserRepository {
     
     func saveDog(_ dog: Dog, userId: String) async throws {
             // Firebase implementation comes here
+    }
+    func updateLocation(_ location: GeoPoint, userId: String) async throws {
+        // Firebase implementation comes here
+
     }
 }
