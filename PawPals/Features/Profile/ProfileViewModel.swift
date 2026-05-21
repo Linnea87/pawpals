@@ -25,13 +25,13 @@ final class ProfileViewModel {
         }
         isLoading = false
     }
-
+    
     func saveDog(_ dog: Dog) async {
         isLoading = true
         errorMessage = nil
         do {
             try await userRepository.saveDog(dog, userId: user.id)
-            user.dog = dog
+            user.dogs.append(dog)
         } catch {
             errorMessage = error.localizedDescription
         }
