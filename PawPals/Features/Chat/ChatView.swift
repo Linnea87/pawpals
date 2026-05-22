@@ -13,6 +13,7 @@ private enum ChatFilter: CaseIterable {
 }
 
 struct ChatView: View {
+    @Binding var selectedTab: Tab
     @Environment(ChatViewModel.self) private var chatViewModel
     @State private var selectedFilter: ChatFilter = .all
     var currentUserID: String = ""
@@ -71,7 +72,12 @@ struct ChatView: View {
                     }
 
                 }
+
             }
+
+        }
+        .safeAreaInset(edge: .bottom, spacing: 0) {
+            TabBarView(selectedTab: $selectedTab)
         }
         .navigationTitle(Text("chat.title"))
         .alert(
@@ -83,6 +89,7 @@ struct ChatView: View {
             Text(chatViewModel.errorMessage ?? "")
         }
     }
+    
 
     private var filterTabs: some View {
         HStack(spacing: Spacing.small) {
@@ -132,7 +139,7 @@ private struct MockChatRepository: ChatRepository {
     }
 }
 
-#Preview {
+private func makePreviewChatViewModel() -> ChatViewModel {
     let mockConversations = [
         Conversation(
             id: "1",
@@ -156,7 +163,12 @@ private struct MockChatRepository: ChatRepository {
 
     let viewModel = ChatViewModel(repository: MockChatRepository())
     viewModel.conversations = mockConversations
-
-    return ChatView(currentUserID: "Patrik")
-        .environment(viewModel)
+    return viewModel
 }
+
+#Preview {
+    ChatView(selectedTab: .constant(.chat), currentUserID: "Patrik")
+        .environment(makePreviewChatViewModel())
+}
+
+

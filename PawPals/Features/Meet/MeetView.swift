@@ -1,6 +1,7 @@
 import SwiftUI
 
 struct MeetView: View {
+    @Binding var selectedTab: Tab
     @Environment(MeetViewModel.self) private var viewModel
     
     var body: some View {
@@ -32,6 +33,7 @@ struct MeetView: View {
                         .padding(.horizontal, Spacing.large)
                         .padding(.bottom, Spacing.large)
                     }
+                    
                     
                     if vm.isLoading {
                         Spacer()
@@ -65,18 +67,22 @@ struct MeetView: View {
                             .padding(.horizontal, Spacing.large)
                         }
                     }
+                    
                 }
+            }
+            .safeAreaInset(edge: .bottom, spacing: 0) {
+                TabBarView(selectedTab: $selectedTab)
             }
             .task { await vm.loadNearbyUsers() }
             .sheet(item: $vm.selectedUser) { user in
-                NavigationStack { ProfileView(user: user, isOwner: false) }
+                NavigationStack { ProfileView(user: user, isOwner: false, selectedTab: $selectedTab) }
             }
         }
     }
 }
 
 #Preview {
-    MeetView()
+    MeetView(selectedTab: .constant(.meet))
         .environment(MeetViewModel())
 }
 
