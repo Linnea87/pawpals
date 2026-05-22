@@ -78,16 +78,15 @@ private struct CustomTabItem: View {
             VStack(spacing: 4) {
                 Image(systemName: tab.icon)
                     .font(.system(size: 20, weight: .regular))
-                    .foregroundStyle(isSelected ? Color.white : Theme.gradientTop)
+                    .foregroundStyle(isSelected ? Theme.offWhite : Theme.sageGreen)
 
                 Text(tab.label)
                     .font(.system(size: 10, weight: .semibold))
-                    .foregroundStyle(isSelected ? Color.white : Theme.gradientTop)
+                    .foregroundStyle(isSelected ? Theme.offWhite : Theme.sageGreen)
             }
-            .frame(maxWidth: .infinity)
             .padding(.horizontal, 16)
             .padding(.vertical, 12)
-            .background(isSelected ? Theme.brand : Color.clear)
+            .background(isSelected ? AnyShapeStyle(Theme.activeTabBar) : AnyShapeStyle(Color.clear))
             .clipShape(Capsule())
         }
         .buttonStyle(.plain)
