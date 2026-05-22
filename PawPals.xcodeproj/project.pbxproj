@@ -18,9 +18,33 @@
 		F88B0ED52FB489E600D59925 /* .gitignore */ = {isa = PBXFileReference; lastKnownFileType = text; path = .gitignore; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		F860CA4B2FC0524A005C8299 /* Exceptions for "PawPals" folder in "PawPals" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Core/Components/TabBar.swift,
+			);
+			target = F88B0EC62FB489DC00D59925 /* PawPals */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
+
+/* Begin PBXFileSystemSynchronizedGroupBuildPhaseMembershipExceptionSet section */
+		F860CA4C2FC0524A005C8299 /* Exceptions for "PawPals" folder in "Compile Sources" phase from "PawPals" target */ = {
+			isa = PBXFileSystemSynchronizedGroupBuildPhaseMembershipExceptionSet;
+			buildPhase = F88B0EC32FB489DC00D59925 /* Sources */;
+			membershipExceptions = (
+				Core/Components/TabBar.swift,
+			);
+		};
+/* End PBXFileSystemSynchronizedGroupBuildPhaseMembershipExceptionSet section */
+
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		F88B0EC92FB489DC00D59925 /* PawPals */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				F860CA4B2FC0524A005C8299 /* Exceptions for "PawPals" folder in "PawPals" target */,
+				F860CA4C2FC0524A005C8299 /* Exceptions for "PawPals" folder in "Compile Sources" phase from "PawPals" target */,
+			);
 			path = PawPals;
 			sourceTree = "<group>";
 		};

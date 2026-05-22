@@ -5,6 +5,8 @@ struct ProfileView: View {
 
     let user: User
     let isOwner: Bool
+    @Binding var selectedTab: Tab
+
     @Environment(\.dismiss) private var dismiss
     @State private var selectedPhoto: PhotosPickerItem?
     @State private var showSidebar = false
@@ -75,6 +77,11 @@ struct ProfileView: View {
                 }
                 .listStyle(.insetGrouped)
                 .scrollContentBackground(.hidden)
+                .safeAreaInset(edge: .bottom, spacing: 0) {
+                    if isOwner {
+                        TabBarView(selectedTab: $selectedTab)
+                    }
+                }
 
                 if showSidebar {
                     VStack(alignment: .leading, spacing: Spacing.large) {
@@ -112,7 +119,7 @@ struct ProfileView: View {
                         Button {
                             dismiss()
                         } label: {
-                            Image(systemName: "xmark.circle.fill")
+                            Image(systemName: "xmark")
                                 .foregroundStyle(Theme.warmBrown)
                         }
                     }
@@ -141,11 +148,10 @@ struct ProfileView: View {
 }
 
 #Preview("Owner") {
-    ProfileView(user: .mock, isOwner: true)
+    ProfileView(user: .mock, isOwner: true, selectedTab: .constant(.profile))
 }
-
 #Preview("Visitor") {
     NavigationStack {
-        ProfileView(user: .mock, isOwner: false)
+        ProfileView(user: .mock, isOwner: false, selectedTab: .constant(.profile))
     }
 }

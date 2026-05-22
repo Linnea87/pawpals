@@ -44,14 +44,6 @@ struct Theme {
         endPoint: .bottom
     )
 
-    // Active tab bar background gradient — leading to trailing
-    static let activeTabBar = LinearGradient(
-        colors: [
-            Color("Colors/Terracotta"),
-            Color("Colors/LightPeach"),
-        ],
-        startPoint: .leading,
-        endPoint: .trailing
-    )
+   
 
 }
