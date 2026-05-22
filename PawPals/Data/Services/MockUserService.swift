@@ -12,13 +12,6 @@ final class MockUserService: UserRepository {
                 name: "Emma",
                 photoURL: nil,
                 bio: "We love morning walks in the park!",
-                dog: Dog(
-                    id: "dog-1",
-                    name: "Max",
-                    breed: "Golden Retriever",
-                    age: 3,
-                    size: .large
-                ),
                 city: "Stockholm",
                 dogs: [],
                 preferences: UserPreferences(
@@ -33,13 +26,6 @@ final class MockUserService: UserRepository {
                 name: "Maja",
                 photoURL: nil,
                 bio: "Looking for a walking buddy in the evenings",
-                dog: Dog(
-                    id: "dog-2",
-                    name: "Charlie",
-                    breed: "Labrador",
-                    age: 2,
-                    size: .medium
-                ),
                 city: "Stockholm",
                 dogs: [],
                 preferences: UserPreferences(

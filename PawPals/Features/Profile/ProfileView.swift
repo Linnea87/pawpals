@@ -4,9 +4,12 @@ import PhotosUI
 struct ProfileView: View {
 
     let user: User
+    let isOwner: Bool
+    @Environment(\.dismiss) private var dismiss
     @State private var selectedPhoto: PhotosPickerItem?
     @State private var showSidebar = false
     @State private var showEditProfile = false
+    @State private var showConversation = false
 
     var body: some View {
         NavigationStack {
@@ -16,19 +19,16 @@ struct ProfileView: View {
 
                 List {
                     HStack(spacing: Spacing.medium) {
-                        PhotosPicker(selection: $selectedPhoto, matching: .images) {
-                            Circle()
-                                .fill(Theme.lightPeach)
-                                .frame(width: IconSize.avatar, height: IconSize.avatar)
-                                .overlay {
-                                    Image(systemName: "person")
-                                        .font(.system(size: IconSize.avatarIcon))
-                                        .foregroundStyle(Theme.offWhite)
-                                }
+                        if isOwner {
+                            PhotosPicker(selection: $selectedPhoto, matching: .images) {
+                                avatarCircle
+                            }
+                        } else {
+                            avatarCircle
                         }
 
                         VStack(alignment: .leading, spacing: Spacing.xSmall) {
-                            Text(user.dog != nil ? "\(user.name) / \(user.dog!.name)" : user.name)
+                            Text(user.dogs.first != nil ? "\(user.name) / \(user.dogs.first!.name)" : user.name)
                                 .font(.title3)
                                 .fontWeight(.bold)
                                 .foregroundStyle(Theme.darkBrown)
@@ -55,6 +55,22 @@ struct ProfileView: View {
                         Text("profile.aboutUs")
                             .font(.subheadline)
                             .foregroundStyle(Theme.darkBrown)
+                    }
+
+                    if !isOwner {
+                        Button {
+                            showConversation = true
+                        } label: {
+                            Text("profile.start_chat")
+                                .fontWeight(.bold)
+                                .foregroundStyle(Theme.offWhite)
+                                .frame(maxWidth: .infinity)
+                                .padding()
+                                .background(Theme.terracotta)
+                                .clipShape(RoundedRectangle(cornerRadius: 12))
+                        }
+                        .listRowBackground(Color.clear)
+                        .listRowSeparator(.hidden)
                     }
                 }
                 .listStyle(.insetGrouped)
@@ -85,21 +101,51 @@ struct ProfileView: View {
             }
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
-                    Button {
-                        withAnimation { showSidebar.toggle() }
-                    } label: {
-                        Label("menu", systemImage: showSidebar ? "xmark" : "line.3.horizontal")
-                            .labelStyle(.iconOnly)
+                    if isOwner {
+                        Button {
+                            withAnimation { showSidebar.toggle() }
+                        } label: {
+                            Label("menu", systemImage: showSidebar ? "xmark" : "line.3.horizontal")
+                                .labelStyle(.iconOnly)
+                        }
+                    } else {
+                        Button {
+                            dismiss()
+                        } label: {
+                            Image(systemName: "xmark.circle.fill")
+                                .foregroundStyle(Theme.warmBrown)
+                        }
                     }
                 }
             }
             .navigationDestination(isPresented: $showEditProfile) {
                 AddProfileSheet()
             }
+            .navigationDestination(isPresented: $showConversation) {
+                // PP-020: Replace with ConversationView(conversation:, currentUserID:) when wired up
+                Text("Conversation with \(user.name)")
+            }
         }
+    }
+
+    private var avatarCircle: some View {
+        Circle()
+            .fill(Theme.lightPeach)
+            .frame(width: IconSize.avatar, height: IconSize.avatar)
+            .overlay {
+                Image(systemName: "person")
+                    .font(.system(size: IconSize.avatarIcon))
+                    .foregroundStyle(Theme.offWhite)
+            }
     }
 }
 
-#Preview {
-    ProfileView(user: .mock)
+#Preview("Owner") {
+    ProfileView(user: .mock, isOwner: true)
+}
+
+#Preview("Visitor") {
+    NavigationStack {
+        ProfileView(user: .mock, isOwner: false)
+    }
 }

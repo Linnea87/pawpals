@@ -121,6 +121,15 @@ private struct MockChatRepository: ChatRepository {
         conversationID: String,
         onUpdate: @escaping ([Message]) -> Void
     ) -> (() -> Void) { return {} }
+    
+    func createOrFetchConversation(between userId1: String, and userId2: String) async throws -> Conversation {
+        Conversation(
+            id: "mock-conv",
+            participantIDs: [userId1, userId2],
+            lastMessage: "",
+            lastMessageTimestamp: Date()
+        )
+    }
 }
 
 #Preview {

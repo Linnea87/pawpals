@@ -50,4 +50,9 @@ final class ChatService: ChatRepository {
 
         return { listener.remove() }
     }
+    
+    func createOrFetchConversation(between userId1: String, and userId2: String) async throws -> Conversation {
+        // PP-020: Query Firestore for existing conversation — blocked by Firebase Auth (PP-002)
+        fatalError("Not implemented yet")
+    }
 }
