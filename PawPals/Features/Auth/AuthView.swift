@@ -1,27 +1,23 @@
 import SwiftUI
 
-private enum AuthOption {
-    case signIn, signUp
-}
-
 struct AuthView: View {
+    @Environment(AuthViewModel.self) private var viewModel
     @State private var showSignIn = false
     @State private var showSignUp = false
-    @State private var activeOption: AuthOption = .signIn
 
     var body: some View {
         ZStack {
             Theme.appBackground.ignoresSafeArea()
 
-            VStack(spacing: 0) {
+            VStack(spacing: Spacing.none) {
                 Spacer()
-                    .frame(minHeight: 60)
+                    .frame(minHeight: AuthLayout.topSpacing)
                 logoSection
                 Spacer()
-                    .frame(minHeight: 40)
+                    .frame(minHeight: AuthLayout.middleSpacing)
                 welcomeCard
                 Spacer()
-                    .frame(minHeight: 250)
+                    .frame(minHeight: AuthLayout.bottomSpacing)
             }
             .padding(.horizontal, Spacing.large)
         }
@@ -37,11 +33,11 @@ struct AuthView: View {
     private var logoSection: some View {
         VStack(spacing: Spacing.small) {
             Circle()
-                .fill(Theme.offWhite.opacity(0.5))
-                .frame(width: 90, height: 90)
+                .fill(Theme.offWhite.opacity(AuthLayout.circleOpacity))
+                .frame(width: IconSize.avatar, height: IconSize.avatar)
                 .overlay {
                     Image(systemName: "pawprint.fill")
-                        .font(.system(size: 36))
+                        .font(.system(size: IconSize.logoIcon))
                         .foregroundStyle(Theme.terracotta)
                 }
 
@@ -71,42 +67,46 @@ struct AuthView: View {
 
             HStack(spacing: Spacing.medium) {
                 Button(String(localized: "auth.sign.in")) {
-                    activeOption = .signIn
+                    viewModel.activeOption = .signIn
                     // TODO: PP-002 — showSignIn = true
                 }
                 .frame(maxWidth: .infinity)
                 .padding(.vertical, Spacing.small)
-                .background(activeOption == .signIn ? Theme.terracotta : Theme.offWhite)
-                .foregroundStyle(activeOption == .signIn ? Theme.offWhite : Theme.darkBrown)
-                .fontWeight(activeOption == .signIn ? .semibold : .regular)
+                .background(viewModel.activeOption == .signIn ? Theme.terracotta : Theme.offWhite)
+                .foregroundStyle(viewModel.activeOption == .signIn ? Theme.offWhite : Theme.darkBrown)
+                .fontWeight(viewModel.activeOption == .signIn ? .semibold : .regular)
                 .clipShape(Capsule())
 
                 Button(String(localized: "auth.sign.up")) {
-                    activeOption = .signUp
+                    viewModel.activeOption = .signUp
                     // TODO: PP-002 — showSignUp = true
                 }
                 .frame(maxWidth: .infinity)
                 .padding(.vertical, Spacing.small)
-                .background(activeOption == .signUp ? Theme.terracotta : Theme.offWhite)
-                .foregroundStyle(activeOption == .signUp ? Theme.offWhite : Theme.darkBrown)
-                .fontWeight(activeOption == .signUp ? .semibold : .regular)
+                .background(viewModel.activeOption == .signUp ? Theme.terracotta : Theme.offWhite)
+                .foregroundStyle(viewModel.activeOption == .signUp ? Theme.offWhite : Theme.darkBrown)
+                .fontWeight(viewModel.activeOption == .signUp ? .semibold : .regular)
                 .clipShape(Capsule())
             }
             .padding(.top, Spacing.large)
         }
         .padding(Spacing.large)
-        .background(Theme.offWhite.opacity(0.15))
+        .background(Theme.offWhite.opacity(AuthLayout.cardOpacity))
         .clipShape(RoundedRectangle(cornerRadius: Radius.large))
         .overlay(
             RoundedRectangle(cornerRadius: Radius.large)
-                .stroke(Theme.creamWhite, lineWidth: 1)
+                .stroke(Theme.creamWhite, lineWidth: AuthLayout.borderWidth)
         )
-        .shadow(color: .black.opacity(0.12), radius: 10, x: 0, y: 4)
-       
-
+        .shadow(color: .black.opacity(AuthLayout.shadowOpacity), radius: AuthLayout.shadowRadius, x: Spacing.none, y: AuthLayout.shadowY)
     }
+}
+
+private struct MockAuthRepository: AuthRepository {
+    func signUp(email: String, password: String) async throws {}
+    func signUpWithGoogle() async throws {}
 }
 
 #Preview {
     AuthView()
+        .environment(AuthViewModel(repository: MockAuthRepository()))
 }

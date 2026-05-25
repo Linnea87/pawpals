@@ -5,6 +5,7 @@ final class AuthViewModel {
     var isLoading = false
     var errorMessage: String? = nil
     var currentUser: User? = nil
+    var activeOption: AuthOption = .signIn
 
     private let repository: AuthRepository
 
@@ -18,6 +19,12 @@ final class AuthViewModel {
         defer { isLoading = false }
         do {
             try await repository.signUp(email: email, password: password)
+        } catch let error as AuthError {
+            switch error {
+            case .notImplemented: errorMessage = String(localized: "auth.error.not.implemented")
+            case .invalidCredential: errorMessage = String(localized: "auth.error.invalid.credential")
+            case .unknown: errorMessage = String(localized: "auth.error.unknown")
+            }
         } catch {
             errorMessage = error.localizedDescription
         }

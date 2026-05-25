@@ -1,7 +1,6 @@
 import Foundation
 
 enum Spacing {
-
     static let none: CGFloat = 0
     static let xSmall: CGFloat = 4
     static let small: CGFloat = 8
@@ -26,10 +25,21 @@ enum FontSize {
 }
 
 enum IconSize {
-
     static let avatar: CGFloat = 90
     static let avatarIcon: CGFloat = 30
+    static let logoIcon: CGFloat = 36
     static let chatAvatar: CGFloat = 50
     static let messageAvatar: CGFloat = 32
+}
 
+enum AuthLayout {
+    static let borderWidth: CGFloat = 1
+    static let topSpacing: CGFloat = 60
+    static let middleSpacing: CGFloat = 40
+    static let bottomSpacing: CGFloat = 250
+    static let cardOpacity: CGFloat = 0.15
+    static let circleOpacity: CGFloat = 0.5
+    static let shadowOpacity: CGFloat = 0.12
+    static let shadowRadius: CGFloat = 10
+    static let shadowY: CGFloat = 4
 }

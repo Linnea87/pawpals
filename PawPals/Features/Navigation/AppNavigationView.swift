@@ -18,7 +18,7 @@ struct AppNavigationView: View {
             }
         } else {
             NavigationStack {
-                SignInView()
+                AuthView()
             }
         }
     }
