@@ -8,12 +8,15 @@ struct ProfileView: View {
     @Binding var selectedTab: Tab
 
     @Environment(\.dismiss) private var dismiss
+    @Environment(ChatViewModel.self) private var chatViewModel
+    @Environment(AuthViewModel.self) private var authViewModel
     @State private var selectedPhoto: PhotosPickerItem?
     @State private var showSidebar = false
     @State private var showEditProfile = false
-    @State private var showConversation = false
 
     var body: some View {
+        @Bindable var chatVM = chatViewModel
+
         NavigationStack {
             ZStack(alignment: .trailing) {
                 Theme.appBackground
@@ -61,15 +64,20 @@ struct ProfileView: View {
 
                     if !isOwner {
                         Button {
-                            showConversation = true
+                            Task {
+                                await chatViewModel.startConversation(
+                                    with: user,
+                                    currentUserId: authViewModel.currentUserId
+                                )
+                            }
                         } label: {
-                            Text("profile.start_chat")
+                            Text("profile.start.chat")
                                 .fontWeight(.bold)
                                 .foregroundStyle(Theme.offWhite)
                                 .frame(maxWidth: .infinity)
                                 .padding()
                                 .background(Theme.terracotta)
-                                .clipShape(RoundedRectangle(cornerRadius: 12))
+                                .clipShape(RoundedRectangle(cornerRadius: Radius.medium))
                         }
                         .listRowBackground(Color.clear)
                         .listRowSeparator(.hidden)
@@ -128,9 +136,8 @@ struct ProfileView: View {
             .navigationDestination(isPresented: $showEditProfile) {
                 AddProfileSheet()
             }
-            .navigationDestination(isPresented: $showConversation) {
-                // PP-020: Replace with ConversationView(conversation:, currentUserID:) when wired up
-                Text("Conversation with \(user.name)")
+            .navigationDestination(item: $chatVM.activeConversation) { conversation in
+                ConversationView(conversation: conversation, currentUserID: authViewModel.currentUserId)
             }
         }
     }
@@ -149,9 +156,32 @@ struct ProfileView: View {
 
 #Preview("Owner") {
     ProfileView(user: .mock, isOwner: true, selectedTab: .constant(.profile))
+        .environment(ChatViewModel(repository: MockChatRepository()))
+        .environment(AuthViewModel(repository: MockAuthRepository()))
 }
+
 #Preview("Visitor") {
     NavigationStack {
         ProfileView(user: .mock, isOwner: false, selectedTab: .constant(.profile))
+    }
+    .environment(ChatViewModel(repository: MockChatRepository()))
+    .environment(AuthViewModel(repository: MockAuthRepository()))
+}
+
+private struct MockAuthRepository: AuthRepository {
+    func signUp(email: String, password: String) async throws -> User {
+        User(id: "preview", name: "", photoURL: nil, bio: "", city: "",
+             dogs: [], preferences: UserPreferences(walkTypes: [], dogSize: .medium, searchRadius: 10),
+             distance: nil)
+    }
+    func signUpWithGoogle() async throws {}
+}
+
+private struct MockChatRepository: ChatRepository {
+    func fetchConversations(for userId: String) async throws -> [Conversation] { [] }
+    func sendMessage(_ message: Message, to conversationID: String) async throws {}
+    func observeMessages(conversationID: String, onUpdate: @escaping ([Message]) -> Void) -> (() -> Void) { return {} }
+    func createOrFetchConversation(between userId1: String, and userId2: String) async throws -> Conversation {
+        Conversation(id: "mock", participantIDs: [userId1, userId2], lastMessage: "", lastMessageTimestamp: Date())
     }
 }

@@ -6,6 +6,7 @@ final class AuthViewModel {
     var errorMessage: String? = nil
     var currentUser: User? = nil
     var isAuthenticated: Bool { currentUser != nil }
+    var currentUserId: String { currentUser?.id ?? "" }
     var activeOption: AuthOption = .signIn
 
     private let repository: AuthRepository
@@ -19,7 +20,9 @@ final class AuthViewModel {
         errorMessage = nil
         defer { isLoading = false }
         do {
-            try await repository.signUp(email: email, password: password)
+            var user = try await repository.signUp(email: email, password: password)
+            user.name = name
+            currentUser = user
         } catch let error as AuthError {
             switch error {
             case .notImplemented: errorMessage = String(localized: "auth.error.not.implemented")

@@ -438,7 +438,7 @@
         }
       }
     },
-    "profile.start_chat" : {
+    "profile.start.chat" : {
       "extractionState" : "manual",
       "localizations" : {
         "en" : {

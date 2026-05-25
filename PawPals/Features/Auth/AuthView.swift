@@ -104,5 +104,14 @@ struct AuthView: View {
 
 #Preview {
     AuthView()
-        .environment(AuthViewModel(repository: AuthService()))
+        .environment(AuthViewModel(repository: MockAuthRepository()))
+}
+
+private struct MockAuthRepository: AuthRepository {
+    func signUp(email: String, password: String) async throws -> User {
+        User(id: "preview", name: "", photoURL: nil, bio: "", city: "",
+             dogs: [], preferences: UserPreferences(walkTypes: [], dogSize: .medium, searchRadius: 10),
+             distance: nil)
+    }
+    func signUpWithGoogle() async throws {}
 }
