@@ -1,6 +1,6 @@
 import SwiftUI
 
-struct ProfileCardView: View {
+struct MeetCardView: View {
     let user: User
 
     var body: some View {
@@ -50,6 +50,6 @@ struct ProfileCardView: View {
 }
 
 #Preview {
-    ProfileCardView(user: .mock)
+    MeetCardView(user: .mock)
         .padding()
 }
