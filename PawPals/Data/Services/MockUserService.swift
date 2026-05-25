@@ -47,4 +47,15 @@ final class MockUserService: UserRepository {
     func updateLocation(_ location: GeoPoint, userId: String) async throws {
         print("MockUserService: updateLocation \(location)")
     }
+    func savePreferences(_ prefs: UserPreferences, userId: String) async throws {
+        print("MockUserService: savePreferences called")
+    }
+
+    func loadPreferences(userId: String) async throws -> UserPreferences {
+        return UserPreferences(
+            walkTypes: [.evening],
+            dogSize: .medium,
+            searchRadius: 5.0
+        )
+    }
 }
