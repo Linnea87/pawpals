@@ -60,7 +60,7 @@ struct MeetView: View {
                         ScrollView {
                             LazyVStack(spacing: Spacing.medium) {
                                 ForEach(vm.filteredUsers) { user in
-                                    ProfileCardView(user: user)
+                                    MeetCardView(user: user)
                                         .onTapGesture { vm.selectedUser = user }
                                 }
                             }
