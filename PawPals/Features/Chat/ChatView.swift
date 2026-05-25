@@ -137,6 +137,8 @@ private struct MockChatRepository: ChatRepository {
             lastMessageTimestamp: Date()
         )
     }
+    
+    func markAsRead(conversationID: String, userID: String) async throws {}
 }
 
 private func makePreviewChatViewModel() -> ChatViewModel {

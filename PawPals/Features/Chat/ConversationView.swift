@@ -226,6 +226,8 @@ private struct MockThreadRepository: ChatRepository {
         return {}
     }
     
+    func markAsRead(conversationID: String, userID: String) async throws {}
+    
     func createOrFetchConversation(between userId1: String, and userId2: String) async throws -> Conversation {
         Conversation(
             id: "mock-conv",
