@@ -2,7 +2,7 @@ import SwiftUI
 
 @main
 struct PawPalsApp: App {
-    @State private var authViewModel = AuthViewModel()
+    @State private var authViewModel = AuthViewModel(repository: AuthService())
     @State private var meetViewModel = MeetViewModel()
     // TODO [PP-002]: Replace MockChatService with ChatService() when Firebase auth is wired
     @State private var chatViewModel = ChatViewModel(repository: MockChatService())
