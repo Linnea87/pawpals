@@ -25,9 +25,9 @@ struct AuthView: View {
         // .sheet(isPresented: $showSignIn) {
         //     SignInView()
         // }
-        // .sheet(isPresented: $showSignUp) {
-        //     SignUpView()
-        // }
+        .sheet(isPresented: $showSignUp) {
+             SignUpView()
+         }
     }
 
     private var logoSection: some View {
@@ -79,7 +79,7 @@ struct AuthView: View {
 
                 Button(String(localized: "auth.sign.up")) {
                     viewModel.activeOption = .signUp
-                    // TODO: PP-002 — showSignUp = true
+                    showSignUp = true
                 }
                 .frame(maxWidth: .infinity)
                 .padding(.vertical, Spacing.small)
@@ -101,12 +101,8 @@ struct AuthView: View {
     }
 }
 
-private struct MockAuthRepository: AuthRepository {
-    func signUp(email: String, password: String) async throws {}
-    func signUpWithGoogle() async throws {}
-}
 
 #Preview {
     AuthView()
-        .environment(AuthViewModel(repository: MockAuthRepository()))
+        .environment(AuthViewModel(repository: AuthService()))
 }

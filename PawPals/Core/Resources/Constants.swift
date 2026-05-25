@@ -6,6 +6,7 @@ enum Spacing {
     static let small: CGFloat = 8
     static let medium: CGFloat = 12
     static let large: CGFloat = 16
+    static let xLarge: CGFloat = 32
     static let sidebarTop: CGFloat = 150
 }
 
@@ -33,7 +34,6 @@ enum IconSize {
 }
 
 enum AuthLayout {
-    static let borderWidth: CGFloat = 1
     static let topSpacing: CGFloat = 60
     static let middleSpacing: CGFloat = 40
     static let bottomSpacing: CGFloat = 250
@@ -42,4 +42,7 @@ enum AuthLayout {
     static let shadowOpacity: CGFloat = 0.12
     static let shadowRadius: CGFloat = 10
     static let shadowY: CGFloat = 4
+    static let borderWidth: CGFloat = 1
+    static let borderOpacity: CGFloat = 0.2
+    static let sheetFraction: CGFloat = 0.65
 }

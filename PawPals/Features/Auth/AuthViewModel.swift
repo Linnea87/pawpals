@@ -5,6 +5,7 @@ final class AuthViewModel {
     var isLoading = false
     var errorMessage: String? = nil
     var currentUser: User? = nil
+    var isAuthenticated: Bool { currentUser != nil }
     var activeOption: AuthOption = .signIn
 
     private let repository: AuthRepository
