@@ -7,6 +7,11 @@ final class ProfileViewModel {
     var user: User
     var isLoading = false
     var errorMessage: String?
+    var preferences: UserPreferences = UserPreferences(
+        walkTypes: [],
+        dogSize: .medium,
+        searchRadius: 5.0
+    )
 
     init(userRepository: UserRepository, user: User) {
         self.userRepository = userRepository
@@ -32,6 +37,26 @@ final class ProfileViewModel {
         do {
             try await userRepository.saveDog(dog, userId: user.id)
             user.dogs.append(dog)
+        } catch {
+            errorMessage = error.localizedDescription
+        }
+        isLoading = false
+    }
+    func loadPreferences() async {
+        isLoading = true
+        errorMessage = nil
+        do {
+            preferences = try await userRepository.loadPreferences(userId: user.id)
+        } catch {
+            errorMessage = error.localizedDescription
+        }
+        isLoading = false
+    }
+    func savePreferences() async {
+        isLoading = true
+        errorMessage = nil
+        do {
+            try await userRepository.savePreferences(preferences, userId: user.id)
         } catch {
             errorMessage = error.localizedDescription
         }
