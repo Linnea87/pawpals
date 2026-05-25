@@ -55,4 +55,11 @@ final class ChatService: ChatRepository {
         // PP-020: Query Firestore for existing conversation — blocked by Firebase Auth (PP-002)
         fatalError("Not implemented yet")
     }
+    
+    
+    func markAsRead(conversationID: String, userID: String) async throws {
+        try await db.collection("conversations")
+            .document(conversationID)
+        .updateData(["unreadCount": 0])
+    }
 }

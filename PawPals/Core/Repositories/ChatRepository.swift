@@ -10,5 +10,7 @@ protocol ChatRepository {
         onUpdate: @escaping ([Message]) -> Void
     ) -> (() -> Void)
     func createOrFetchConversation(between userId1: String, and userId2: String) async throws -> Conversation
+    
+    func markAsRead(conversationID: String, userID: String) async throws
 }
 
