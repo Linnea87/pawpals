@@ -56,7 +56,8 @@ final class ChatViewModel {
             conversations[index].unreadCount = previous
             errorMessage = error.localizedDescription
         }
-    
+    }
+
     func startConversation(with user: User, currentUserId: String) async {
         isLoading = true
         errorMessage = nil
