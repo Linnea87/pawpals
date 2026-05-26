@@ -56,15 +56,13 @@ final class ChatViewModel {
             conversations[index].unreadCount = previous
             errorMessage = error.localizedDescription
         }
-    }
-
-    func startConversation(with user: User) async {
+    
+    func startConversation(with user: User, currentUserId: String) async {
         isLoading = true
         errorMessage = nil
         do {
-            // PP-020: Replace "currentUserId" with real userId from AuthViewModel when Firebase is ready
             let conversation = try await repository.createOrFetchConversation(
-                between: "currentUserId",
+                between: currentUserId,
                 and: user.id
             )
             activeConversation = conversation
@@ -73,6 +71,7 @@ final class ChatViewModel {
         }
         isLoading = false
     }
+
 
     func observeMessages(conversationID: String) {
         isLoading = true

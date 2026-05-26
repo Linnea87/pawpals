@@ -34,13 +34,9 @@ final class MeetViewModel {
             func loadNearbyUsers() async {
                 isLoading = true
                 errorMessage = nil
-                do {
-                    // TODO: riktigt anrop
-                    allNearbyUsers = [.mock]
-                    applyFilter()
-                } catch {
-                    errorMessage = error.localizedDescription
-                }
+                // TODO: real call
+                allNearbyUsers = [.mock]
+                applyFilter()
                 isLoading = false
             }
         }

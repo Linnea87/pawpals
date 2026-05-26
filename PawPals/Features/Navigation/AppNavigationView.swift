@@ -6,19 +6,19 @@ struct AppNavigationView: View {
     @State private var selectedTab: Tab = .meet
 
     var body: some View {
-        // TODO [PP-002]: Replace `true` with `authVM.currentUser != nil` when auth is wired
-        if true {
+
+        if authVM.isAuthenticated {
             switch selectedTab {
             case .profile:
                 ProfileView(user: .mock, isOwner: true, selectedTab: $selectedTab)
             case .chat:
-                ChatView(selectedTab: $selectedTab)
+                ChatView(selectedTab: $selectedTab, currentUserID: authVM.currentUserId)
             case .meet:
                 MeetView(selectedTab: $selectedTab)
             }
         } else {
             NavigationStack {
-                SignInView()
+                AuthView()
             }
         }
     }
