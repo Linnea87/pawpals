@@ -23,4 +23,5 @@ private struct MockChatService: ChatRepository {
     func createOrFetchConversation(between userId1: String, and userId2: String) async throws -> Conversation {
         Conversation(id: "mock", participantIDs: [userId1, userId2], lastMessage: "", lastMessageTimestamp: Date())
     }
+    func markAsRead(conversationID: String, userID: String) async throws {}
 }
