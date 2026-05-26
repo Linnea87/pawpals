@@ -49,7 +49,12 @@ struct ChatView: View {
                         ZStack {
                             NavigationLink(value: conversation) { EmptyView() }
                                 .opacity(0)
-                            ConversationRowView(conversation: conversation)
+                            ConversationRowView(
+                                conversation: conversation,
+                                timestampText: chatViewModel.formattedTimeStamp(
+                                    for: conversation
+                                )
+                            )
                         }
                         .listRowBackground(Color.clear)
                         .listRowSeparator(.hidden)
@@ -168,7 +173,7 @@ private func makePreviewChatViewModel() -> ChatViewModel {
             participantIDs: ["Johan", "Patrik"],
             lastMessage: "See you at the park!",
             lastMessageTimestamp: Date().addingTimeInterval(-7200),
-            
+
         ),
     ]
 
