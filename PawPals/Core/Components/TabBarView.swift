@@ -2,6 +2,7 @@ import SwiftUI
 
 struct TabBarView: View {
     @Binding var selectedTab: Tab
+    var chatUnreadCount: Int = 0
 
     var body: some View {
         HStack(spacing: 0) {
@@ -14,7 +15,8 @@ struct TabBarView: View {
             CustomTabItem(
                 label: String(localized: "chat.tab"),
                 icon: "bubble.left",
-                isSelected: selectedTab == .chat
+                isSelected: selectedTab == .chat,
+                badge: chatUnreadCount
             ) { selectedTab = .chat }
 
             CustomTabItem(
@@ -33,6 +35,7 @@ private struct CustomTabItem: View {
     let label: String
     let icon: String
     let isSelected: Bool
+    var badge: Int = 0
     let action: () -> Void
 
     var body: some View {
@@ -40,6 +43,17 @@ private struct CustomTabItem: View {
             VStack(spacing: 4) {
                 Image(systemName: isSelected ? "\(icon).fill" : icon)
                     .font(.system(size: 22))
+                    .overlay(alignment: .topTrailing) {
+                        if badge > 0 {
+                            Text("\(badge)")
+                                .font(.system(size: 8, weight: .bold))
+                                .foregroundStyle(.white)
+                                .padding(3)
+                                .background(Theme.terracotta)
+                                .clipShape(Circle())
+                                .offset(x: 8, y: -6)
+                        }
+                    }
                 Text(label.uppercased())
                     .font(.system(size: 9, weight: .semibold))
             }

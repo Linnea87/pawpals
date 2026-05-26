@@ -8,6 +8,9 @@ final class ChatViewModel {
     var isLoading: Bool = false
     var errorMessage: String?
     var activeConversation: Conversation?
+    var totalUnread: Int {
+        conversations.reduce(0) { $0 + $1.unreadCount }
+    }
 
     private let repository: ChatRepository
     private var stopObserving: (() -> Void)?
@@ -33,23 +36,43 @@ final class ChatViewModel {
         isLoading = false
 
     }
-    
-    func startConversation(with user: User) async {
-            isLoading = true
-            errorMessage = nil
-            do {
-                // PP-020: Replace "currentUserId" with real userId from AuthViewModel when Firebase is ready
-                let conversation = try await repository.createOrFetchConversation(
-                    between: "currentUserId",
-                    and: user.id
-                )
-                activeConversation = conversation
-            } catch {
-                errorMessage = error.localizedDescription
-            }
-            isLoading = false
-        }
 
+    func markAsRead(conversationID: String, userID: String) async {
+        guard
+            let index = conversations.firstIndex(where: {
+                $0.id == conversationID
+            })
+        else { return }
+
+        let previous = conversations[index].unreadCount
+        conversations[index].unreadCount = 0
+
+        do {
+            try await repository.markAsRead(
+                conversationID: conversationID,
+                userID: userID
+            )
+        } catch {
+            conversations[index].unreadCount = previous
+            errorMessage = error.localizedDescription
+        }
+    }
+
+    func startConversation(with user: User) async {
+        isLoading = true
+        errorMessage = nil
+        do {
+            // PP-020: Replace "currentUserId" with real userId from AuthViewModel when Firebase is ready
+            let conversation = try await repository.createOrFetchConversation(
+                between: "currentUserId",
+                and: user.id
+            )
+            activeConversation = conversation
+        } catch {
+            errorMessage = error.localizedDescription
+        }
+        isLoading = false
+    }
 
     func observeMessages(conversationID: String) {
         isLoading = true
@@ -63,7 +86,8 @@ final class ChatViewModel {
     }
 
     func sendMessage(in conversation: Conversation, senderID: String) async {
-        let receiverID = conversation.participantIDs.first { $0 != senderID } ?? ""
+        let receiverID =
+            conversation.participantIDs.first { $0 != senderID } ?? ""
         let trimmedMessage = messageText.trimmingCharacters(in: .whitespaces)
         guard !trimmedMessage.isEmpty else { return }
 
@@ -88,7 +112,8 @@ final class ChatViewModel {
         in conversation: Conversation,
         currentUserID: String
     ) -> String {
-        conversation.participantIDs.first { $0 != currentUserID } ?? "common.unknown"
+        conversation.participantIDs.first { $0 != currentUserID }
+            ?? "common.unknown"
     }
 
     func stopListening() {

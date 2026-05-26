@@ -64,6 +64,9 @@ struct ConversationView: View {
         .toolbar(.hidden, for: .tabBar)
         .onAppear {
             chatViewModel.observeMessages(conversationID: conversation.id)
+            Task {
+                await chatViewModel.markAsRead(conversationID: conversation.id, userID: currentUserID)
+            }
         }
         .onDisappear {
             chatViewModel.stopListening()

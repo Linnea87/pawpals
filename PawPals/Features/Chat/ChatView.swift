@@ -76,8 +76,8 @@ struct ChatView: View {
             }
 
         }
-        .safeAreaInset(edge: .bottom, spacing: 0) {
-            TabBarView(selectedTab: $selectedTab)
+        .safeAreaInset(edge: .bottom, spacing: Spacing.none) {
+            TabBarView(selectedTab: $selectedTab, chatUnreadCount: chatViewModel.totalUnread)
         }
         .navigationTitle(Text("chat.title"))
         .alert(
