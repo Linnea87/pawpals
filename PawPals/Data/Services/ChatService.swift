@@ -72,4 +72,10 @@ final class ChatService: ChatRepository {
 
         return { listener.remove() }
     }
+  
+    func markAsRead(conversationID: String, userID: String) async throws {
+        try await db.collection("conversations")
+            .document(conversationID)
+        .updateData(["unreadCount": 0])
+    }
 }

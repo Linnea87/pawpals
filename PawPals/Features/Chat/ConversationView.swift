@@ -64,6 +64,9 @@ struct ConversationView: View {
         .toolbar(.hidden, for: .tabBar)
         .onAppear {
             chatViewModel.observeMessages(conversationID: conversation.id)
+            Task {
+                await chatViewModel.markAsRead(conversationID: conversation.id, userID: currentUserID)
+            }
         }
         .onDisappear {
             chatViewModel.stopListening()
@@ -225,6 +228,8 @@ private struct MockThreadRepository: ChatRepository {
         ])
         return {}
     }
+    
+    func markAsRead(conversationID: String, userID: String) async throws {}
     
     func createOrFetchConversation(between userId1: String, and userId2: String) async throws -> Conversation {
         Conversation(
