@@ -109,11 +109,11 @@ final class ChatViewModel {
         let days =
             calendar.dateComponents([.day], from: date, to: .now).day ?? 0
         if days < 7 {
-            return "\(days)days ago"
+            return String(localized: "\(days) days ago")
         }
 
         let formatter = DateFormatter()
-        formatter.dateFormat = "MMM d"
+        formatter.setLocalizedDateFormatFromTemplate("MMMd")
         return formatter.string(from: date)
     }
 
