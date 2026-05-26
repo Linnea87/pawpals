@@ -44,4 +44,38 @@ final class AuthViewModel {
             errorMessage = error.localizedDescription
         }
     }
+    
+    func signIn(email: String, password: String) async {
+        isLoading = true
+        errorMessage = nil
+        defer { isLoading = false }
+        do {
+            currentUser = try await repository.signIn(email: email, password: password)
+        } catch let error as AuthError {
+            switch error {
+            case .notImplemented: errorMessage = String(localized: "auth.error.not.implemented")
+            case .invalidCredential: errorMessage = String(localized: "auth.error.invalid.credential")
+            case .unknown: errorMessage = String(localized: "auth.error.unknown")
+            }
+        } catch {
+            errorMessage = error.localizedDescription
+        }
+    }
+
+    func signInWithGoogle() async {
+        isLoading = true
+        errorMessage = nil
+        defer { isLoading = false }
+        do {
+            currentUser = try await repository.signInWithGoogle()
+        } catch let error as AuthError {
+            switch error {
+            case .notImplemented: errorMessage = String(localized: "auth.error.not.implemented")
+            case .invalidCredential: errorMessage = String(localized: "auth.error.invalid.credential")
+            case .unknown: errorMessage = String(localized: "auth.error.unknown")
+            }
+        } catch {
+            errorMessage = error.localizedDescription
+        }
+    }
 }

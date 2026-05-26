@@ -22,9 +22,9 @@ struct AuthView: View {
             .padding(.horizontal, Spacing.large)
         }
         // TODO: PP-002 — uncomment when SignInView and SignUpView are coded
-        // .sheet(isPresented: $showSignIn) {
-        //     SignInView()
-        // }
+        .sheet(isPresented: $showSignIn) {
+             SignInView()
+        }
         .sheet(isPresented: $showSignUp) {
              SignUpView()
          }
@@ -68,7 +68,7 @@ struct AuthView: View {
             HStack(spacing: Spacing.medium) {
                 Button(String(localized: "auth.sign.in")) {
                     viewModel.activeOption = .signIn
-                    // TODO: PP-002 — showSignIn = true
+                    showSignIn = true
                 }
                 .frame(maxWidth: .infinity)
                 .padding(.vertical, Spacing.small)
@@ -114,4 +114,15 @@ private struct MockAuthRepository: AuthRepository {
              distance: nil)
     }
     func signUpWithGoogle() async throws {}
+    
+    func signIn(email: String, password: String) async throws -> User {
+        User(id: "preview", name: "", photoURL: nil, bio: "", city: "",
+             dogs: [], preferences: UserPreferences(walkTypes: [], dogSize: .medium, searchRadius: 10),
+             distance: nil)
+    }
+    func signInWithGoogle() async throws -> User {
+        User(id: "preview", name: "", photoURL: nil, bio: "", city: "",
+             dogs: [], preferences: UserPreferences(walkTypes: [], dogSize: .medium, searchRadius: 10),
+             distance: nil)
+    }
 }
