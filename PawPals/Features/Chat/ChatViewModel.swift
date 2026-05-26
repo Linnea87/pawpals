@@ -37,6 +37,21 @@ final class ChatViewModel {
 
     }
 
+    func startConversation(with user: User, currentUserId: String) async {
+        isLoading = true
+        errorMessage = nil
+        do {
+            let conversation = try await repository.createOrFetchConversation(
+                between: currentUserId,
+                and: user.id
+            )
+            activeConversation = conversation
+        } catch {
+            errorMessage = error.localizedDescription
+        }
+        isLoading = false
+    }
+
     func markAsRead(conversationID: String, userID: String) async {
         guard
             let index = conversations.firstIndex(where: {
@@ -55,33 +70,6 @@ final class ChatViewModel {
         } catch {
             conversations[index].unreadCount = previous
             errorMessage = error.localizedDescription
-        }
-    }
-
-    func startConversation(with user: User, currentUserId: String) async {
-        isLoading = true
-        errorMessage = nil
-        do {
-            let conversation = try await repository.createOrFetchConversation(
-                between: currentUserId,
-                and: user.id
-            )
-            activeConversation = conversation
-        } catch {
-            errorMessage = error.localizedDescription
-        }
-        isLoading = false
-    }
-
-
-    func observeMessages(conversationID: String) {
-        isLoading = true
-        stopObserving = repository.observeMessages(
-            conversationID: conversationID
-        ) { [weak self] updatedMessages in
-            guard let self else { return }
-            self.messages = updatedMessages
-            self.isLoading = false
         }
     }
 
@@ -105,6 +93,38 @@ final class ChatViewModel {
             try await repository.sendMessage(message, to: conversation.id)
         } catch {
             errorMessage = error.localizedDescription
+        }
+    }
+
+    //========== HELPERS =============================================
+
+    func formattedTimeStamp(for conversation: Conversation) -> String {
+        let calendar = Calendar.current
+        let date = conversation.lastMessageTimestamp
+
+        if calendar.isDateInToday(date) {
+            return String(localized: "date.today")
+        }
+
+        let days =
+            calendar.dateComponents([.day], from: date, to: .now).day ?? 0
+        if days < 7 {
+            return "\(days)days ago"
+        }
+
+        let formatter = DateFormatter()
+        formatter.dateFormat = "MMM d"
+        return formatter.string(from: date)
+    }
+
+    func observeMessages(conversationID: String) {
+        isLoading = true
+        stopObserving = repository.observeMessages(
+            conversationID: conversationID
+        ) { [weak self] updatedMessages in
+            guard let self else { return }
+            self.messages = updatedMessages
+            self.isLoading = false
         }
     }
 
