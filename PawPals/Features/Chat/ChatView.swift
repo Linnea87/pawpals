@@ -40,7 +40,7 @@ struct ChatView: View {
                         .frame(maxWidth: .infinity, maxHeight: .infinity)
                 } else if filteredConversations.isEmpty {
                     ContentUnavailableView(
-                        String(localized: "chat.noConversations"),
+                        "chat.noConversations",
                         systemImage: "bubble.left.and.bubble.right"
                     )
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -89,10 +89,10 @@ struct ChatView: View {
         }
         .navigationTitle(Text("chat.title"))
         .alert(
-            String(localized: "common.error"),
+            "common.error",
             isPresented: .constant(chatViewModel.errorMessage != nil)
         ) {
-            Button(String(localized: "common.ok")) {}
+            Button("common.ok") {}
         } message: {
             Text(chatViewModel.errorMessage ?? "")
         }
