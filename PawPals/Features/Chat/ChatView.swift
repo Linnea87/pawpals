@@ -77,7 +77,10 @@ struct ChatView: View {
 
         }
         .safeAreaInset(edge: .bottom, spacing: Spacing.none) {
-            TabBarView(selectedTab: $selectedTab, chatUnreadCount: chatViewModel.totalUnread)
+            TabBarView(
+                selectedTab: $selectedTab,
+                chatUnreadCount: chatViewModel.totalUnread
+            )
         }
         .navigationTitle(Text("chat.title"))
         .alert(
@@ -89,7 +92,6 @@ struct ChatView: View {
             Text(chatViewModel.errorMessage ?? "")
         }
     }
-    
 
     private var filterTabs: some View {
         HStack(spacing: Spacing.small) {
@@ -128,8 +130,10 @@ private struct MockChatRepository: ChatRepository {
         conversationID: String,
         onUpdate: @escaping ([Message]) -> Void
     ) -> (() -> Void) { return {} }
-    
-    func createOrFetchConversation(between userId1: String, and userId2: String) async throws -> Conversation {
+
+    func createOrFetchConversation(between userId1: String, and userId2: String)
+        async throws -> Conversation
+    {
         Conversation(
             id: "mock-conv",
             participantIDs: [userId1, userId2],
@@ -137,7 +141,7 @@ private struct MockChatRepository: ChatRepository {
             lastMessageTimestamp: Date()
         )
     }
-    
+
     func markAsRead(conversationID: String, userID: String) async throws {}
 }
 
@@ -147,19 +151,24 @@ private func makePreviewChatViewModel() -> ChatViewModel {
             id: "1",
             participantIDs: ["Anna", "Patrik"],
             lastMessage: "Hey, want to go for a walk?",
-            lastMessageTimestamp: Date()
+            lastMessageTimestamp: Date(),
+            unreadCount: 3
+
         ),
         Conversation(
             id: "2",
             participantIDs: ["Sara", "Patrik"],
             lastMessage: "My dog loved meeting yours!",
-            lastMessageTimestamp: Date().addingTimeInterval(-3600)
+            lastMessageTimestamp: Date().addingTimeInterval(-3600),
+            unreadCount: 1
+
         ),
         Conversation(
             id: "3",
             participantIDs: ["Johan", "Patrik"],
             lastMessage: "See you at the park!",
-            lastMessageTimestamp: Date().addingTimeInterval(-7200)
+            lastMessageTimestamp: Date().addingTimeInterval(-7200),
+            
         ),
     ]
 
@@ -172,5 +181,3 @@ private func makePreviewChatViewModel() -> ChatViewModel {
     ChatView(selectedTab: .constant(.chat), currentUserID: "Patrik")
         .environment(makePreviewChatViewModel())
 }
-
-
