@@ -1,11 +1,19 @@
 import SwiftUI
+import FirebaseCore
 
 @main
 struct PawPalsApp: App {
-    @State private var authViewModel = AuthViewModel()
-    @State private var meetViewModel = MeetViewModel()
-    // TODO [PP-002]: Replace MockChatService with ChatService() when Firebase auth is wired
-    @State private var chatViewModel = ChatViewModel(repository: MockChatService())
+    @State private var authViewModel: AuthViewModel
+    @State private var meetViewModel: MeetViewModel
+    @State private var chatViewModel: ChatViewModel
+
+    init() {
+        FirebaseApp.configure()
+        _authViewModel = State(initialValue: AuthViewModel(repository: AuthService()))
+        _meetViewModel = State(initialValue: MeetViewModel())
+        _chatViewModel = State(initialValue: ChatViewModel(repository: ChatService()))
+    }
+
     var body: some Scene {
         WindowGroup {
             AppNavigationView()
@@ -13,14 +21,5 @@ struct PawPalsApp: App {
                 .environment(meetViewModel)
                 .environment(chatViewModel)
         }
-    }
-}
-// Temporary mock — remove when Firebase is wired in PP-002
-private struct MockChatService: ChatRepository {
-    func fetchConversations(for userId: String) async throws -> [Conversation] { [] }
-    func sendMessage(_ message: Message, to conversationID: String) async throws {}
-    func observeMessages(conversationID: String, onUpdate: @escaping ([Message]) -> Void) -> (() -> Void) { return {} }
-    func createOrFetchConversation(between userId1: String, and userId2: String) async throws -> Conversation {
-        Conversation(id: "mock", participantIDs: [userId1, userId2], lastMessage: "", lastMessageTimestamp: Date())
     }
 }

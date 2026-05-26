@@ -34,21 +34,20 @@ final class ChatViewModel {
 
     }
     
-    func startConversation(with user: User) async {
-            isLoading = true
-            errorMessage = nil
-            do {
-                // PP-020: Replace "currentUserId" with real userId from AuthViewModel when Firebase is ready
-                let conversation = try await repository.createOrFetchConversation(
-                    between: "currentUserId",
-                    and: user.id
-                )
-                activeConversation = conversation
-            } catch {
-                errorMessage = error.localizedDescription
-            }
-            isLoading = false
+    func startConversation(with user: User, currentUserId: String) async {
+        isLoading = true
+        errorMessage = nil
+        do {
+            let conversation = try await repository.createOrFetchConversation(
+                between: currentUserId,
+                and: user.id
+            )
+            activeConversation = conversation
+        } catch {
+            errorMessage = error.localizedDescription
         }
+        isLoading = false
+    }
 
 
     func observeMessages(conversationID: String) {
