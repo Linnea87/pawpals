@@ -44,4 +44,20 @@ final class AuthViewModel {
             errorMessage = error.localizedDescription
         }
     }
+    
+    func signOut() {
+        do {
+            try repository.signOut()
+            currentUser = nil
+            errorMessage = nil
+        } catch let error as AuthError {
+            switch error {
+            case .notImplemented: errorMessage = String(localized: "auth.error.not.implemented")
+            case .invalidCredential: errorMessage = String(localized: "auth.error.invalid.credential")
+            case .unknown: errorMessage = String(localized: "auth.error.unknown")
+            }
+        } catch {
+            errorMessage = error.localizedDescription
+        }
+    }
 }

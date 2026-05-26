@@ -102,6 +102,19 @@ struct ProfileView: View {
                             }
 
                         Divider()
+                        
+                        Spacer()
+                        
+                        Divider()
+                        
+                        Text("profile.logOut")
+                            .foregroundStyle(Theme.terracotta)
+                            .contentShape(Rectangle())
+                            .onTapGesture {
+                                showSidebar = false
+                                authViewModel.signOut()
+                            }
+
 
                         Spacer()
                     }
@@ -175,6 +188,7 @@ private struct MockAuthRepository: AuthRepository {
              distance: nil)
     }
     func signUpWithGoogle() async throws {}
+    func signOut() throws {}
 }
 
 private struct MockChatRepository: ChatRepository {

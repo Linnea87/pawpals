@@ -29,4 +29,12 @@ final class AuthService: AuthRepository {
     func signUpWithGoogle() async throws {
         throw AuthError.notImplemented
     }
+    
+    func signOut() throws {
+        do {
+            try Auth.auth().signOut()
+        } catch {
+            throw AuthError.unknown
+        }
+    }
 }
