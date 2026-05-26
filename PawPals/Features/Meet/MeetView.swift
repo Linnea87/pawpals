@@ -11,7 +11,7 @@ struct MeetView: View {
                 Theme.appBackground.ignoresSafeArea()
                 
                 VStack(alignment: .leading, spacing: Spacing.medium) {
-                    Text("Meet your new dog buddy")
+                    Text("Meet your new dog buddy!")
                         .font(.headline)
                         .fontWeight(.light)
                         .foregroundStyle(Theme.darkBrown)
@@ -21,12 +21,12 @@ struct MeetView: View {
                     
                     ScrollView(.horizontal, showsIndicators: false) {
                         HStack(spacing: Spacing.small) {
-                            FilterChip(title: "All", isSelected: vm.selectedFilter == nil) {
-                                vm.selectFilter(nil)
+                            FilterChip(title: "All", isSelected: vm.activeFilters.isEmpty) {
+                                vm.clearFilters()
                             }
                             ForEach(WalkType.allCases) { walkType in
-                                FilterChip(title: walkType.rawValue, isSelected: vm.selectedFilter == walkType) {
-                                    vm.selectFilter(walkType)
+                                FilterChip(title: walkType.rawValue, isSelected:vm.activeFilters.contains(walkType.rawValue)) {
+                                    vm.toggleFilter(walkType.rawValue)
                                 }
                             }
                         }
@@ -81,9 +81,17 @@ struct MeetView: View {
     }
 }
 
-#Preview {
+#Preview ("Default") {
     MeetView(selectedTab: .constant(.meet))
         .environment(MeetViewModel())
+}
+
+#Preview("Active filters") {
+    let vm = MeetViewModel()
+    vm.activeFilters = ["Evening walk", "City walk"]
+    vm.filteredUsers = [.mock]
+    return MeetView(selectedTab: .constant(.meet))
+        .environment(vm)
 }
 
 private struct FilterChip: View {
