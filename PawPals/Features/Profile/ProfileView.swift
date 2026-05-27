@@ -189,6 +189,17 @@ private struct MockAuthRepository: AuthRepository {
     }
     func signUpWithGoogle() async throws {}
     func signOut() throws {}
+    
+    func signIn(email: String, password: String) async throws -> User {
+        User(id: "preview", name: "", photoURL: nil, bio: "", city: "",
+             dogs: [], preferences: UserPreferences(walkTypes: [], dogSize: .medium, searchRadius: 10),
+             distance: nil)
+    }
+    func signInWithGoogle() async throws -> User {
+        User(id: "preview", name: "", photoURL: nil, bio: "", city: "",
+             dogs: [], preferences: UserPreferences(walkTypes: [], dogSize: .medium, searchRadius: 10),
+             distance: nil)
+    }
 }
 
 private struct MockChatRepository: ChatRepository {
@@ -199,4 +210,15 @@ private struct MockChatRepository: ChatRepository {
         Conversation(id: "mock", participantIDs: [userId1, userId2], lastMessage: "", lastMessageTimestamp: Date())
     }
     func markAsRead(conversationID: String, userID: String) async throws {}
+    
+    func signIn(email: String, password: String) async throws -> User {
+        User(id: "preview", name: "", photoURL: nil, bio: "", city: "",
+             dogs: [], preferences: UserPreferences(walkTypes: [], dogSize: .medium, searchRadius: 10),
+             distance: nil)
+    }
+    func signInWithGoogle() async throws -> User {
+        User(id: "preview", name: "", photoURL: nil, bio: "", city: "",
+             dogs: [], preferences: UserPreferences(walkTypes: [], dogSize: .medium, searchRadius: 10),
+             distance: nil)
+    }
 }

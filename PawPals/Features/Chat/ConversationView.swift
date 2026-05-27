@@ -28,6 +28,7 @@ struct ConversationView: View {
                                         isFromCurrentUser: message.senderID
                                             == currentUserID
                                     )
+
                                     .id(message.id)
                                 }
                             }
@@ -65,7 +66,10 @@ struct ConversationView: View {
         .onAppear {
             chatViewModel.observeMessages(conversationID: conversation.id)
             Task {
-                await chatViewModel.markAsRead(conversationID: conversation.id, userID: currentUserID)
+                await chatViewModel.markAsRead(
+                    conversationID: conversation.id,
+                    userID: currentUserID
+                )
             }
         }
         .onDisappear {
@@ -90,7 +94,9 @@ private struct DateSeparatorView: View {
     private var label: LocalizedStringKey {
         if Calendar.current.isDateInToday(date) { return "date.today" }
         if Calendar.current.isDateInYesterday(date) { return "date.yesterday" }
-        return LocalizedStringKey(date.formatted(date: .abbreviated, time: .omitted))
+        return LocalizedStringKey(
+            date.formatted(date: .abbreviated, time: .omitted)
+        )
     }
 
     var body: some View {
@@ -114,7 +120,9 @@ private struct MessageBubbleView: View {
                         .padding(.vertical, Spacing.small)
                         .background(Theme.offWhite)
                         .foregroundStyle(Theme.darkBrown)
-                        .clipShape(RoundedRectangle(cornerRadius: Radius.medium))
+                        .clipShape(
+                            RoundedRectangle(cornerRadius: Radius.medium)
+                        )
 
                     Text(message.timestamp, style: .time)
                         .font(.caption2)
@@ -129,13 +137,33 @@ private struct MessageBubbleView: View {
                         .padding(.vertical, Spacing.small)
                         .background(Theme.terracotta)
                         .foregroundStyle(.white)
-                        .clipShape(RoundedRectangle(cornerRadius: Radius.medium))
+                        .clipShape(
+                            RoundedRectangle(cornerRadius: Radius.medium)
+                        )
 
                     Text(message.timestamp, style: .time)
                         .font(.caption2)
                         .foregroundStyle(Theme.warmBrown)
+                    MessageStatusView(isRead: message.isRead)
+
                 }
             }
+        }
+    }
+}
+
+private struct MessageStatusView: View {
+    let isRead: Bool
+
+    var body: some View {
+        HStack(spacing: -4) {
+            Image(systemName: "checkmark")
+                .font(.system(size: 9, weight: .semibold))
+                .foregroundStyle(isRead ? Theme.terracotta : Theme.warmBrown)
+            Image(systemName: "checkmark")
+                .font(.system(size: 9, weight: .semibold))
+                .foregroundStyle(Theme.terracotta)
+                .opacity(isRead ? 1 : 0)  // ← always takes space, invisible until read
         }
     }
 }
@@ -202,7 +230,8 @@ private struct MockThreadRepository: ChatRepository {
                 senderID: "user1",
                 receiverID: "user2",
                 text: "Oh that sounds perfect! When are you free?",
-                timestamp: Date().addingTimeInterval(-240)
+                timestamp: Date().addingTimeInterval(-240),
+                isRead: true
             ),
             Message(
                 id: "3",
@@ -216,7 +245,8 @@ private struct MockThreadRepository: ChatRepository {
                 senderID: "user1",
                 receiverID: "user2",
                 text: "Yes! 10am works great for us 🐕",
-                timestamp: Date().addingTimeInterval(-120)
+                timestamp: Date().addingTimeInterval(-120),
+                isRead: true
             ),
             Message(
                 id: "5",
@@ -228,10 +258,12 @@ private struct MockThreadRepository: ChatRepository {
         ])
         return {}
     }
-    
+
     func markAsRead(conversationID: String, userID: String) async throws {}
-    
-    func createOrFetchConversation(between userId1: String, and userId2: String) async throws -> Conversation {
+
+    func createOrFetchConversation(between userId1: String, and userId2: String)
+        async throws -> Conversation
+    {
         Conversation(
             id: "mock-conv",
             participantIDs: [userId1, userId2],
