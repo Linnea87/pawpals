@@ -5,7 +5,6 @@ import UIKit
 
 
 final class AuthService: AuthRepository {
-
     func signUp(email: String, password: String) async throws -> User {
         do {
             let result = try await Auth.auth().createUser(withEmail: email, password: password)
@@ -33,10 +32,15 @@ final class AuthService: AuthRepository {
     func signUpWithGoogle() async throws {
         throw AuthError.notImplemented
     }
-    
+
     func signOut() throws {
         do {
             try Auth.auth().signOut()
+        } catch {
+            throw AuthError.unknown
+        }
+    }
+
     func signIn(email: String, password: String) async throws -> User {
         do {
             let result = try await Auth.auth().signIn(withEmail: email, password: password)
@@ -60,7 +64,7 @@ final class AuthService: AuthRepository {
             }
         }
     }
-    
+
     @MainActor
     func signInWithGoogle() async throws -> User {
         guard
