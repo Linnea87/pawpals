@@ -47,7 +47,8 @@ final class ChatService: ChatRepository {
             "senderID": message.senderID,
             "receiverID": message.receiverID,
             "text": message.text,
-            "timestamp": Timestamp(date: message.timestamp)
+            "timestamp": Timestamp(date: message.timestamp),
+            "isRead": false
         ]
         try await ref.setData(data)
     }
@@ -77,5 +78,18 @@ final class ChatService: ChatRepository {
         try await db.collection("conversations")
             .document(conversationID)
         .updateData(["unreadCount": 0])
+        
+        let snapshot = try await db.collection("conversations")
+            .document(conversationID)
+            .collection("messages")
+            .whereField("receiverID", isEqualTo: userID)
+            .whereField("isRead", isEqualTo: false)
+            .getDocuments()
+        
+        let batch = db.batch()
+        for doc in snapshot.documents {
+            batch.updateData(["isRead": true], forDocument: doc.reference)
+        }
+        try await batch.commit()
     }
 }

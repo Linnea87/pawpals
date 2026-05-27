@@ -5,8 +5,8 @@ struct Message: Identifiable, Codable{
     var senderID: String
     var receiverID: String
     var text: String
-    var timestamp: Date 
-  
+    var timestamp: Date
+    var isRead = false
 }
 
 

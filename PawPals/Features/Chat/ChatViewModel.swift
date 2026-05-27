@@ -135,7 +135,7 @@ final class ChatViewModel {
         conversation.participantIDs.first { $0 != currentUserID }
             ?? "common.unknown"
     }
-
+    
     func stopListening() {
         stopObserving?()
         stopObserving = nil
