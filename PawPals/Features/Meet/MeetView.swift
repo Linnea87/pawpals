@@ -34,6 +34,20 @@ struct MeetView: View {
                         .padding(.bottom, Spacing.large)
                     }
                     
+                    ScrollView(.horizontal, showsIndicators: false) {
+                        HStack(spacing: Spacing.small) {
+                            FilterChip(title: "All sizes", isSelected: vm.activeSizeFilters.isEmpty) {
+                                vm.clearSizeFilters()
+                            }
+                            ForEach(DogSize.allCases, id: \.self) { size in
+                                FilterChip(title: size.rawValue.capitalized, isSelected: vm.activeSizeFilters.contains(size.rawValue)) {
+                                    vm.toggleSizeFilter(size.rawValue)
+                                }
+                            }
+                        }
+                        .padding(.horizontal, Spacing.large)
+                        .padding(.bottom, Spacing.large)
+                    }
                     
                     if vm.isLoading {
                         Spacer()
@@ -87,13 +101,16 @@ struct MeetView: View {
 }
 
 #Preview("Active filters") {
-    let vm = MeetViewModel()
-    vm.activeFilters = ["Evening walk", "City walk"]
-    vm.filteredUsers = [.mock]
-    return MeetView(selectedTab: .constant(.meet))
+    let vm: MeetViewModel = {
+        let m = MeetViewModel()
+        m.activeFilters = ["Evening walk", "City walk"]
+        m.activeSizeFilters = ["medium"]
+        m.filteredUsers = [.mock]
+        return m
+    }()
+    MeetView(selectedTab: .constant(.meet))
         .environment(vm)
 }
-
 private struct FilterChip: View {
     let title: String
     let isSelected: Bool
