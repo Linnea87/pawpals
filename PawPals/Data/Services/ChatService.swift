@@ -9,9 +9,31 @@ final class ChatService: ChatRepository {
             .whereField("participantIDs", arrayContains: userId)
             .getDocuments()
 
-        return try snapshot.documents.compactMap { doc in
-            try doc.data(as: Conversation.self)
+        return snapshot.documents.compactMap { try? $0.data(as: Conversation.self) }
+    }
+
+    func createOrFetchConversation(between userId1: String, and userId2: String) async throws -> Conversation {
+        let snapshot = try await db.collection("conversations")
+            .whereField("participantIDs", arrayContains: userId1)
+            .getDocuments()
+
+        if let existing = snapshot.documents.first(where: { doc in
+            let ids = doc.data()["participantIDs"] as? [String] ?? []
+            return ids.contains(userId2)
+        }) {
+            return try existing.data(as: Conversation.self)
         }
+
+        let ref = db.collection("conversations").document()
+        let conversation = Conversation(
+            id: ref.documentID,
+            participantIDs: [userId1, userId2],
+            lastMessage: "",
+            lastMessageTimestamp: Date(),
+            unreadCount: 0
+        )
+        try ref.setData(from: conversation)
+        return conversation
     }
 
     func sendMessage(_ message: Message, to conversationID: String) async throws {
@@ -25,7 +47,8 @@ final class ChatService: ChatRepository {
             "senderID": message.senderID,
             "receiverID": message.receiverID,
             "text": message.text,
-            "timestamp": Timestamp(date: message.timestamp)
+            "timestamp": Timestamp(date: message.timestamp),
+            "isRead": false
         ]
         try await ref.setData(data)
     }
@@ -50,9 +73,23 @@ final class ChatService: ChatRepository {
 
         return { listener.remove() }
     }
-    
-    func createOrFetchConversation(between userId1: String, and userId2: String) async throws -> Conversation {
-        // PP-020: Query Firestore for existing conversation — blocked by Firebase Auth (PP-002)
-        fatalError("Not implemented yet")
+  
+    func markAsRead(conversationID: String, userID: String) async throws {
+        try await db.collection("conversations")
+            .document(conversationID)
+        .updateData(["unreadCount": 0])
+        
+        let snapshot = try await db.collection("conversations")
+            .document(conversationID)
+            .collection("messages")
+            .whereField("receiverID", isEqualTo: userID)
+            .whereField("isRead", isEqualTo: false)
+            .getDocuments()
+        
+        let batch = db.batch()
+        for doc in snapshot.documents {
+            batch.updateData(["isRead": true], forDocument: doc.reference)
+        }
+        try await batch.commit()
     }
 }

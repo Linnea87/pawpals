@@ -1,5 +1,11 @@
 import Foundation
 
 protocol AuthRepository {
-    // code comming soon
+    func signUp(email: String, password: String) async throws -> User
+    func signUpWithGoogle() async throws
+    func signOut() throws
+    func signIn(email: String, password: String) async throws -> User
+    func signInWithGoogle() async throws -> User
+    
+    
 }
