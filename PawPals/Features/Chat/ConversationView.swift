@@ -26,13 +26,9 @@ struct ConversationView: View {
                                     MessageBubbleView(
                                         message: message,
                                         isFromCurrentUser: message.senderID
-                                            == currentUserID,
-                                        showReadReceipt: message.isRead
-                                            && chatViewModel.isLastSentMessage(
-                                                message,
-                                                currentUserID: currentUserID
-                                            )
+                                            == currentUserID
                                     )
+
                                     .id(message.id)
                                 }
                             }
@@ -114,7 +110,6 @@ private struct DateSeparatorView: View {
 private struct MessageBubbleView: View {
     let message: Message
     let isFromCurrentUser: Bool
-    let showReadReceipt: Bool
 
     var body: some View {
         HStack {
@@ -149,14 +144,26 @@ private struct MessageBubbleView: View {
                     Text(message.timestamp, style: .time)
                         .font(.caption2)
                         .foregroundStyle(Theme.warmBrown)
+                    MessageStatusView(isRead: message.isRead)
 
-                    if showReadReceipt {
-                        Text("message.read")
-                            .font(.caption2)
-                            .foregroundStyle(Theme.warmBrown)
-                    }
                 }
             }
+        }
+    }
+}
+
+private struct MessageStatusView: View {
+    let isRead: Bool
+
+    var body: some View {
+        HStack(spacing: -4) {
+            Image(systemName: "checkmark")
+                .font(.system(size: 9, weight: .semibold))
+                .foregroundStyle(isRead ? Theme.terracotta : Theme.warmBrown)
+            Image(systemName: "checkmark")
+                .font(.system(size: 9, weight: .semibold))
+                .foregroundStyle(Theme.terracotta)
+                .opacity(isRead ? 1 : 0)  // ← always takes space, invisible until read
         }
     }
 }
@@ -223,7 +230,8 @@ private struct MockThreadRepository: ChatRepository {
                 senderID: "user1",
                 receiverID: "user2",
                 text: "Oh that sounds perfect! When are you free?",
-                timestamp: Date().addingTimeInterval(-240)
+                timestamp: Date().addingTimeInterval(-240),
+                isRead: true
             ),
             Message(
                 id: "3",

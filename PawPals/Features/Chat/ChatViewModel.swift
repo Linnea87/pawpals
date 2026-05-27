@@ -116,12 +116,6 @@ final class ChatViewModel {
             ?? "common.unknown"
     }
     
-    func isLastSentMessage(_ message: Message, currentUserID: String) -> Bool {
-        messages
-            .last { $0.senderID == currentUserID }
-            .map { $0.id == message.id } ?? false
-    }
-
     func stopListening() {
         stopObserving?()
         stopObserving = nil
