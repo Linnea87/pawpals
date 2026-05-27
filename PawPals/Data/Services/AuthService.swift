@@ -34,6 +34,9 @@ final class AuthService: AuthRepository {
         throw AuthError.notImplemented
     }
     
+    func signOut() throws {
+        do {
+            try Auth.auth().signOut()
     func signIn(email: String, password: String) async throws -> User {
         do {
             let result = try await Auth.auth().signIn(withEmail: email, password: password)

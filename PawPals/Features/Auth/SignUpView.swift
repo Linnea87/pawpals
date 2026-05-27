@@ -140,6 +140,7 @@ private struct MockAuthRepository: AuthRepository {
              distance: nil)
     }
     func signUpWithGoogle() async throws {}
+    func signOut() throws {}
     
     func signIn(email: String, password: String) async throws -> User {
         User(id: "preview", name: "", photoURL: nil, bio: "", city: "",

@@ -491,6 +491,17 @@
         }
       }
     },
+    "profile.logOut" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Log out"
+          }
+        }
+      }
+    },
     "profile.start.chat" : {
       "extractionState" : "manual",
       "localizations" : {

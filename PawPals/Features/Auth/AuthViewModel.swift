@@ -45,6 +45,11 @@ final class AuthViewModel {
         }
     }
     
+    func signOut() {
+        do {
+            try repository.signOut()
+            currentUser = nil
+            errorMessage = nil
     func signIn(email: String, password: String) async {
         isLoading = true
         errorMessage = nil
