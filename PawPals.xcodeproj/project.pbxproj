@@ -20,9 +20,22 @@
 		F88B0ED52FB489E600D59925 /* .gitignore */ = {isa = PBXFileReference; lastKnownFileType = text; path = .gitignore; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		F840DEAD2FC716C1005AB493 /* Exceptions for "PawPals" folder in "PawPals" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = F88B0EC62FB489DC00D59925 /* PawPals */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
+
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		F88B0EC92FB489DC00D59925 /* PawPals */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				F840DEAD2FC716C1005AB493 /* Exceptions for "PawPals" folder in "PawPals" target */,
+			);
 			path = PawPals;
 			sourceTree = "<group>";
 		};
@@ -286,6 +299,7 @@
 				DEVELOPMENT_TEAM = 5YP249L2TY;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = PawPals/Info.plist;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -318,6 +332,7 @@
 				DEVELOPMENT_TEAM = 5YP249L2TY;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = PawPals/Info.plist;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
