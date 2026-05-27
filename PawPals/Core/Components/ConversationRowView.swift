@@ -2,6 +2,7 @@ import SwiftUI
 
 struct ConversationRowView: View {
     let conversation: Conversation
+    let timestampText: String
 
     var body: some View {
         HStack(spacing: Spacing.medium) {
@@ -28,15 +29,21 @@ struct ConversationRowView: View {
             }
 
             Spacer()
-
-            if conversation.unreadCount > 0 {
-                Text("\(conversation.unreadCount)")
+            
+            VStack(alignment: .trailing, spacing: Spacing.xSmall) {
+                Text(timestampText)
                     .font(.caption)
-                    .fontWeight(.semibold)
-                    .foregroundStyle(.white)
-                    .padding(Spacing.small)
-                    .background(Theme.terracotta)
-                    .clipShape(Circle())
+                    .foregroundStyle(Theme.warmBrown)
+                
+                if conversation.unreadCount > 0 {
+                    Text("\(conversation.unreadCount)")
+                        .font(.caption)
+                        .fontWeight(.semibold)
+                        .foregroundStyle(.white)
+                        .padding(Spacing.small)
+                        .background(Theme.terracotta)
+                        .clipShape(Circle())
+                }
             }
         }
         .padding(Spacing.large)
@@ -53,6 +60,6 @@ struct ConversationRowView: View {
         lastMessageTimestamp: Date(),
         unreadCount: 2
     )
-    ConversationRowView(conversation: mockConversation)
-        .padding()
+    ConversationRowView(conversation: mockConversation, timestampText: "Today")
+           .padding()
 }

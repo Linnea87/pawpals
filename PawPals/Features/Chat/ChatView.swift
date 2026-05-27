@@ -40,7 +40,7 @@ struct ChatView: View {
                         .frame(maxWidth: .infinity, maxHeight: .infinity)
                 } else if filteredConversations.isEmpty {
                     ContentUnavailableView(
-                        String(localized: "chat.noConversations"),
+                        "chat.noConversations",
                         systemImage: "bubble.left.and.bubble.right"
                     )
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -49,7 +49,12 @@ struct ChatView: View {
                         ZStack {
                             NavigationLink(value: conversation) { EmptyView() }
                                 .opacity(0)
-                            ConversationRowView(conversation: conversation)
+                            ConversationRowView(
+                                conversation: conversation,
+                                timestampText: chatViewModel.formattedTimeStamp(
+                                    for: conversation
+                                )
+                            )
                         }
                         .listRowBackground(Color.clear)
                         .listRowSeparator(.hidden)
@@ -84,10 +89,10 @@ struct ChatView: View {
         }
         .navigationTitle(Text("chat.title"))
         .alert(
-            String(localized: "common.error"),
+            "common.error",
             isPresented: .constant(chatViewModel.errorMessage != nil)
         ) {
-            Button(String(localized: "common.ok")) {}
+            Button("common.ok") {}
         } message: {
             Text(chatViewModel.errorMessage ?? "")
         }
@@ -168,7 +173,7 @@ private func makePreviewChatViewModel() -> ChatViewModel {
             participantIDs: ["Johan", "Patrik"],
             lastMessage: "See you at the park!",
             lastMessageTimestamp: Date().addingTimeInterval(-7200),
-            
+
         ),
     ]
 
