@@ -39,4 +39,10 @@ final class UserService: UserRepository {
         // Firebase implementation comes here
         fatalError("Not implemented yet")
     }
+    
+    func savwPushNotificationToken(_ token: String, userID: String) async throws {
+            try await db.collection("users")
+                .document(userID)
+                .setData(["pushNotificationToken": token], merge: true)
+        }
 }
