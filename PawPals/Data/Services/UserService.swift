@@ -40,7 +40,7 @@ final class UserService: UserRepository {
         fatalError("Not implemented yet")
     }
     
-    func savwPushNotificationToken(_ token: String, userID: String) async throws {
+    func savePushNotificationToken(_ token: String, userID: String) async throws {
             try await db.collection("users")
                 .document(userID)
                 .setData(["pushNotificationToken": token], merge: true)
