@@ -1,5 +1,6 @@
 import SwiftUI
 import FirebaseCore
+import GoogleSignIn
 
 @main
 struct PawPalsApp: App {
@@ -9,6 +10,11 @@ struct PawPalsApp: App {
 
     init() {
         FirebaseApp.configure()
+
+        if let clientID = FirebaseApp.app()?.options.clientID {
+            GIDSignIn.sharedInstance.configuration = GIDConfiguration(clientID: clientID)
+        }
+
         _authViewModel = State(initialValue: AuthViewModel(repository: AuthService()))
         _meetViewModel = State(initialValue: MeetViewModel())
         _chatViewModel = State(initialValue: ChatViewModel(repository: ChatService()))
@@ -20,6 +26,9 @@ struct PawPalsApp: App {
                 .environment(authViewModel)
                 .environment(meetViewModel)
                 .environment(chatViewModel)
+                .onOpenURL { url in
+                    GIDSignIn.sharedInstance.handle(url)
+                }
         }
     }
 }

@@ -140,4 +140,15 @@ private struct MockAuthRepository: AuthRepository {
              distance: nil)
     }
     func signUpWithGoogle() async throws {}
+    
+    func signIn(email: String, password: String) async throws -> User {
+        User(id: "preview", name: "", photoURL: nil, bio: "", city: "",
+             dogs: [], preferences: UserPreferences(walkTypes: [], dogSize: .medium, searchRadius: 10),
+             distance: nil)
+    }
+    func signInWithGoogle() async throws -> User {
+        User(id: "preview", name: "", photoURL: nil, bio: "", city: "",
+             dogs: [], preferences: UserPreferences(walkTypes: [], dogSize: .medium, searchRadius: 10),
+             distance: nil)
+    }
 }
