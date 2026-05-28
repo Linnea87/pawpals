@@ -35,15 +35,21 @@ final class AuthViewModel {
     }
 
     func signUpWithGoogle() async {
-        isLoading = true
-        errorMessage = nil
-        defer { isLoading = false }
-        do {
-            try await repository.signUpWithGoogle()
-        } catch {
-            errorMessage = error.localizedDescription
+            isLoading = true
+            errorMessage = nil
+            defer { isLoading = false }
+            do {
+                currentUser = try await repository.signUpWithGoogle()
+            } catch let error as AuthError {
+                switch error {
+                case .notImplemented: errorMessage = String(localized: "auth.error.not.implemented")
+                case .invalidCredential: errorMessage = String(localized: "auth.error.invalid.credential")
+                case .unknown: errorMessage = String(localized: "auth.error.unknown")
+                }
+            } catch {
+                errorMessage = error.localizedDescription
+            }
         }
-    }
     
     func signOut() {
         do {

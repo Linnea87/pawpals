@@ -29,9 +29,38 @@ final class AuthService: AuthRepository {
         }
     }
 
-    func signUpWithGoogle() async throws {
-        throw AuthError.notImplemented
-    }
+    @MainActor
+        func signUpWithGoogle() async throws -> User {
+            guard
+                let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
+                let rootVC = windowScene.windows.first(where: { $0.isKeyWindow })?.rootViewController
+            else {
+                throw AuthError.unknown
+            }
+
+            do {
+                let result = try await GIDSignIn.sharedInstance.signIn(withPresenting: rootVC)
+                guard let idToken = result.user.idToken?.tokenString else {
+                    throw AuthError.invalidCredential
+                }
+                let credential = GoogleAuthProvider.credential(
+                    withIDToken: idToken,
+                    accessToken: result.user.accessToken.tokenString
+                )
+                let authResult = try await Auth.auth().signIn(with: credential)
+                return User(
+                    id: authResult.user.uid,
+                    name: authResult.user.displayName ?? "",
+                    photoURL: authResult.user.photoURL?.absoluteString,
+                    bio: "",
+                    city: "",
+                    dogs: [],
+                    preferences: UserPreferences(walkTypes: [], dogSize: .medium, searchRadius: 10)
+                )
+            } catch {
+                throw AuthError.unknown
+            }
+        }
 
     func signOut() throws {
         do {
