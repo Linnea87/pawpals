@@ -31,24 +31,27 @@ struct AppNavigationView: View {
                 }
             }
         }
+        // Fires when the user taps a push notification.
+        // Passes the conversationID to ChatViewModel and switches to the chat tab.
         .onChange(of: notificationService.pendingConversationID) { _, conversationID in
             guard let conversationID else { return }
             chatViewModel.pendingConversationID = conversationID
             selectedTab = .chat
             notificationService.pendingConversationID = nil
         }
+        // Fires once after the user signs in.
+        // Requests notification permission and saves the token to Firestore.
         .onChange(of: authVM.isAuthenticated) { _, isAuthenticated in
-              guard isAuthenticated else { return }
-              Task {
-                  await notificationService.requestPermission()
-                  if let token = notificationService.pushNotificationToken {
-                      await notificationService.savePushNotificationToken(
-                          token,
-                          for: authVM.currentUserId
-                      )
-                  }
-              }
-          }
-      }
-  }
-
+            guard isAuthenticated else { return }
+            Task {
+                await notificationService.requestPermission()
+                if let token = notificationService.pushNotificationToken {
+                    await notificationService.savePushNotificationToken(
+                        token,
+                        for: authVM.currentUserId
+                    )
+                }
+            }
+        }
+    }
+}

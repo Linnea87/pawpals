@@ -16,7 +16,7 @@ struct ChatView: View {
     @Binding var selectedTab: Tab
     @Environment(ChatViewModel.self) private var chatViewModel
     @State private var selectedFilter: ChatFilter = .all
-    @State private var navigationPath = NavigationPath()
+    @State private var navigationPath = NavigationPath() /// Controls which conversation is currently pushed onto the navigation stack.
     var currentUserID: String = ""
 
     private var filteredConversations: [Conversation] {
@@ -102,9 +102,11 @@ struct ChatView: View {
                 Text(chatViewModel.errorMessage ?? "")
             }
         }
+        // Handles the case where the notification tap arrives while the app is already open
         .onChange(of: chatViewModel.pendingConversationID) { _, _ in
             navigateToPendingConversationIfNeeded()
         }
+        // Handles the case where the notification tap arrived before conversations were loaded
         .onChange(of: chatViewModel.conversations) { _, _ in
             navigateToPendingConversationIfNeeded()
         }
@@ -136,6 +138,7 @@ struct ChatView: View {
         .padding(.vertical, Spacing.medium)
     }
 
+    // Navigates to the pending conversation if one is waiting AND conversations are loaded.
     private func navigateToPendingConversationIfNeeded() {
         guard let pendingID = chatViewModel.pendingConversationID,
             let conversation = chatViewModel.conversations.first(where: {

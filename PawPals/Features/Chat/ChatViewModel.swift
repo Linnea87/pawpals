@@ -8,7 +8,7 @@ final class ChatViewModel {
     var isLoading: Bool = false
     var errorMessage: String?
     var activeConversation: Conversation?
-    var pendingConversationID: String?
+    var pendingConversationID: String? /// Set when the user taps a push notification for a new message.
 
     var totalUnread: Int {
         conversations.reduce(0) { $0 + $1.unreadCount }

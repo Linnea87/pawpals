@@ -3,9 +3,15 @@ import Foundation
 import UIKit
 import UserNotifications
 
+/// Handles everything related to push notifications:
+/// - Requesting permission from the user
+/// - Receiving and storing the device push notification token
+/// - Reacting to notification taps and exposing the conversation to navigate to
+///
+/// Conforms to UNUserNotificationCenterDelegate (Apple) and MessagingDelegate (Firebase).
+/// NSObject is required because Apple's delegate protocols need an Objective-C compatible base.
 @Observable
-final class NotificationService: NSObject
-{
+final class NotificationService: NSObject {
 
     var pendingConversationID: String?
     var pushNotificationToken: String?
@@ -18,7 +24,7 @@ final class NotificationService: NSObject
         UNUserNotificationCenter.current().delegate = self
         Messaging.messaging().delegate = self
     }
-
+    /// Asks the user for permission to show notifications.
     func requestPermission() async {
         do {
             let granted = try await UNUserNotificationCenter.current()
@@ -33,7 +39,7 @@ final class NotificationService: NSObject
             )
         }
     }
-
+    /// Saves the push notification token to Firestore via the repository.
     func savePushNotificationToken(_ token: String, for userID: String) async {
         do {
             try await userRepository.savePushNotificationToken(
@@ -50,7 +56,8 @@ final class NotificationService: NSObject
 }
 
 extension NotificationService: UNUserNotificationCenterDelegate {
-
+    /// Called when a notification arrives while the app is open in the foreground.
+    /// We tell it to show the banner, play the sound, and update the badge anyway.
     func userNotificationCenter(
         _ center: UNUserNotificationCenter,
         willPresent notification: UNNotification,
@@ -59,7 +66,9 @@ extension NotificationService: UNUserNotificationCenterDelegate {
     ) {
         completionHandler([.banner, .sound, .badge])
     }
-
+    /// Called when the user taps a notification.
+    /// Extracts the conversationID from the notification payload and stores it.
+    /// AppNavigationView picks this up and navigates to the correct conversation.
     func userNotificationCenter(
         _ center: UNUserNotificationCenter,
         didReceive response: UNNotificationResponse,
@@ -73,10 +82,13 @@ extension NotificationService: UNUserNotificationCenterDelegate {
     }
 
 }
-
 extension NotificationService: MessagingDelegate {
-    
-    func messaging(_ messaging: Messaging, didReceiveRegistrationToken fcmToken: String?) {
+
+    /// Called by Firebase when the device receives a new push notification token.
+    func messaging(
+        _ messaging: Messaging,
+        didReceiveRegistrationToken fcmToken: String?
+    ) {
         pushNotificationToken = fcmToken
     }
 }
