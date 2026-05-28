@@ -21,6 +21,8 @@ extension User {
             dogSize: .large,
             searchRadius: 10.0
         ),
-        distance: 1.2
+        distance: 1.2,
+        latitude: 59.3293,
+        longitude: 18.0686
     )
 }

@@ -9,4 +9,6 @@ struct User: Identifiable, Codable {
     var dogs: [Dog]
     var preferences: UserPreferences
     var distance: Double?
+    var latitude: Double?
+    var longitude: Double?
 }
