@@ -1,4 +1,5 @@
 import Foundation
+import CoreLocation
 
 @Observable
 final class MeetViewModel {
@@ -6,16 +7,32 @@ final class MeetViewModel {
     var allNearbyUsers: [User] = []
     var filteredUsers: [User] = []
     var activeFilters: Set<String> = []
-    
     var activeSizeFilters: Set<String> = []
     var isLoading = false
     var errorMessage: String? = nil
+    var currentUserLocation: CLLocationCoordinate2D?
     
     
     func loadNearbyUsers() async {
         isLoading = true
+        currentUserLocation = CLLocationCoordinate2D(latitude: 59.3500, longitude: 18.0686)
         errorMessage = nil
         allNearbyUsers = [.mock] // Replace with real firebase later
+        if let currentLocation = currentUserLocation {
+            allNearbyUsers = allNearbyUsers.map { user in
+                var updated = user
+                if let lat = user.latitude, let lon = user.longitude {
+                    let userLocation = CLLocation(latitude: lat, longitude: lon)
+                    let current = CLLocation(
+                        latitude: currentLocation.latitude,
+                        longitude: currentLocation.longitude
+                    )
+                    let distanceKm = current.distance(from: userLocation) / 1000
+                    updated.distance = (distanceKm * 10).rounded() / 10
+                }
+                return updated
+            }
+        }
         applyFilters()
         isLoading = false
     }
