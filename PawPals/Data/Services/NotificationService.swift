@@ -1,12 +1,10 @@
-import Combine
 import FirebaseMessaging
 import Foundation
 import UIKit
 import UserNotifications
 
 @Observable
-final class NotificationService: NSObject, MessagingDelegate,
-    UNUserNotificationCenterDelegate
+final class NotificationService: NSObject
 {
 
     var pendingConversationID: String?
@@ -47,5 +45,38 @@ final class NotificationService: NSObject, MessagingDelegate,
                 "Failed to save push notification token: \(error.localizedDescription)"
             )
         }
+    }
+
+}
+
+extension NotificationService: UNUserNotificationCenterDelegate {
+
+    func userNotificationCenter(
+        _ center: UNUserNotificationCenter,
+        willPresent notification: UNNotification,
+        withCompletionHandler completionHandler:
+            @escaping (UNNotificationPresentationOptions) -> Void
+    ) {
+        completionHandler([.banner, .sound, .badge])
+    }
+
+    func userNotificationCenter(
+        _ center: UNUserNotificationCenter,
+        didReceive response: UNNotificationResponse,
+        withCompletionHandler completionHandler: @escaping () -> Void
+    ) {
+        let userInfo = response.notification.request.content.userInfo
+        if let conversationID = userInfo["conversationID"] as? String {
+            pendingConversationID = conversationID
+        }
+        completionHandler()
+    }
+
+}
+
+extension NotificationService: MessagingDelegate {
+    
+    func messaging(_ messaging: Messaging, didReceiveRegistrationToken fcmToken: String?) {
+        pushNotificationToken = fcmToken
     }
 }
