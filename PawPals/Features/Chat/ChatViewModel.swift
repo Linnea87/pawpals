@@ -8,6 +8,8 @@ final class ChatViewModel {
     var isLoading: Bool = false
     var errorMessage: String?
     var activeConversation: Conversation?
+    var pendingConversationID: String?
+
     var totalUnread: Int {
         conversations.reduce(0) { $0 + $1.unreadCount }
     }
@@ -28,7 +30,6 @@ final class ChatViewModel {
             conversations = result.sorted {
                 $0.lastMessageTimestamp > $1.lastMessageTimestamp
             }
-
         } catch {
             errorMessage = error.localizedDescription
         }
@@ -36,7 +37,8 @@ final class ChatViewModel {
         isLoading = false
 
     }
-
+    
+    
     func startConversation(with user: User, currentUserId: String) async {
         isLoading = true
         errorMessage = nil
@@ -135,9 +137,11 @@ final class ChatViewModel {
         conversation.participantIDs.first { $0 != currentUserID }
             ?? "common.unknown"
     }
-    
+
     func stopListening() {
         stopObserving?()
         stopObserving = nil
     }
+    
+
 }
