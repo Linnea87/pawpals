@@ -16,6 +16,7 @@ struct ChatView: View {
     @Binding var selectedTab: Tab
     @Environment(ChatViewModel.self) private var chatViewModel
     @State private var selectedFilter: ChatFilter = .all
+    @State private var navigationPath = NavigationPath() /// Controls which conversation is currently pushed onto the navigation stack.
     var currentUserID: String = ""
 
     private var filteredConversations: [Conversation] {
@@ -28,73 +29,86 @@ struct ChatView: View {
     }
 
     var body: some View {
-        ZStack {
-            Theme.appBackground
-                .ignoresSafeArea()
+        NavigationStack(path: $navigationPath) {
+            ZStack {
+                Theme.appBackground
+                    .ignoresSafeArea()
 
-            VStack(spacing: Spacing.none) {
-                filterTabs
+                VStack(spacing: Spacing.none) {
+                    filterTabs
 
-                if chatViewModel.isLoading {
-                    ProgressView()
+                    if chatViewModel.isLoading {
+                        ProgressView()
+                            .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    } else if filteredConversations.isEmpty {
+                        ContentUnavailableView(
+                            "chat.noConversations",
+                            systemImage: "bubble.left.and.bubble.right"
+                        )
                         .frame(maxWidth: .infinity, maxHeight: .infinity)
-                } else if filteredConversations.isEmpty {
-                    ContentUnavailableView(
-                        "chat.noConversations",
-                        systemImage: "bubble.left.and.bubble.right"
-                    )
-                    .frame(maxWidth: .infinity, maxHeight: .infinity)
-                } else {
-                    List(filteredConversations) { conversation in
-                        ZStack {
-                            NavigationLink(value: conversation) { EmptyView() }
+                    } else {
+                        List(filteredConversations) { conversation in
+                            ZStack {
+                                NavigationLink(value: conversation) {
+                                    EmptyView()
+                                }
                                 .opacity(0)
-                            ConversationRowView(
-                                conversation: conversation,
-                                timestampText: chatViewModel.formattedTimeStamp(
-                                    for: conversation
+                                ConversationRowView(
+                                    conversation: conversation,
+                                    timestampText:
+                                        chatViewModel.formattedTimeStamp(
+                                            for: conversation
+                                        )
+                                )
+                            }
+                            .listRowBackground(Color.clear)
+                            .listRowSeparator(.hidden)
+                            .listRowInsets(
+                                EdgeInsets(
+                                    top: Spacing.small,
+                                    leading: Spacing.medium,
+                                    bottom: Spacing.small,
+                                    trailing: Spacing.medium
                                 )
                             )
                         }
-                        .listRowBackground(Color.clear)
-                        .listRowSeparator(.hidden)
-                        .listRowInsets(
-                            EdgeInsets(
-                                top: Spacing.small,
-                                leading: Spacing.medium,
-                                bottom: Spacing.small,
-                                trailing: Spacing.medium
+                        .scrollContentBackground(.hidden)
+                        .navigationDestination(for: Conversation.self) {
+                            conversation in
+                            ConversationView(
+                                conversation: conversation,
+                                currentUserID: currentUserID
                             )
-                        )
-                    }
-                    .scrollContentBackground(.hidden)
-                    .navigationDestination(for: Conversation.self) {
-                        conversation in
-                        ConversationView(
-                            conversation: conversation,
-                            currentUserID: currentUserID
-                        )
+                        }
+
                     }
 
                 }
 
             }
-
+            .safeAreaInset(edge: .bottom, spacing: Spacing.none) {
+                TabBarView(
+                    selectedTab: $selectedTab,
+                    chatUnreadCount: chatViewModel.totalUnread
+                )
+            }
+            .navigationTitle(Text("chat.title"))
+            .alert(
+                "common.error",
+                isPresented: .constant(chatViewModel.errorMessage != nil)
+            ) {
+                Button("common.ok") {}
+            } message: {
+                Text(chatViewModel.errorMessage ?? "")
+            }
         }
-        .safeAreaInset(edge: .bottom, spacing: Spacing.none) {
-            TabBarView(
-                selectedTab: $selectedTab,
-                chatUnreadCount: chatViewModel.totalUnread
-            )
+        // Handles the case where the notification tap arrives while the app is already open
+        .onChange(of: chatViewModel.pendingConversationID) { _, _ in
+            navigateToPendingConversationIfNeeded()
         }
-        .navigationTitle(Text("chat.title"))
-        .alert(
-            "common.error",
-            isPresented: .constant(chatViewModel.errorMessage != nil)
-        ) {
-            Button("common.ok") {}
-        } message: {
-            Text(chatViewModel.errorMessage ?? "")
+        // Handles the case where the notification tap arrived before conversations were loaded
+        .onChange(of: chatViewModel.conversations) { _, _ in
+            navigateToPendingConversationIfNeeded()
         }
     }
 
@@ -123,6 +137,18 @@ struct ChatView: View {
         .padding(.horizontal, Spacing.medium)
         .padding(.vertical, Spacing.medium)
     }
+
+    // Navigates to the pending conversation if one is waiting AND conversations are loaded.
+    private func navigateToPendingConversationIfNeeded() {
+        guard let pendingID = chatViewModel.pendingConversationID,
+            let conversation = chatViewModel.conversations.first(where: {
+                $0.id == pendingID
+            })
+        else { return }
+        navigationPath.append(conversation)
+        chatViewModel.pendingConversationID = nil
+    }
+
 }
 
 private struct MockChatRepository: ChatRepository {

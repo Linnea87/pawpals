@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		27371E2F2FC75B7100A01EE6 /* FirebaseMessaging in Frameworks */ = {isa = PBXBuildFile; productRef = 27371E2E2FC75B7100A01EE6 /* FirebaseMessaging */; };
 		F88B0ED72FB489F400D59925 /* .gitignore in Resources */ = {isa = PBXBuildFile; fileRef = F88B0ED52FB489E600D59925 /* .gitignore */; };
 		F8AB423D2FC5B4A100E36B5A /* GoogleSignIn in Frameworks */ = {isa = PBXBuildFile; productRef = F8AB423C2FC5B4A100E36B5A /* GoogleSignIn */; };
 		F8AB423F2FC5B4A100E36B5A /* GoogleSignInSwift in Frameworks */ = {isa = PBXBuildFile; productRef = F8AB423E2FC5B4A100E36B5A /* GoogleSignInSwift */; };
@@ -46,6 +47,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				27371E2F2FC75B7100A01EE6 /* FirebaseMessaging in Frameworks */,
 				F8AB423F2FC5B4A100E36B5A /* GoogleSignInSwift in Frameworks */,
 				F8B4FA7B2FB70C7600AD9695 /* FirebaseAuth in Frameworks */,
 				F8AB423D2FC5B4A100E36B5A /* GoogleSignIn in Frameworks */,
@@ -57,12 +59,20 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		27371E2D2FC75B7100A01EE6 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
 		F88B0EBE2FB489DC00D59925 = {
 			isa = PBXGroup;
 			children = (
 				F88B0EC92FB489DC00D59925 /* PawPals */,
 				F88B0EC82FB489DC00D59925 /* Products */,
 				F88B0ED52FB489E600D59925 /* .gitignore */,
+				27371E2D2FC75B7100A01EE6 /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -99,6 +109,7 @@
 				F8B4FA7E2FB70C7600AD9695 /* FirebaseStorage */,
 				F8AB423C2FC5B4A100E36B5A /* GoogleSignIn */,
 				F8AB423E2FC5B4A100E36B5A /* GoogleSignInSwift */,
+				27371E2E2FC75B7100A01EE6 /* FirebaseMessaging */,
 			);
 			productName = PawPals;
 			productReference = F88B0EC72FB489DC00D59925 /* PawPals.app */;
@@ -294,6 +305,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = PawPals/PawPals.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 5YP249L2TY;
@@ -327,6 +339,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = PawPals/PawPals.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 5YP249L2TY;
@@ -398,6 +411,11 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		27371E2E2FC75B7100A01EE6 /* FirebaseMessaging */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = F8B4FA792FB70C7600AD9695 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseMessaging;
+		};
 		F8AB423C2FC5B4A100E36B5A /* GoogleSignIn */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = F8AB423B2FC5B4A100E36B5A /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS" */;
