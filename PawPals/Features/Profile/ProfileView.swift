@@ -88,6 +88,11 @@ struct ProfileView: View {
                 }
                 .listStyle(.insetGrouped)
                 .scrollContentBackground(.hidden)
+                .task {
+                    if isOwner {
+                        await profileViewModel.loadPreferences()
+                    }
+                }
                 .safeAreaInset(edge: .bottom, spacing: 0) {
                     if isOwner {
                         TabBarView(selectedTab: $selectedTab)

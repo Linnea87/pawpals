@@ -7,11 +7,6 @@ final class ProfileViewModel {
     var user: User
     var isLoading = false
     var errorMessage: String?
-    var preferences: UserPreferences = UserPreferences(
-        walkTypes: [],
-        dogSize: .medium,
-        searchRadius: 5.0
-    )
 
     init(userRepository: UserRepository, user: User) {
         self.userRepository = userRepository
@@ -62,11 +57,11 @@ final class ProfileViewModel {
         } else {
             user.dogs.append(dog)
         }
-        preferences.walkTypes = walkTypes
+        user.preferences.walkTypes = walkTypes
         do {
             try await userRepository.updateProfile(user)
             try await userRepository.saveDog(dog, userId: user.id)
-            try await userRepository.savePreferences(preferences, userId: user.id)
+            try await userRepository.savePreferences(user.preferences, userId: user.id)
         } catch {
             errorMessage = error.localizedDescription
         }
@@ -77,7 +72,7 @@ final class ProfileViewModel {
         isLoading = true
         errorMessage = nil
         do {
-            preferences = try await userRepository.loadPreferences(userId: user.id)
+            user.preferences = try await userRepository.loadPreferences(userId: user.id)
         } catch {
             errorMessage = error.localizedDescription
         }
@@ -88,7 +83,7 @@ final class ProfileViewModel {
         isLoading = true
         errorMessage = nil
         do {
-            try await userRepository.savePreferences(preferences, userId: user.id)
+            try await userRepository.savePreferences(user.preferences, userId: user.id)
         } catch {
             errorMessage = error.localizedDescription
         }
