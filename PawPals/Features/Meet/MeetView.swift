@@ -54,7 +54,7 @@ struct MeetView: View {
                         Spacer()
                         VStack(spacing: Spacing.small) {
                             ProgressView()
-                            Text("Finding you location")
+                            Text("Finding your location...")
                                 .font(.footnote)
                                 .foregroundStyle(Theme.warmBrown.opacity(0.6))
                         }
@@ -71,7 +71,7 @@ struct MeetView: View {
                             Text("Location access is off")
                                 .font(.headline)
                                 .foregroundStyle(Theme.warmBrown)
-                            Text("PawPals needs you location to find nerby dogs")
+                            Text("PawPals needs your location to find nearby dogs.")
                                 .font(.footnote)
                                 .foregroundStyle(Theme.darkBrown.opacity(0.6))
                                 .multilineTextAlignment(.center)
