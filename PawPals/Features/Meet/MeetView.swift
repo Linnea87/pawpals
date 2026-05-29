@@ -1,4 +1,5 @@
 import SwiftUI
+import CoreLocation
 
 struct MeetView: View {
     @Binding var selectedTab: Tab
@@ -49,7 +50,46 @@ struct MeetView: View {
                         .padding(.bottom, Spacing.large)
                     }
                     
-                    if vm.isLoading {
+                    if vm.isLocating {
+                        Spacer()
+                        VStack(spacing: Spacing.small) {
+                            ProgressView()
+                            Text("Finding you location")
+                                .font(.footnote)
+                                .foregroundStyle(Theme.warmBrown.opacity(0.6))
+                        }
+                        .frame(maxWidth: .infinity)
+                        Spacer()
+                            
+                    } else if
+                        vm.locationStatus == .denied || vm.locationStatus == .restricted {
+                        Spacer()
+                        VStack(spacing: Spacing.medium) {
+                            Image(systemName: "location.slash")
+                                .font(.largeTitle)
+                                .foregroundStyle(Theme.terracotta)
+                            Text("Location access is off")
+                                .font(.headline)
+                                .foregroundStyle(Theme.warmBrown)
+                            Text("PawPals needs you location to find nerby dogs")
+                                .font(.footnote)
+                                .foregroundStyle(Theme.darkBrown.opacity(0.6))
+                                .multilineTextAlignment(.center)
+                                .padding(.horizontal, Spacing.large)
+                            Button("Open Settings") {
+                                if let url = URL(string: UIApplication.openSettingsURLString) {
+                                    UIApplication.shared.open(url)
+                                }
+                            }
+                            .font(.footnote)
+                            .fontWeight(.semibold)
+                            .foregroundStyle(Theme.terracotta)
+                        }
+                        .frame(maxWidth: .infinity)
+                        Spacer()
+                        
+                        
+                    } else if vm.isLoading {
                         Spacer()
                         ProgressView()
                             .frame(maxWidth: .infinity)
@@ -87,7 +127,7 @@ struct MeetView: View {
             .safeAreaInset(edge: .bottom, spacing: 0) {
                 TabBarView(selectedTab: $selectedTab)
             }
-            .task { await vm.loadNearbyUsers() }
+            .task { await vm.loadWithLocation() }
             .sheet(item: $vm.selectedUser) { user in
                 NavigationStack { ProfileView(user: user, isOwner: false, selectedTab: $selectedTab) }
             }
@@ -95,14 +135,14 @@ struct MeetView: View {
     }
 }
 
-#Preview ("Default") {
+#Preview("Default") {
     MeetView(selectedTab: .constant(.meet))
-        .environment(MeetViewModel())
+        .environment(MeetViewModel(locationService: LocationService()))
 }
 
 #Preview("Active filters") {
     let vm: MeetViewModel = {
-        let m = MeetViewModel()
+        let m = MeetViewModel(locationService: LocationService())
         m.activeFilters = ["Evening walk", "City walk"]
         m.activeSizeFilters = ["medium"]
         m.filteredUsers = [.mock]
@@ -111,11 +151,12 @@ struct MeetView: View {
     MeetView(selectedTab: .constant(.meet))
         .environment(vm)
 }
+
 private struct FilterChip: View {
     let title: String
     let isSelected: Bool
     let action: () -> Void
-    
+
     var body: some View {
         Button(action: action) {
             Text(title)
