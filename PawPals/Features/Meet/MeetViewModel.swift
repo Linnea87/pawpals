@@ -53,10 +53,6 @@ final class MeetViewModel {
 
     func loadNearbyUsers() async {
         isLoading = true
-//        currentUserLocation = CLLocationCoordinate2D(
-//            latitude: 59.3500,
-//            longitude: 18.0686
-//        )
         errorMessage = nil
         allNearbyUsers = [.mock]  // Replace with real firebase later
         if let currentLocation = currentUserLocation {
