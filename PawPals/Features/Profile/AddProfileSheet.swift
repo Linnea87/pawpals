@@ -130,7 +130,7 @@ struct AddProfileSheet: View {
             dogName = user.dogs.first?.name ?? ""
             dogBreed = user.dogs.first?.breed ?? ""
             dogSize = user.dogs.first?.size
-            selectedWalkTypes = Set(profileViewModel.preferences.walkTypes)
+            selectedWalkTypes = Set(user.preferences.walkTypes)
         }
     }
 }
