@@ -12,11 +12,9 @@ struct AppNavigationView: View {
             if authVM.isAuthenticated {
                 switch selectedTab {
                 case .profile:
-                    ProfileView(
-                        user: .mock,
-                        isOwner: true,
-                        selectedTab: $selectedTab
-                    )
+                    if let user = authVM.currentUser {
+                        ProfileView(user: user, isOwner: true, selectedTab: $selectedTab)
+                    }
                 case .chat:
                     ChatView(
                         selectedTab: $selectedTab,

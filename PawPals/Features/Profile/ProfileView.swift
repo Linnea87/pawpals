@@ -10,9 +10,12 @@ struct ProfileView: View {
     @Environment(\.dismiss) private var dismiss
     @Environment(ChatViewModel.self) private var chatViewModel
     @Environment(AuthViewModel.self) private var authViewModel
+    @Environment(ProfileViewModel.self) private var profileViewModel
+    
     @State private var selectedPhoto: PhotosPickerItem?
     @State private var showSidebar = false
     @State private var showEditProfile = false
+
 
     var body: some View {
         @Bindable var chatVM = chatViewModel
@@ -102,11 +105,11 @@ struct ProfileView: View {
                             }
 
                         Divider()
-                        
+
                         Spacer()
-                        
+
                         Divider()
-                        
+
                         Text("profile.logOut")
                             .foregroundStyle(Theme.terracotta)
                             .contentShape(Rectangle())
@@ -114,7 +117,6 @@ struct ProfileView: View {
                                 showSidebar = false
                                 authViewModel.signOut()
                             }
-
 
                         Spacer()
                     }
@@ -147,12 +149,13 @@ struct ProfileView: View {
                 }
             }
             .navigationDestination(isPresented: $showEditProfile) {
-                AddProfileSheet()
+                AddProfileSheet(user: user)
             }
             .navigationDestination(item: $chatVM.activeConversation) { conversation in
                 ConversationView(conversation: conversation, currentUserID: authViewModel.currentUserId)
             }
         }
+        .environment(profileViewModel)
     }
 
     private var avatarCircle: some View {
@@ -171,6 +174,7 @@ struct ProfileView: View {
     ProfileView(user: .mock, isOwner: true, selectedTab: .constant(.profile))
         .environment(ChatViewModel(repository: MockChatRepository()))
         .environment(AuthViewModel(repository: MockAuthRepository()))
+        .environment(ProfileViewModel(userRepository: MockUserRepository(), user: .mock))
 }
 
 #Preview("Visitor") {
@@ -179,6 +183,7 @@ struct ProfileView: View {
     }
     .environment(ChatViewModel(repository: MockChatRepository()))
     .environment(AuthViewModel(repository: MockAuthRepository()))
+    .environment(ProfileViewModel(userRepository: MockUserRepository(), user: .mock))
 }
 
 private struct MockAuthRepository: AuthRepository {
@@ -188,12 +193,11 @@ private struct MockAuthRepository: AuthRepository {
              distance: nil)
     }
     func signUpWithGoogle() async throws -> User {
-            User(id: "preview", name: "", photoURL: nil, bio: "", city: "",
-                 dogs: [], preferences: UserPreferences(walkTypes: [], dogSize: .medium, searchRadius: 10),
-                 distance: nil)
+        User(id: "preview", name: "", photoURL: nil, bio: "", city: "",
+             dogs: [], preferences: UserPreferences(walkTypes: [], dogSize: .medium, searchRadius: 10),
+             distance: nil)
     }
     func signOut() throws {}
-    
     func signIn(email: String, password: String) async throws -> User {
         User(id: "preview", name: "", photoURL: nil, bio: "", city: "",
              dogs: [], preferences: UserPreferences(walkTypes: [], dogSize: .medium, searchRadius: 10),
@@ -214,7 +218,6 @@ private struct MockChatRepository: ChatRepository {
         Conversation(id: "mock", participantIDs: [userId1, userId2], lastMessage: "", lastMessageTimestamp: Date())
     }
     func markAsRead(conversationID: String, userID: String) async throws {}
-    
     func signIn(email: String, password: String) async throws -> User {
         User(id: "preview", name: "", photoURL: nil, bio: "", city: "",
              dogs: [], preferences: UserPreferences(walkTypes: [], dogSize: .medium, searchRadius: 10),
@@ -226,3 +229,5 @@ private struct MockChatRepository: ChatRepository {
              distance: nil)
     }
 }
+
+

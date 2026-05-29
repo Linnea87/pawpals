@@ -1,4 +1,5 @@
 import Foundation
+import FirebaseFirestore
 
 extension User {
     static let mock = User(
@@ -26,3 +27,17 @@ extension User {
         longitude: 18.0686
     )
 }
+
+#if DEBUG
+struct MockUserRepository: UserRepository {
+    func updateProfile(_ user: User) async throws {}
+    func saveDog(_ dog: Dog, userId: String) async throws {}
+    func fetchNearbyUsers(location: GeoPoint, radius: Double) async throws -> [User] { [] }
+    func updateLocation(_ location: GeoPoint, userId: String) async throws {}
+    func savePreferences(_ prefs: UserPreferences, userId: String) async throws {}
+    func loadPreferences(userId: String) async throws -> UserPreferences {
+        UserPreferences(walkTypes: [], dogSize: .medium, searchRadius: 5)
+    }
+    func savePushNotificationToken(_ token: String, userID: String) async throws {}
+}
+#endif
