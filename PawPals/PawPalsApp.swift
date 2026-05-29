@@ -8,6 +8,7 @@ struct PawPalsApp: App {
     @State private var meetViewModel: MeetViewModel
     @State private var chatViewModel: ChatViewModel
     @State private var notificationService: NotificationService
+    @State private var profileViewModel: ProfileViewModel
 
     init() {
         FirebaseApp.configure()
@@ -19,7 +20,8 @@ struct PawPalsApp: App {
         _authViewModel = State(initialValue: AuthViewModel(repository: AuthService()))
         _meetViewModel = State(initialValue: MeetViewModel())
         _chatViewModel = State(initialValue: ChatViewModel(repository: ChatService()))
-        _notificationService = State(initialValue: NotificationService(userRepository: UserService())) 
+        _notificationService = State(initialValue: NotificationService(userRepository: UserService()))
+        _profileViewModel = State(initialValue: ProfileViewModel(userRepository: UserService(), user: .mock))
     }
 
     var body: some Scene {
@@ -29,6 +31,12 @@ struct PawPalsApp: App {
                 .environment(meetViewModel)
                 .environment(chatViewModel)
                 .environment(notificationService)
+                .environment(profileViewModel)
+                .onChange(of: authViewModel.currentUser?.id) { _, _ in
+                    if let user = authViewModel.currentUser {
+                        profileViewModel.user = user
+                    }
+                }
                 .onOpenURL { url in
                     GIDSignIn.sharedInstance.handle(url)
                 }

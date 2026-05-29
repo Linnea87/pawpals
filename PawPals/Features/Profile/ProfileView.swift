@@ -10,9 +10,15 @@ struct ProfileView: View {
     @Environment(\.dismiss) private var dismiss
     @Environment(ChatViewModel.self) private var chatViewModel
     @Environment(AuthViewModel.self) private var authViewModel
+    @Environment(ProfileViewModel.self) private var profileViewModel
+
     @State private var selectedPhoto: PhotosPickerItem?
     @State private var showSidebar = false
     @State private var showEditProfile = false
+
+    private var displayUser: User {
+        isOwner ? profileViewModel.user : user
+    }
 
     var body: some View {
         @Bindable var chatVM = chatViewModel
@@ -33,7 +39,7 @@ struct ProfileView: View {
                         }
 
                         VStack(alignment: .leading, spacing: Spacing.xSmall) {
-                            Text(user.dogs.first != nil ? "\(user.name) / \(user.dogs.first!.name)" : user.name)
+                            Text(displayUser.dogs.first != nil ? "\(displayUser.name) / \(displayUser.dogs.first!.name)" : displayUser.name)
                                 .font(.title3)
                                 .fontWeight(.bold)
                                 .foregroundStyle(Theme.darkBrown)
@@ -41,7 +47,7 @@ struct ProfileView: View {
                             HStack(spacing: Spacing.xSmall) {
                                 Image(systemName: "pawprint")
                                     .font(.caption2)
-                                Text(user.city)
+                                Text(displayUser.city)
                                     .font(.subheadline)
                             }
                             .foregroundStyle(Theme.warmBrown)
@@ -52,7 +58,7 @@ struct ProfileView: View {
                     .padding(.vertical, Spacing.small)
 
                     Section {
-                        Text(user.bio)
+                        Text(displayUser.bio)
                             .font(.callout)
                             .foregroundStyle(Theme.darkBrown)
                             .listRowBackground(Theme.offWhite.opacity(0.6))
@@ -85,6 +91,11 @@ struct ProfileView: View {
                 }
                 .listStyle(.insetGrouped)
                 .scrollContentBackground(.hidden)
+                .task {
+                    if isOwner {
+                        await profileViewModel.loadPreferences()
+                    }
+                }
                 .safeAreaInset(edge: .bottom, spacing: 0) {
                     if isOwner {
                         TabBarView(selectedTab: $selectedTab)
@@ -102,11 +113,11 @@ struct ProfileView: View {
                             }
 
                         Divider()
-                        
+
                         Spacer()
-                        
+
                         Divider()
-                        
+
                         Text("profile.logOut")
                             .foregroundStyle(Theme.terracotta)
                             .contentShape(Rectangle())
@@ -114,7 +125,6 @@ struct ProfileView: View {
                                 showSidebar = false
                                 authViewModel.signOut()
                             }
-
 
                         Spacer()
                     }
@@ -147,12 +157,13 @@ struct ProfileView: View {
                 }
             }
             .navigationDestination(isPresented: $showEditProfile) {
-                AddProfileSheet()
+                AddProfileSheet(user: profileViewModel.user)
             }
             .navigationDestination(item: $chatVM.activeConversation) { conversation in
                 ConversationView(conversation: conversation, currentUserID: authViewModel.currentUserId)
             }
         }
+        .environment(profileViewModel)
     }
 
     private var avatarCircle: some View {
@@ -171,6 +182,7 @@ struct ProfileView: View {
     ProfileView(user: .mock, isOwner: true, selectedTab: .constant(.profile))
         .environment(ChatViewModel(repository: MockChatRepository()))
         .environment(AuthViewModel(repository: MockAuthRepository()))
+        .environment(ProfileViewModel(userRepository: MockUserRepository(), user: .mock))
 }
 
 #Preview("Visitor") {
@@ -179,6 +191,7 @@ struct ProfileView: View {
     }
     .environment(ChatViewModel(repository: MockChatRepository()))
     .environment(AuthViewModel(repository: MockAuthRepository()))
+    .environment(ProfileViewModel(userRepository: MockUserRepository(), user: .mock))
 }
 
 private struct MockAuthRepository: AuthRepository {
@@ -188,12 +201,11 @@ private struct MockAuthRepository: AuthRepository {
              distance: nil)
     }
     func signUpWithGoogle() async throws -> User {
-            User(id: "preview", name: "", photoURL: nil, bio: "", city: "",
-                 dogs: [], preferences: UserPreferences(walkTypes: [], dogSize: .medium, searchRadius: 10),
-                 distance: nil)
+        User(id: "preview", name: "", photoURL: nil, bio: "", city: "",
+             dogs: [], preferences: UserPreferences(walkTypes: [], dogSize: .medium, searchRadius: 10),
+             distance: nil)
     }
     func signOut() throws {}
-    
     func signIn(email: String, password: String) async throws -> User {
         User(id: "preview", name: "", photoURL: nil, bio: "", city: "",
              dogs: [], preferences: UserPreferences(walkTypes: [], dogSize: .medium, searchRadius: 10),
@@ -214,7 +226,6 @@ private struct MockChatRepository: ChatRepository {
         Conversation(id: "mock", participantIDs: [userId1, userId2], lastMessage: "", lastMessageTimestamp: Date())
     }
     func markAsRead(conversationID: String, userID: String) async throws {}
-    
     func signIn(email: String, password: String) async throws -> User {
         User(id: "preview", name: "", photoURL: nil, bio: "", city: "",
              dogs: [], preferences: UserPreferences(walkTypes: [], dogSize: .medium, searchRadius: 10),
