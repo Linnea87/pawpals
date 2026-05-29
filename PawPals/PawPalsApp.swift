@@ -32,6 +32,11 @@ struct PawPalsApp: App {
                 .environment(chatViewModel)
                 .environment(notificationService)
                 .environment(profileViewModel)
+                .onChange(of: authViewModel.currentUser?.id) { _, _ in
+                    if let user = authViewModel.currentUser {
+                        profileViewModel.user = user
+                    }
+                }
                 .onOpenURL { url in
                     GIDSignIn.sharedInstance.handle(url)
                 }

@@ -11,11 +11,14 @@ struct ProfileView: View {
     @Environment(ChatViewModel.self) private var chatViewModel
     @Environment(AuthViewModel.self) private var authViewModel
     @Environment(ProfileViewModel.self) private var profileViewModel
-    
+
     @State private var selectedPhoto: PhotosPickerItem?
     @State private var showSidebar = false
     @State private var showEditProfile = false
 
+    private var displayUser: User {
+        isOwner ? profileViewModel.user : user
+    }
 
     var body: some View {
         @Bindable var chatVM = chatViewModel
@@ -36,7 +39,7 @@ struct ProfileView: View {
                         }
 
                         VStack(alignment: .leading, spacing: Spacing.xSmall) {
-                            Text(user.dogs.first != nil ? "\(user.name) / \(user.dogs.first!.name)" : user.name)
+                            Text(displayUser.dogs.first != nil ? "\(displayUser.name) / \(displayUser.dogs.first!.name)" : displayUser.name)
                                 .font(.title3)
                                 .fontWeight(.bold)
                                 .foregroundStyle(Theme.darkBrown)
@@ -44,7 +47,7 @@ struct ProfileView: View {
                             HStack(spacing: Spacing.xSmall) {
                                 Image(systemName: "pawprint")
                                     .font(.caption2)
-                                Text(user.city)
+                                Text(displayUser.city)
                                     .font(.subheadline)
                             }
                             .foregroundStyle(Theme.warmBrown)
@@ -55,7 +58,7 @@ struct ProfileView: View {
                     .padding(.vertical, Spacing.small)
 
                     Section {
-                        Text(user.bio)
+                        Text(displayUser.bio)
                             .font(.callout)
                             .foregroundStyle(Theme.darkBrown)
                             .listRowBackground(Theme.offWhite.opacity(0.6))
@@ -154,7 +157,7 @@ struct ProfileView: View {
                 }
             }
             .navigationDestination(isPresented: $showEditProfile) {
-                AddProfileSheet(user: user)
+                AddProfileSheet(user: profileViewModel.user)
             }
             .navigationDestination(item: $chatVM.activeConversation) { conversation in
                 ConversationView(conversation: conversation, currentUserID: authViewModel.currentUserId)
@@ -234,5 +237,3 @@ private struct MockChatRepository: ChatRepository {
              distance: nil)
     }
 }
-
-
