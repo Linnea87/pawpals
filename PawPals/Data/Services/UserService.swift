@@ -28,9 +28,11 @@ final class UserService: UserRepository {
     }
     
     func updateLocation(_ location: GeoPoint, userId: String) async throws {
-        // Firebase implementation comes here
-
+        try await db.collection("users")
+            .document(userId)
+            .setData(["location": location], merge: true)
     }
+    
     func savePreferences(_ prefs: UserPreferences, userId: String) async throws {
         // Firebase implementation comes here
     }
