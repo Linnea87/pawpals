@@ -25,6 +25,22 @@ final class ProfileViewModel {
         }
         isLoading = false
     }
+    
+    func saveProfileInfo(name: String, bio: String, city: String, walkTypes: [WalkType]) async {
+        isLoading = true
+        errorMessage = nil
+        user.name = name
+        user.bio = bio
+        user.city = city
+        user.preferences.walkTypes = walkTypes
+        do {
+            try await userRepository.updateProfile(user)
+            try await userRepository.savePreferences(user.preferences, userId: user.id)
+        } catch {
+            errorMessage = error.localizedDescription
+        }
+        isLoading = false
+    }
 
     func saveDog(_ dog: Dog) async {
         isLoading = true
@@ -32,6 +48,18 @@ final class ProfileViewModel {
         do {
             try await userRepository.saveDog(dog, userId: user.id)
             user.dogs.append(dog)
+        } catch {
+            errorMessage = error.localizedDescription
+        }
+        isLoading = false
+    }
+    
+    func removeDog(_ dogId: String) async {
+        isLoading = true
+        errorMessage = nil
+        do {
+            try await userRepository.removeDog(dogId: dogId, userId: user.id)
+            user.dogs.removeAll { $0.id == dogId }
         } catch {
             errorMessage = error.localizedDescription
         }

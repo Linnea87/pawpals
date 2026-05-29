@@ -338,6 +338,17 @@
         }
       }
     },
+    "dog.add" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Add dog"
+          }
+        }
+      }
+    },
     "dog.breed" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -487,6 +498,17 @@
         }
       }
     },
+    "profile.dog" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "My dog"
+          }
+        }
+      }
+    },
     "profile.dog_info" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -494,6 +516,17 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Dog info"
+          }
+        }
+      }
+    },
+    "profile.dogs" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "My dogs"
           }
         }
       }
@@ -574,6 +607,9 @@
           }
         }
       }
+    },
+    "Ta bort" : {
+
     },
     "tab.chat" : {
       "extractionState" : "stale",

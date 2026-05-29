@@ -23,6 +23,14 @@ final class UserService: UserRepository {
             .document(dog.id)
             .setData(from: dog)
     }
+    
+    func removeDog(dogId: String, userId: String) async throws {
+        try await db.collection("users")
+            .document(userId)
+            .collection("dogs")
+            .document(dogId)
+            .delete()
+    }
 
     func fetchNearbyUsers(location: GeoPoint, radius: Double) async throws -> [User] {
         let snapshot = try await db.collection("users").getDocuments()
