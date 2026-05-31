@@ -100,4 +100,22 @@ final class AuthViewModel {
             errorMessage = error.localizedDescription
         }
     }
+    
+    func deleteAccount() async {
+        isLoading = true
+        errorMessage = nil
+        defer { isLoading = false }
+        do {
+            try await repository.deleteAccount()
+            currentUser = nil
+        } catch let error as AuthError {
+            switch error {
+            case .notImplemented: errorMessage = String(localized: "auth.error.not.implemented")
+            case .invalidCredential: errorMessage = String(localized: "auth.error.invalid.credential")
+            case .unknown: errorMessage = String(localized: "auth.error.unknown")
+            }
+        } catch {
+            errorMessage = error.localizedDescription
+        }
+    }
 }

@@ -156,4 +156,5 @@ private struct MockAuthRepository: AuthRepository {
              dogs: [], preferences: UserPreferences(walkTypes: [], dogSize: .medium, searchRadius: 10),
              distance: nil)
     }
+    func deleteAccount() async throws {}
 }

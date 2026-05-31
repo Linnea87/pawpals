@@ -150,4 +150,5 @@ private struct MockAuthRepository: AuthRepository {
                  distance: nil)
     }
     func signOut() throws {}
+    func deleteAccount() async throws {}
 }

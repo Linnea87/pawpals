@@ -126,4 +126,13 @@ final class AuthService: AuthRepository {
             throw AuthError.unknown
         }
     }
+    
+    func deleteAccount() async throws {
+        guard let user = Auth.auth().currentUser else { throw AuthError.unknown }
+        do {
+            try await user.delete()
+        } catch {
+            throw AuthError.unknown
+        }
+    }
 }

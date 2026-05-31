@@ -6,6 +6,7 @@ struct AddProfileSheet: View {
 
     @Environment(ProfileViewModel.self) private var profileViewModel
     @Environment(\.dismiss) private var dismiss
+    @Environment(AuthViewModel.self) private var authViewModel
 
     @State private var name = ""
     @State private var bio = ""
@@ -14,6 +15,7 @@ struct AddProfileSheet: View {
     @State private var dogBreed = ""
     @State private var dogSize: DogSize? = nil
     @State private var selectedWalkTypes: Set<WalkType> = []
+    @State private var showDeleteConfirm = false
 
     init(user: User? = nil) {
         self.user = user
@@ -116,6 +118,8 @@ struct AddProfileSheet: View {
                 }
                 .listRowBackground(Color.clear)
                 .listRowSeparator(.hidden)
+                .padding(.vertical, Spacing.medium)
+
             }
             .listStyle(.insetGrouped)
             .scrollContentBackground(.hidden)
@@ -137,10 +141,21 @@ struct AddProfileSheet: View {
 #Preview("Add") {
     NavigationStack { AddProfileSheet() }
         .environment(ProfileViewModel(userRepository: MockUserRepository(), user: .mock))
+        .environment(AuthViewModel(repository: MockAuthRepository()))
 }
 
 #Preview("Edit") {
     NavigationStack { AddProfileSheet(user: .mock) }
         .environment(ProfileViewModel(userRepository: MockUserRepository(), user: .mock))
+        .environment(AuthViewModel(repository: MockAuthRepository()))
+}
+
+private struct MockAuthRepository: AuthRepository {
+    func signUp(email: String, password: String) async throws -> User { .mock }
+    func signUpWithGoogle() async throws -> User { .mock }
+    func signIn(email: String, password: String) async throws -> User { .mock }
+    func signInWithGoogle() async throws -> User { .mock }
+    func signOut() throws {}
+    func deleteAccount() async throws {}
 }
 
