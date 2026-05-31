@@ -141,13 +141,13 @@ struct AddProfileSheet: View {
 #Preview("Add") {
     NavigationStack { AddProfileSheet() }
         .environment(ProfileViewModel(userRepository: MockUserRepository(), user: .mock))
-        .environment(AuthViewModel(repository: MockAuthRepository()))
+        .environment(AuthViewModel(repository: MockAuthRepository(), userRepository: MockUserRepository()))
 }
 
 #Preview("Edit") {
     NavigationStack { AddProfileSheet(user: .mock) }
         .environment(ProfileViewModel(userRepository: MockUserRepository(), user: .mock))
-        .environment(AuthViewModel(repository: MockAuthRepository()))
+        .environment(AuthViewModel(repository: MockAuthRepository(), userRepository: MockUserRepository()))
 }
 
 private struct MockAuthRepository: AuthRepository {

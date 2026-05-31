@@ -225,7 +225,7 @@ struct ProfileView: View {
 #Preview("Owner") {
     ProfileView(user: .mock, isOwner: true, selectedTab: .constant(.profile))
         .environment(ChatViewModel(repository: MockChatRepository()))
-        .environment(AuthViewModel(repository: MockAuthRepository()))
+        .environment(AuthViewModel(repository: MockAuthRepository(), userRepository: MockUserRepository()))
         .environment(
             ProfileViewModel(userRepository: MockUserRepository(), user: .mock)
         )
@@ -240,7 +240,7 @@ struct ProfileView: View {
         )
     }
     .environment(ChatViewModel(repository: MockChatRepository()))
-    .environment(AuthViewModel(repository: MockAuthRepository()))
+    .environment(AuthViewModel(repository: MockAuthRepository(), userRepository: MockUserRepository()))
     .environment(
         ProfileViewModel(userRepository: MockUserRepository(), user: .mock)
     )
@@ -370,5 +370,5 @@ private struct MockChatRepository: ChatRepository {
         )
     }
 
-    func deleteAccount() async throws {}
+    func deleteUserData(userId: String) async throws {}
 }

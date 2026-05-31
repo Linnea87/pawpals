@@ -130,7 +130,7 @@ struct SignUpView: View {
 
 #Preview {
     SignUpView()
-        .environment(AuthViewModel(repository: MockAuthRepository()))
+        .environment(AuthViewModel(repository: MockAuthRepository(), userRepository: MockUserRepository()))
 }
 
 private struct MockAuthRepository: AuthRepository {

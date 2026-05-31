@@ -39,6 +39,6 @@ struct MockUserRepository: UserRepository {
         UserPreferences(walkTypes: [], dogSize: .medium, searchRadius: 10.0)
     }
     func savePushNotificationToken(_ token: String, userID: String) async throws {}
-    func deleteAccount() async throws {}
+    func deleteUserData(userId: String) async throws {}
 }
 #endif

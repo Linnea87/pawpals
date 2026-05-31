@@ -104,7 +104,7 @@ struct AuthView: View {
 
 #Preview {
     AuthView()
-        .environment(AuthViewModel(repository: MockAuthRepository()))
+        .environment(AuthViewModel(repository: MockAuthRepository(), userRepository: MockUserRepository()))
 }
 
 private struct MockAuthRepository: AuthRepository {
