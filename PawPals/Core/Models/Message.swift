@@ -7,6 +7,7 @@ struct Message: Identifiable, Codable{
     var text: String
     var timestamp: Date
     var isRead = false
+    var isDelivered = false
 }
 
 

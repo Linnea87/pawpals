@@ -64,7 +64,10 @@ struct ConversationView: View {
         .navigationBarTitleDisplayMode(.inline)
         .toolbar(.hidden, for: .tabBar)
         .onAppear {
-            chatViewModel.observeMessages(conversationID: conversation.id)
+            chatViewModel.observeMessages(
+                conversationID: conversation.id,
+                currentUserID: currentUserID
+            )
             Task {
                 await chatViewModel.markAsRead(
                     conversationID: conversation.id,
@@ -140,11 +143,15 @@ private struct MessageBubbleView: View {
                         .clipShape(
                             RoundedRectangle(cornerRadius: Radius.medium)
                         )
-
-                    Text(message.timestamp, style: .time)
-                        .font(.caption2)
-                        .foregroundStyle(Theme.warmBrown)
-                    MessageStatusView(isRead: message.isRead)
+                    HStack (spacing: Spacing.xSmall) {
+                        Text(message.timestamp, style: .time)
+                            .font(.caption2)
+                            .foregroundStyle(Theme.warmBrown)
+                        MessageStatusView(
+                            isDelivered: message.isDelivered,
+                            isRead: message.isRead
+                        )
+                    }
 
                 }
             }
@@ -153,6 +160,7 @@ private struct MessageBubbleView: View {
 }
 
 private struct MessageStatusView: View {
+    let isDelivered: Bool
     let isRead: Bool
 
     var body: some View {
@@ -162,8 +170,8 @@ private struct MessageStatusView: View {
                 .foregroundStyle(isRead ? Theme.terracotta : Theme.warmBrown)
             Image(systemName: "checkmark")
                 .font(.system(size: 9, weight: .semibold))
-                .foregroundStyle(Theme.terracotta)
-                .opacity(isRead ? 1 : 0)  // ← always takes space, invisible until read
+                .foregroundStyle(isRead ? Theme.terracotta : Theme.warmBrown)
+                .opacity(isDelivered || isRead ? 1 : 0)
         }
     }
 }
@@ -231,7 +239,7 @@ private struct MockThreadRepository: ChatRepository {
                 receiverID: "user2",
                 text: "Oh that sounds perfect! When are you free?",
                 timestamp: Date().addingTimeInterval(-240),
-                isRead: true
+                isRead: true, isDelivered: true
             ),
             Message(
                 id: "3",
@@ -246,7 +254,7 @@ private struct MockThreadRepository: ChatRepository {
                 receiverID: "user2",
                 text: "Yes! 10am works great for us 🐕",
                 timestamp: Date().addingTimeInterval(-120),
-                isRead: true
+                 isRead: true, isDelivered: true
             ),
             Message(
                 id: "5",
@@ -260,6 +268,8 @@ private struct MockThreadRepository: ChatRepository {
     }
 
     func markAsRead(conversationID: String, userID: String) async throws {}
+    
+    func markAsDelivered(conversationID: String, userID: String) async throws {}
 
     func createOrFetchConversation(between userId1: String, and userId2: String)
         async throws -> Conversation

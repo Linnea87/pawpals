@@ -7,11 +7,11 @@ final class LocationService {
     var currentLocation: CLLocation?
         var authorizationStatus: CLAuthorizationStatus = .notDetermined
 
-        private let locationManager = CLLocationManager()           // ← only used to read authorizationStatus
+        private let locationManager = CLLocationManager()
 
         func requestLocationOnce() async throws -> CLLocation {
-            for try await update in CLLocationUpdate.liveUpdates() { // ← iOS 17 — triggers permission prompt automatically
-                authorizationStatus = locationManager.authorizationStatus  // ← read status after each update
+            for try await update in CLLocationUpdate.liveUpdates() {
+                authorizationStatus = locationManager.authorizationStatus
 
                 if authorizationStatus == .denied || authorizationStatus == .restricted {
                     throw LocationError.permissionDenied
@@ -19,7 +19,7 @@ final class LocationService {
 
                 if let location = update.location {
                     currentLocation = location
-                    return location                                  // ← first fix — exit the stream
+                    return location
                 }
             }
             throw LocationError.unavailable
