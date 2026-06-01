@@ -21,7 +21,7 @@ struct PawPalsApp: App {
         let locationService = LocationService()
         _locationService = State(initialValue: locationService)
         _meetViewModel = State(initialValue: MeetViewModel(locationService: locationService))
-        _authViewModel = State(initialValue: AuthViewModel(repository: AuthService()))
+        _authViewModel = State(initialValue: AuthViewModel(repository: AuthService(), userRepository: UserService()))
         _chatViewModel = State(initialValue: ChatViewModel(repository: ChatService()))
         _notificationService = State(initialValue: NotificationService(userRepository: UserService()))
         _profileViewModel = State(initialValue: ProfileViewModel(userRepository: UserService(), user: .mock))

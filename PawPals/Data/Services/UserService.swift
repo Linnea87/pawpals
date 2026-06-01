@@ -74,4 +74,27 @@ final class UserService: UserRepository {
             .document(userID)
             .setData(["pushNotificationToken": token], merge: true)
     }
+    
+    func deleteUserData(userId: String) async throws {
+        let batch = db.batch()
+        let dogsSnapshot = try await db.collection("users").document(userId).collection("dogs").getDocuments()
+        for doc in dogsSnapshot.documents {
+            batch.deleteDocument(doc.reference)
+        }
+        batch.deleteDocument(db.collection("users").document(userId))
+        try await batch.commit()
+
+        let conversationsSnapshot = try await db.collection("conversations")
+            .whereField("participantIDs", arrayContains: userId)
+            .getDocuments()
+        for conversationDoc in conversationsSnapshot.documents {
+            let messagesSnapshot = try await conversationDoc.reference.collection("messages").getDocuments()
+            let messageBatch = db.batch()
+            for messageDoc in messagesSnapshot.documents {
+                messageBatch.deleteDocument(messageDoc.reference)
+            }
+            messageBatch.deleteDocument(conversationDoc.reference)
+            try await messageBatch.commit()
+        }
+    }
 }
