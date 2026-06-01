@@ -3,13 +3,14 @@ import SwiftUI
 struct MeetView: View {
     @Binding var selectedTab: Tab
     @Environment(MeetViewModel.self) private var viewModel
-    
+    @State private var showFilterSheet = false
+
     var body: some View {
         @Bindable var vm = viewModel
         NavigationStack {
             ZStack {
                 Theme.appBackground.ignoresSafeArea()
-                
+
                 VStack(alignment: .leading, spacing: Spacing.medium) {
                     Text("Meet your new dog buddy!")
                         .font(.headline)
@@ -18,14 +19,14 @@ struct MeetView: View {
                         .padding(.horizontal, Spacing.large)
                         .padding(.top, Spacing.large)
                         .padding(.bottom, Spacing.medium)
-                    
+
                     ScrollView(.horizontal, showsIndicators: false) {
                         HStack(spacing: Spacing.small) {
                             FilterChip(title: "All", isSelected: vm.activeFilters.isEmpty) {
                                 vm.clearFilters()
                             }
                             ForEach(WalkType.allCases) { walkType in
-                                FilterChip(title: walkType.rawValue, isSelected:vm.activeFilters.contains(walkType.rawValue)) {
+                                FilterChip(title: walkType.rawValue, isSelected: vm.activeFilters.contains(walkType.rawValue)) {
                                     vm.toggleFilter(walkType.rawValue)
                                 }
                             }
@@ -33,7 +34,7 @@ struct MeetView: View {
                         .padding(.horizontal, Spacing.large)
                         .padding(.bottom, Spacing.large)
                     }
-                    
+
                     ScrollView(.horizontal, showsIndicators: false) {
                         HStack(spacing: Spacing.small) {
                             FilterChip(title: "All sizes", isSelected: vm.activeSizeFilters.isEmpty) {
@@ -48,29 +49,25 @@ struct MeetView: View {
                         .padding(.horizontal, Spacing.large)
                         .padding(.bottom, Spacing.large)
                     }
-                    
+
                     if vm.isLoading {
                         Spacer()
                         ProgressView()
                             .frame(maxWidth: .infinity)
                         Spacer()
-                    }
-                    else if let error = vm.errorMessage {
+                    } else if let error = vm.errorMessage {
                         Spacer()
                         Text(error)
                             .foregroundStyle(Theme.warmBrown)
                             .frame(maxWidth: .infinity)
                         Spacer()
-                    }
-                    else if vm.filteredUsers.isEmpty {
+                    } else if vm.filteredUsers.isEmpty {
                         Spacer()
                         Text("No matches nearby")
                             .foregroundStyle(Theme.darkBrown.opacity(0.5))
                             .frame(maxWidth: .infinity)
                         Spacer()
-                    }
-                    
-                    else {
+                    } else {
                         ScrollView {
                             LazyVStack(spacing: Spacing.medium) {
                                 ForEach(vm.filteredUsers) { user in
@@ -81,21 +78,36 @@ struct MeetView: View {
                             .padding(.horizontal, Spacing.large)
                         }
                     }
-                    
                 }
             }
             .safeAreaInset(edge: .bottom, spacing: 0) {
                 TabBarView(selectedTab: $selectedTab)
             }
             .task { await vm.loadNearbyUsers() }
+            .toolbar {
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button {
+                        showFilterSheet = true
+                    } label: {
+                        Image(systemName: "slider.horizontal.3")
+                            .foregroundStyle(Theme.darkBrown)
+                    }
+                }
+            }
             .sheet(item: $vm.selectedUser) { user in
-                NavigationStack { ProfileView(user: user, isOwner: false, selectedTab: $selectedTab) }
+                NavigationStack {
+                    ProfileView(user: user, isOwner: false, selectedTab: $selectedTab)
+                }
+            }
+            .sheet(isPresented: $showFilterSheet) {
+                FilterSheetView()
+                    .environment(viewModel)
             }
         }
     }
 }
 
-#Preview ("Default") {
+#Preview("Default") {
     MeetView(selectedTab: .constant(.meet))
         .environment(MeetViewModel())
 }
@@ -111,11 +123,12 @@ struct MeetView: View {
     MeetView(selectedTab: .constant(.meet))
         .environment(vm)
 }
+
 private struct FilterChip: View {
     let title: String
     let isSelected: Bool
     let action: () -> Void
-    
+
     var body: some View {
         Button(action: action) {
             Text(title)
