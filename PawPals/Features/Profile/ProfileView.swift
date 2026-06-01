@@ -226,6 +226,7 @@ private struct MockChatRepository: ChatRepository {
         Conversation(id: "mock", participantIDs: [userId1, userId2], lastMessage: "", lastMessageTimestamp: Date())
     }
     func markAsRead(conversationID: String, userID: String) async throws {}
+    func markAsDelivered(conversationID: String, userID: String) async throws {}
     func signIn(email: String, password: String) async throws -> User {
         User(id: "preview", name: "", photoURL: nil, bio: "", city: "",
              dogs: [], preferences: UserPreferences(walkTypes: [], dogSize: .medium, searchRadius: 10),
