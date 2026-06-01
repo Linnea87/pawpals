@@ -174,6 +174,8 @@ private struct MockChatRepository: ChatRepository {
     }
 
     func markAsRead(conversationID: String, userID: String) async throws {}
+    
+    func markAsDelivered(conversationID: String, userID: String) async throws {}
 }
 
 private func makePreviewChatViewModel() -> ChatViewModel {

@@ -6,6 +6,7 @@ protocol AuthRepository {
     func signOut() throws
     func signIn(email: String, password: String) async throws -> User
     func signInWithGoogle() async throws -> User
+    func deleteAccount() async throws
     
     
 }

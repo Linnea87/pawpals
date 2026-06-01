@@ -12,5 +12,7 @@ protocol ChatRepository {
     func createOrFetchConversation(between userId1: String, and userId2: String) async throws -> Conversation
     
     func markAsRead(conversationID: String, userID: String) async throws
+    
+    func markAsDelivered(conversationID: String, userID: String) async throws
 }
 

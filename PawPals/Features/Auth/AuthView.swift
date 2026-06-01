@@ -104,7 +104,7 @@ struct AuthView: View {
 
 #Preview {
     AuthView()
-        .environment(AuthViewModel(repository: MockAuthRepository()))
+        .environment(AuthViewModel(repository: MockAuthRepository(), userRepository: MockUserRepository()))
 }
 
 private struct MockAuthRepository: AuthRepository {
@@ -130,4 +130,6 @@ private struct MockAuthRepository: AuthRepository {
              dogs: [], preferences: UserPreferences(walkTypes: [], dogSize: .medium, searchRadius: 10),
              distance: nil)
     }
+    
+    func deleteAccount() async throws {}
 }

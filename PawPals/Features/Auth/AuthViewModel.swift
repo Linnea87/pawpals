@@ -10,9 +10,11 @@ final class AuthViewModel {
     var activeOption: AuthOption = .signIn
 
     private let repository: AuthRepository
+    private let userRepository: UserRepository
 
-    init(repository: AuthRepository) {
+    init(repository: AuthRepository, userRepository: UserRepository) {
         self.repository = repository
+        self.userRepository = userRepository
     }
 
     func signUp(name: String, email: String, password: String) async {
@@ -90,6 +92,26 @@ final class AuthViewModel {
         defer { isLoading = false }
         do {
             currentUser = try await repository.signInWithGoogle()
+        } catch let error as AuthError {
+            switch error {
+            case .notImplemented: errorMessage = String(localized: "auth.error.not.implemented")
+            case .invalidCredential: errorMessage = String(localized: "auth.error.invalid.credential")
+            case .unknown: errorMessage = String(localized: "auth.error.unknown")
+            }
+        } catch {
+            errorMessage = error.localizedDescription
+        }
+    }
+    
+    func deleteAccount() async {
+        isLoading = true
+        errorMessage = nil
+        defer { isLoading = false }
+        guard let userId = currentUser?.id else { return }
+        do {
+            try await userRepository.deleteUserData(userId: userId)
+            try await repository.deleteAccount()
+            currentUser = nil
         } catch let error as AuthError {
             switch error {
             case .notImplemented: errorMessage = String(localized: "auth.error.not.implemented")

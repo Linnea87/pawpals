@@ -1,5 +1,5 @@
-import SwiftUI
 import PhotosUI
+import SwiftUI
 
 struct ProfileView: View {
 
@@ -10,9 +10,16 @@ struct ProfileView: View {
     @Environment(\.dismiss) private var dismiss
     @Environment(ChatViewModel.self) private var chatViewModel
     @Environment(AuthViewModel.self) private var authViewModel
+    @Environment(ProfileViewModel.self) private var profileViewModel
+
     @State private var selectedPhoto: PhotosPickerItem?
     @State private var showSidebar = false
     @State private var showEditProfile = false
+    @State private var showDeleteConfirm = false
+
+    private var displayUser: User {
+        isOwner ? profileViewModel.user : user
+    }
 
     var body: some View {
         @Bindable var chatVM = chatViewModel
@@ -25,7 +32,10 @@ struct ProfileView: View {
                 List {
                     HStack(spacing: Spacing.medium) {
                         if isOwner {
-                            PhotosPicker(selection: $selectedPhoto, matching: .images) {
+                            PhotosPicker(
+                                selection: $selectedPhoto,
+                                matching: .images
+                            ) {
                                 avatarCircle
                             }
                         } else {
@@ -33,15 +43,19 @@ struct ProfileView: View {
                         }
 
                         VStack(alignment: .leading, spacing: Spacing.xSmall) {
-                            Text(user.dogs.first != nil ? "\(user.name) / \(user.dogs.first!.name)" : user.name)
-                                .font(.title3)
-                                .fontWeight(.bold)
-                                .foregroundStyle(Theme.darkBrown)
+                            Text(
+                                displayUser.dogs.first != nil
+                                    ? "\(displayUser.name) / \(displayUser.dogs.first!.name)"
+                                    : displayUser.name
+                            )
+                            .font(.title3)
+                            .fontWeight(.bold)
+                            .foregroundStyle(Theme.darkBrown)
 
                             HStack(spacing: Spacing.xSmall) {
                                 Image(systemName: "pawprint")
                                     .font(.caption2)
-                                Text(user.city)
+                                Text(displayUser.city)
                                     .font(.subheadline)
                             }
                             .foregroundStyle(Theme.warmBrown)
@@ -52,7 +66,7 @@ struct ProfileView: View {
                     .padding(.vertical, Spacing.small)
 
                     Section {
-                        Text(user.bio)
+                        Text(displayUser.bio)
                             .font(.callout)
                             .foregroundStyle(Theme.darkBrown)
                             .listRowBackground(Theme.offWhite.opacity(0.6))
@@ -60,6 +74,25 @@ struct ProfileView: View {
                         Text("profile.aboutUs")
                             .font(.subheadline)
                             .foregroundStyle(Theme.darkBrown)
+                    }
+                    
+                    if !displayUser.dogs.isEmpty {
+                        Section {
+                            ForEach(displayUser.dogs) { dog in
+                                VStack(alignment: .leading, spacing: Spacing.xSmall) {
+                                    Text(dog.name)
+                                        .fontWeight(.medium)
+                                    Text(dog.breed)
+                                        .font(.caption)
+                                        .foregroundStyle(Theme.warmBrown)
+                                }
+                                .listRowBackground(Theme.offWhite.opacity(0.6))
+                            }
+                        } header: {
+                            Text(displayUser.dogs.count == 1 ? "profile.dog" : "profile.dogs")
+                                .font(.subheadline)
+                                .foregroundStyle(Theme.darkBrown)
+                        }
                     }
 
                     if !isOwner {
@@ -77,7 +110,11 @@ struct ProfileView: View {
                                 .frame(maxWidth: .infinity)
                                 .padding()
                                 .background(Theme.terracotta)
-                                .clipShape(RoundedRectangle(cornerRadius: Radius.medium))
+                                .clipShape(
+                                    RoundedRectangle(
+                                        cornerRadius: Radius.medium
+                                    )
+                                )
                         }
                         .listRowBackground(Color.clear)
                         .listRowSeparator(.hidden)
@@ -85,6 +122,11 @@ struct ProfileView: View {
                 }
                 .listStyle(.insetGrouped)
                 .scrollContentBackground(.hidden)
+                .task {
+                    if isOwner {
+                        await profileViewModel.loadPreferences()
+                    }
+                }
                 .safeAreaInset(edge: .bottom, spacing: 0) {
                     if isOwner {
                         TabBarView(selectedTab: $selectedTab)
@@ -102,11 +144,11 @@ struct ProfileView: View {
                             }
 
                         Divider()
-                        
+
                         Spacer()
-                        
+
                         Divider()
-                        
+
                         Text("profile.logOut")
                             .foregroundStyle(Theme.terracotta)
                             .contentShape(Rectangle())
@@ -115,12 +157,24 @@ struct ProfileView: View {
                                 authViewModel.signOut()
                             }
 
-
+                        Text("profile.deleteAccount")
+                            .font(.subheadline)
+                            .foregroundStyle(.red)
+                            .contentShape(Rectangle())
+                            .onTapGesture {
+                                showSidebar = false
+                                showDeleteConfirm = true
+                            }
                         Spacer()
                     }
                     .padding(.top, Spacing.sidebarTop)
                     .padding(.horizontal, Spacing.large)
-                    .containerRelativeFrame(.horizontal, count: 3, span: 2, spacing: Spacing.none)
+                    .containerRelativeFrame(
+                        .horizontal,
+                        count: 3,
+                        span: 2,
+                        spacing: Spacing.none
+                    )
                     .frame(maxHeight: .infinity)
                     .background(Theme.offWhite)
                     .ignoresSafeArea()
@@ -133,8 +187,12 @@ struct ProfileView: View {
                         Button {
                             withAnimation { showSidebar.toggle() }
                         } label: {
-                            Label("menu", systemImage: showSidebar ? "xmark" : "line.3.horizontal")
-                                .labelStyle(.iconOnly)
+                            Label(
+                                "menu",
+                                systemImage: showSidebar
+                                    ? "xmark" : "line.3.horizontal"
+                            )
+                            .labelStyle(.iconOnly)
                         }
                     } else {
                         Button {
@@ -147,12 +205,28 @@ struct ProfileView: View {
                 }
             }
             .navigationDestination(isPresented: $showEditProfile) {
-                AddProfileSheet()
+                AddProfileSheet(user: profileViewModel.user)
             }
-            .navigationDestination(item: $chatVM.activeConversation) { conversation in
-                ConversationView(conversation: conversation, currentUserID: authViewModel.currentUserId)
+            .navigationDestination(item: $chatVM.activeConversation) {
+                conversation in
+                ConversationView(
+                    conversation: conversation,
+                    currentUserID: authViewModel.currentUserId
+                )
+            }
+            .alert(
+                "profile.deleteAccount.title",
+                isPresented: $showDeleteConfirm
+            ) {
+                Button("profile.deleteAccount.confirm", role: .destructive) {
+                    Task { await authViewModel.deleteAccount() }
+                }
+                Button("sheet.cancel", role: .cancel) {}
+            } message: {
+                Text("profile.deleteAccount.message")
             }
         }
+        .environment(profileViewModel)
     }
 
     private var avatarCircle: some View {
@@ -170,59 +244,151 @@ struct ProfileView: View {
 #Preview("Owner") {
     ProfileView(user: .mock, isOwner: true, selectedTab: .constant(.profile))
         .environment(ChatViewModel(repository: MockChatRepository()))
-        .environment(AuthViewModel(repository: MockAuthRepository()))
+        .environment(AuthViewModel(repository: MockAuthRepository(), userRepository: MockUserRepository()))
+        .environment(
+            ProfileViewModel(userRepository: MockUserRepository(), user: .mock)
+        )
 }
 
 #Preview("Visitor") {
     NavigationStack {
-        ProfileView(user: .mock, isOwner: false, selectedTab: .constant(.profile))
+        ProfileView(
+            user: .mock,
+            isOwner: false,
+            selectedTab: .constant(.profile)
+        )
     }
     .environment(ChatViewModel(repository: MockChatRepository()))
-    .environment(AuthViewModel(repository: MockAuthRepository()))
+    .environment(AuthViewModel(repository: MockAuthRepository(), userRepository: MockUserRepository()))
+    .environment(
+        ProfileViewModel(userRepository: MockUserRepository(), user: .mock)
+    )
 }
 
 private struct MockAuthRepository: AuthRepository {
     func signUp(email: String, password: String) async throws -> User {
-        User(id: "preview", name: "", photoURL: nil, bio: "", city: "",
-             dogs: [], preferences: UserPreferences(walkTypes: [], dogSize: .medium, searchRadius: 10),
-             distance: nil)
+        User(
+            id: "preview",
+            name: "",
+            photoURL: nil,
+            bio: "",
+            city: "",
+            dogs: [],
+            preferences: UserPreferences(
+                walkTypes: [],
+                dogSize: .medium,
+                searchRadius: 10
+            ),
+            distance: nil
+        )
     }
     func signUpWithGoogle() async throws -> User {
-            User(id: "preview", name: "", photoURL: nil, bio: "", city: "",
-                 dogs: [], preferences: UserPreferences(walkTypes: [], dogSize: .medium, searchRadius: 10),
-                 distance: nil)
+        User(
+            id: "preview",
+            name: "",
+            photoURL: nil,
+            bio: "",
+            city: "",
+            dogs: [],
+            preferences: UserPreferences(
+                walkTypes: [],
+                dogSize: .medium,
+                searchRadius: 10
+            ),
+            distance: nil
+        )
     }
     func signOut() throws {}
-    
     func signIn(email: String, password: String) async throws -> User {
-        User(id: "preview", name: "", photoURL: nil, bio: "", city: "",
-             dogs: [], preferences: UserPreferences(walkTypes: [], dogSize: .medium, searchRadius: 10),
-             distance: nil)
+        User(
+            id: "preview",
+            name: "",
+            photoURL: nil,
+            bio: "",
+            city: "",
+            dogs: [],
+            preferences: UserPreferences(
+                walkTypes: [],
+                dogSize: .medium,
+                searchRadius: 10
+            ),
+            distance: nil
+        )
     }
     func signInWithGoogle() async throws -> User {
-        User(id: "preview", name: "", photoURL: nil, bio: "", city: "",
-             dogs: [], preferences: UserPreferences(walkTypes: [], dogSize: .medium, searchRadius: 10),
-             distance: nil)
+        User(
+            id: "preview",
+            name: "",
+            photoURL: nil,
+            bio: "",
+            city: "",
+            dogs: [],
+            preferences: UserPreferences(
+                walkTypes: [],
+                dogSize: .medium,
+                searchRadius: 10
+            ),
+            distance: nil
+        )
     }
+
+    func deleteAccount() async throws {}
 }
 
 private struct MockChatRepository: ChatRepository {
-    func fetchConversations(for userId: String) async throws -> [Conversation] { [] }
-    func sendMessage(_ message: Message, to conversationID: String) async throws {}
-    func observeMessages(conversationID: String, onUpdate: @escaping ([Message]) -> Void) -> (() -> Void) { return {} }
-    func createOrFetchConversation(between userId1: String, and userId2: String) async throws -> Conversation {
-        Conversation(id: "mock", participantIDs: [userId1, userId2], lastMessage: "", lastMessageTimestamp: Date())
+    func fetchConversations(for userId: String) async throws -> [Conversation] {
+        []
+    }
+    func sendMessage(_ message: Message, to conversationID: String) async throws
+    {}
+    func observeMessages(
+        conversationID: String,
+        onUpdate: @escaping ([Message]) -> Void
+    ) -> (() -> Void) { return {} }
+    func createOrFetchConversation(between userId1: String, and userId2: String)
+        async throws -> Conversation
+    {
+        Conversation(
+            id: "mock",
+            participantIDs: [userId1, userId2],
+            lastMessage: "",
+            lastMessageTimestamp: Date()
+        )
     }
     func markAsRead(conversationID: String, userID: String) async throws {}
-    
+    func markAsDelivered(conversationID: String, userID: String) async throws {}
     func signIn(email: String, password: String) async throws -> User {
-        User(id: "preview", name: "", photoURL: nil, bio: "", city: "",
-             dogs: [], preferences: UserPreferences(walkTypes: [], dogSize: .medium, searchRadius: 10),
-             distance: nil)
+        User(
+            id: "preview",
+            name: "",
+            photoURL: nil,
+            bio: "",
+            city: "",
+            dogs: [],
+            preferences: UserPreferences(
+                walkTypes: [],
+                dogSize: .medium,
+                searchRadius: 10
+            ),
+            distance: nil
+        )
     }
     func signInWithGoogle() async throws -> User {
-        User(id: "preview", name: "", photoURL: nil, bio: "", city: "",
-             dogs: [], preferences: UserPreferences(walkTypes: [], dogSize: .medium, searchRadius: 10),
-             distance: nil)
+        User(
+            id: "preview",
+            name: "",
+            photoURL: nil,
+            bio: "",
+            city: "",
+            dogs: [],
+            preferences: UserPreferences(
+                walkTypes: [],
+                dogSize: .medium,
+                searchRadius: 10
+            ),
+            distance: nil
+        )
     }
+
+    func deleteUserData(userId: String) async throws {}
 }

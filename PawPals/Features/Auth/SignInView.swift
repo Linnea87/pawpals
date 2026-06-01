@@ -125,7 +125,7 @@ struct SignInView: View {
 
 #Preview {
     SignInView()
-        .environment(AuthViewModel(repository: MockAuthRepository()))
+        .environment(AuthViewModel(repository: MockAuthRepository(), userRepository: MockUserRepository()))
 }
 
 private struct MockAuthRepository: AuthRepository {
@@ -150,4 +150,5 @@ private struct MockAuthRepository: AuthRepository {
                  distance: nil)
     }
     func signOut() throws {}
+    func deleteAccount() async throws {}
 }

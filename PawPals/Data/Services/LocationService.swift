@@ -2,44 +2,41 @@ import CoreLocation
 import Observation
 
 @Observable
-final class LocationService: NSObject {
-
-    var authorizationStatus: CLAuthorizationStatus = .notDetermined
+final class LocationService {
 
     var currentLocation: CLLocation?
+        var authorizationStatus: CLAuthorizationStatus = .notDetermined
 
-    private let locationManager = CLLocationManager()
+        private let locationManager = CLLocationManager()
 
-    override init() {
-        super.init()
-        locationManager.delegate = self
-        locationManager.desiredAccuracy = kCLLocationAccuracyHundredMeters
-        authorizationStatus = locationManager.authorizationStatus
+        func requestLocationOnce() async throws -> CLLocation {
+            for try await update in CLLocationUpdate.liveUpdates() {
+                authorizationStatus = locationManager.authorizationStatus
+
+                if authorizationStatus == .denied || authorizationStatus == .restricted {
+                    throw LocationError.permissionDenied
+                }
+
+                if let location = update.location {
+                    currentLocation = location
+                    return location
+                }
+            }
+            throw LocationError.unavailable
+        }
     }
 
-    func requestPermission() {
-        locationManager.requestWhenInUseAuthorization()
-    }
+enum LocationError: LocalizedError {
+    case permissionDenied
+    case unavailable
 
-    func requestLocation() {
-        locationManager.requestLocation()
-    }
-}
-
-
-extension LocationService: CLLocationManagerDelegate {
-
-    func locationManagerDidChangeAuthorization(_ manager: CLLocationManager) {
-        authorizationStatus = manager.authorizationStatus
-    }
-
-    func locationManager(_ manager: CLLocationManager,
-                         didUpdateLocations locations: [CLLocation]) {
-        currentLocation = locations.last
-    }
-
-    func locationManager(_ manager: CLLocationManager,
-                         didFailWithError error: Error) {
-        print("LocationService error: \(error.localizedDescription)")
+    var errorDescription: String? {
+        switch self {
+        case .permissionDenied:
+            return "Location access is denied. Please enable it in Settings."
+        case .unavailable:
+            return "Could not determine your location. Try again."
+        }
     }
 }
+
