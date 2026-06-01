@@ -48,7 +48,8 @@ final class ChatService: ChatRepository {
             "receiverID": message.receiverID,
             "text": message.text,
             "timestamp": Timestamp(date: message.timestamp),
-            "isRead": false
+            "isRead": false,
+            "isDelivered": false
         ]
         try await ref.setData(data)
     }
@@ -89,6 +90,23 @@ final class ChatService: ChatRepository {
         let batch = db.batch()
         for doc in snapshot.documents {
             batch.updateData(["isRead": true], forDocument: doc.reference)
+        }
+        try await batch.commit()
+    }
+    
+    func markAsDelivered(conversationID: String, userID: String) async throws {
+        let snapshot = try await db.collection("conversations")
+            .document(conversationID)
+            .collection("messages")
+            .whereField("receiverID", isEqualTo: userID)
+            .whereField("isDelivered", isEqualTo: false)
+            .getDocuments()
+        
+        guard !snapshot.documents.isEmpty else { return }
+        
+        let batch = db.batch()
+        for doc in snapshot.documents {
+            batch.updateData(["isDelivered": true], forDocument: doc.reference)
         }
         try await batch.commit()
     }

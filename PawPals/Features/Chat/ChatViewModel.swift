@@ -53,6 +53,17 @@ final class ChatViewModel {
         }
         isLoading = false
     }
+    
+    func markAsDelivered(conversationID: String, userID: String) async {
+        do {
+            try await repository.markAsDelivered(
+                conversationID: conversationID,
+                userID: userID
+            )
+        } catch {
+            errorMessage = error.localizedDescription
+        }
+    }
 
     func markAsRead(conversationID: String, userID: String) async {
         guard
@@ -119,7 +130,7 @@ final class ChatViewModel {
         return formatter.string(from: date)
     }
 
-    func observeMessages(conversationID: String) {
+    func observeMessages(conversationID: String, currentUserID: String) {
         isLoading = true
         stopObserving = repository.observeMessages(
             conversationID: conversationID
@@ -127,6 +138,11 @@ final class ChatViewModel {
             guard let self else { return }
             self.messages = updatedMessages
             self.isLoading = false
+            Task {
+                await self.markAsDelivered(
+                    conversationID: conversationID,
+                    userID: currentUserID)
+            }
         }
     }
 
