@@ -15,6 +15,8 @@ final class MeetViewModel {
     var errorMessage: String? = nil
     var locationStatus: CLAuthorizationStatus = .notDetermined
     var currentUserLocation: CLLocationCoordinate2D?
+    var searchRadius: Double = 5.0
+
 
     private let userRepository: UserRepository
     private let locationService: LocationService
@@ -74,6 +76,19 @@ final class MeetViewModel {
         isLoading = false
     }
 
+
+    func setRadius(_ km: Double, userId: String) {
+        searchRadius = km
+        applyFilters()
+        Task {
+            try? await userRepository.savePreferences(
+                UserPreferences(walkTypes: [], dogSize: .medium, searchRadius: km),
+                userId: userId
+            )
+        }
+    }
+
+
     func toggleFilter(_ filter: String) {
         if activeFilters.contains(filter) {
             activeFilters.remove(filter)
@@ -119,6 +134,11 @@ final class MeetViewModel {
                 guard let size = user.dogs.first?.size else { return false }
                 return activeSizeFilters.contains(size.rawValue)
             }
+        }
+
+        result = result.filter { user in
+            guard let distance = user.distance else { return true }
+            return distance <= searchRadius
         }
 
         filteredUsers = result
