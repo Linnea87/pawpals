@@ -67,6 +67,6 @@ struct FilterSheetView: View {
 
 #Preview {
     FilterSheetView()
-        .environment(MeetViewModel())
-        .environment(AuthViewModel(repository: AuthService()))
+        .environment(MeetViewModel(locationService: LocationService()))
+        .environment(AuthViewModel(repository: AuthService(), userRepository: UserService()))
 }
