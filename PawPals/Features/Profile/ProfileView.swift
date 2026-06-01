@@ -67,6 +67,25 @@ struct ProfileView: View {
                             .font(.subheadline)
                             .foregroundStyle(Theme.darkBrown)
                     }
+                    
+                    if !displayUser.dogs.isEmpty {
+                        Section {
+                            ForEach(displayUser.dogs) { dog in
+                                VStack(alignment: .leading, spacing: Spacing.xSmall) {
+                                    Text(dog.name)
+                                        .fontWeight(.medium)
+                                    Text(dog.breed)
+                                        .font(.caption)
+                                        .foregroundStyle(Theme.warmBrown)
+                                }
+                                .listRowBackground(Theme.offWhite.opacity(0.6))
+                            }
+                        } header: {
+                            Text(displayUser.dogs.count == 1 ? "profile.dog" : "profile.dogs")
+                                .font(.subheadline)
+                                .foregroundStyle(Theme.darkBrown)
+                        }
+                    }
 
                     if !isOwner {
                         Button {

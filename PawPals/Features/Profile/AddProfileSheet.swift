@@ -1,12 +1,12 @@
 import SwiftUI
 
 struct AddProfileSheet: View {
-
+    
     let user: User?
-
+    
     @Environment(ProfileViewModel.self) private var profileViewModel
     @Environment(\.dismiss) private var dismiss
-
+    
     @State private var name = ""
     @State private var bio = ""
     @State private var city = ""
@@ -14,23 +14,21 @@ struct AddProfileSheet: View {
     @State private var dogBreed = ""
     @State private var dogSize: DogSize? = nil
     @State private var selectedWalkTypes: Set<WalkType> = []
-
+    @State private var showAddDogForm = false
+    
     init(user: User? = nil) {
         self.user = user
     }
-
+    
     private var isFormValid: Bool {
-        !name.trimmingCharacters(in: .whitespaces).isEmpty &&
-        !dogName.trimmingCharacters(in: .whitespaces).isEmpty &&
-        !dogBreed.trimmingCharacters(in: .whitespaces).isEmpty &&
-        dogSize != nil
+        !name.trimmingCharacters(in: .whitespaces).isEmpty
     }
-
+    
     var body: some View {
         ZStack {
             Theme.appBackground
                 .ignoresSafeArea()
-
+            
             List {
                 Section {
                     TextField("profile.name", text: $name)
@@ -46,25 +44,80 @@ struct AddProfileSheet: View {
                         .foregroundStyle(Theme.darkBrown)
                 }
                 .padding(.top, Spacing.large)
-
+                
                 Section {
-                    TextField("dog.name", text: $dogName)
+                    ForEach(profileViewModel.user.dogs) { dog in
+                        VStack(alignment: .leading, spacing: Spacing.xSmall) {
+                            Text(dog.name)
+                                .fontWeight(.medium)
+                            Text(dog.breed)
+                                .font(.caption)
+                                .foregroundStyle(Theme.warmBrown)
+                        }
                         .listRowBackground(Theme.offWhite.opacity(0.6))
-                    TextField("dog.breed", text: $dogBreed)
-                        .listRowBackground(Theme.offWhite.opacity(0.6))
-                    Picker("dog.size", selection: $dogSize) {
-                        Text("dog.size.placeholder").tag(Optional<DogSize>.none)
-                        ForEach(DogSize.allCases, id: \.self) { size in
-                            Text(size.rawValue.capitalized).tag(Optional(size))
+                        .swipeActions {
+                            Button(role: .destructive) {
+                                Task { await profileViewModel.removeDog(dog.id) }
+                            } label: {
+                                Label("Ta bort", systemImage: "trash")
+                            }
                         }
                     }
-                    .listRowBackground(Theme.offWhite.opacity(0.6))
                 } header: {
-                    Text("dog.section")
-                        .font(.subheadline)
-                        .foregroundStyle(Theme.darkBrown)
+                    HStack {
+                        Text(profileViewModel.user.dogs.count == 1 ? "profile.dog" : "profile.dogs")
+                        Spacer()
+                        Button {
+                            withAnimation { showAddDogForm.toggle() }
+                        } label: {
+                            Image(systemName: showAddDogForm ? "minus" : "plus")
+                        }
+                    }
+                    .font(.subheadline)
+                    .foregroundStyle(Theme.darkBrown)
                 }
-
+                
+                if showAddDogForm {
+                    Section {
+                        TextField("dog.name", text: $dogName)
+                            .listRowBackground(Theme.offWhite.opacity(0.6))
+                        TextField("dog.breed", text: $dogBreed)
+                            .listRowBackground(Theme.offWhite.opacity(0.6))
+                        Picker("dog.size", selection: $dogSize) {
+                            Text("dog.size.placeholder").tag(Optional<DogSize>.none)
+                            ForEach(DogSize.allCases, id: \.self) { size in
+                                Text(size.rawValue.capitalized).tag(Optional(size))
+                            }
+                        }
+                        .listRowBackground(Theme.offWhite.opacity(0.6))
+                        Button {
+                            guard !dogName.isEmpty, !dogBreed.isEmpty, let size = dogSize else { return }
+                            let newDog = Dog(
+                                id: UUID().uuidString,
+                                name: dogName.trimmingCharacters(in: .whitespaces),
+                                breed: dogBreed.trimmingCharacters(in: .whitespaces),
+                                age: 0,
+                                size: size
+                            )
+                            Task {
+                                await profileViewModel.saveDog(newDog)
+                                dogName = ""
+                                dogBreed = ""
+                                dogSize = nil
+                                withAnimation { showAddDogForm = false }
+                            }
+                        } label: {
+                            Text("dog.save")
+                                .foregroundStyle(Theme.terracotta)
+                        }
+                        .listRowBackground(Theme.offWhite.opacity(0.6))
+                    } header: {
+                        Text("dog.section")
+                            .font(.subheadline)
+                            .foregroundStyle(Theme.darkBrown)
+                    }
+                }
+                
                 Section {
                     ForEach(WalkType.allCases) { walkType in
                         Button {
@@ -91,17 +144,14 @@ struct AddProfileSheet: View {
                         .font(.subheadline)
                         .foregroundStyle(Theme.darkBrown)
                 }
-
+                
                 Button {
-                    guard isFormValid, let size = dogSize else { return }
+                    guard isFormValid else { return }
                     Task {
-                        await profileViewModel.saveProfile(
+                        await profileViewModel.saveProfileInfo(
                             name: name,
                             bio: bio,
                             city: city,
-                            dogName: dogName,
-                            dogBreed: dogBreed,
-                            dogSize: size,
                             walkTypes: Array(selectedWalkTypes)
                         )
                         dismiss()
@@ -120,27 +170,23 @@ struct AddProfileSheet: View {
             .listStyle(.insetGrouped)
             .scrollContentBackground(.hidden)
         }
-      
         .onAppear {
             guard let user else { return }
             name = user.name
             bio = user.bio
             city = user.city
-            dogName = user.dogs.first?.name ?? ""
-            dogBreed = user.dogs.first?.breed ?? ""
-            dogSize = user.dogs.first?.size
             selectedWalkTypes = Set(user.preferences.walkTypes)
         }
     }
+    
+    #Preview("Add") {
+        NavigationStack { AddProfileSheet() }
+            .environment(ProfileViewModel(userRepository: MockUserRepository(), user: .mock))
+    }
+    
+    #Preview("Edit") {
+        NavigationStack { AddProfileSheet(user: .mock) }
+            .environment(ProfileViewModel(userRepository: MockUserRepository(), user: .mock))
+    }
+    
 }
-
-#Preview("Add") {
-    NavigationStack { AddProfileSheet() }
-        .environment(ProfileViewModel(userRepository: MockUserRepository(), user: .mock))
-}
-
-#Preview("Edit") {
-    NavigationStack { AddProfileSheet(user: .mock) }
-        .environment(ProfileViewModel(userRepository: MockUserRepository(), user: .mock))
-}
-
