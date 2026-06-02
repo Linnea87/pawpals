@@ -1,5 +1,6 @@
 import Foundation
 import FirebaseFirestore
+import FirebaseStorage
 
 final class UserService: UserRepository {
     private let db = Firestore.firestore()
@@ -96,5 +97,14 @@ final class UserService: UserRepository {
             messageBatch.deleteDocument(conversationDoc.reference)
             try await messageBatch.commit()
         }
+    }
+    
+    func uploadProfilePhoto(_ data: Data, userId: String) async throws -> String {
+        let ref = Storage.storage().reference().child("profile_photos/\(userId).jpg")
+        let metadata = StorageMetadata()
+        metadata.contentType = "image/jpeg"
+        _ = try await ref.putDataAsync(data, metadata: metadata)
+        let url = try await ref.downloadURL()
+        return url.absoluteString
     }
 }
