@@ -1,4 +1,5 @@
 import Foundation
+import UIKit
 
 @Observable
 final class ProfileViewModel {
@@ -126,4 +127,32 @@ final class ProfileViewModel {
             errorMessage = error.localizedDescription
         }
     }
+
+    func uploadProfilePhoto(_ data: Data) async {
+         isLoading = true
+         errorMessage = nil
+         defer { isLoading = false }
+         do {
+             guard let uiImage = UIImage(data: data),
+                   let jpegData = uiImage.jpegData(compressionQuality: 0.8) else { return }
+             let url = try await userRepository.uploadProfilePhoto(jpegData, userId: user.id)
+             user.photoURL = url
+             try await userRepository.updateProfile(user)
+         } catch {
+             errorMessage = error.localizedDescription
+         }
+      
+    func loadUser(userId: String) async {
+         isLoading = true
+         errorMessage = nil
+         do {
+             user = try await userRepository.fetchUser(userId: userId)
+             user.preferences = try await userRepository.loadPreferences(userId: userId)
+         } catch {
+             errorMessage = error.localizedDescription
+         }
+         isLoading = false
+
+     }
 }
+
