@@ -3,18 +3,18 @@ import UIKit
 
 @Observable
 final class ProfileViewModel {
-
+    
     private let userRepository: UserRepository
     var user: User
     var isLoading = false
     var errorMessage: String?
     var savedUsers: [User] = []
-
+    
     init(userRepository: UserRepository, user: User) {
         self.userRepository = userRepository
         self.user = user
     }
-
+    
     func saveOwnerInfo(name: String, photoURL: String?) async {
         isLoading = true
         errorMessage = nil
@@ -43,7 +43,7 @@ final class ProfileViewModel {
         }
         isLoading = false
     }
-
+    
     func saveDog(_ dog: Dog) async {
         isLoading = true
         errorMessage = nil
@@ -67,7 +67,7 @@ final class ProfileViewModel {
         }
         isLoading = false
     }
-
+    
     func saveProfile(name: String, bio: String, city: String, dogName: String, dogBreed: String, dogSize: DogSize, walkTypes: [WalkType]) async {
         isLoading = true
         errorMessage = nil
@@ -97,7 +97,7 @@ final class ProfileViewModel {
         }
         isLoading = false
     }
-
+    
     func loadPreferences() async {
         isLoading = true
         errorMessage = nil
@@ -108,7 +108,7 @@ final class ProfileViewModel {
         }
         isLoading = false
     }
-
+    
     func savePreferences() async {
         isLoading = true
         errorMessage = nil
@@ -127,32 +127,32 @@ final class ProfileViewModel {
             errorMessage = error.localizedDescription
         }
     }
-
+    
     func uploadProfilePhoto(_ data: Data) async {
-         isLoading = true
-         errorMessage = nil
-         defer { isLoading = false }
-         do {
-             guard let uiImage = UIImage(data: data),
-                   let jpegData = uiImage.jpegData(compressionQuality: 0.8) else { return }
-             let url = try await userRepository.uploadProfilePhoto(jpegData, userId: user.id)
-             user.photoURL = url
-             try await userRepository.updateProfile(user)
-         } catch {
-             errorMessage = error.localizedDescription
-         }
-      
+        isLoading = true
+        errorMessage = nil
+        defer { isLoading = false }
+        do {
+            guard let uiImage = UIImage(data: data),
+                  let jpegData = uiImage.jpegData(compressionQuality: 0.8) else { return }
+            let url = try await userRepository.uploadProfilePhoto(jpegData, userId: user.id)
+            user.photoURL = url
+            try await userRepository.updateProfile(user)
+        } catch {
+            errorMessage = error.localizedDescription
+        }
+    }
+
     func loadUser(userId: String) async {
-         isLoading = true
-         errorMessage = nil
-         do {
-             user = try await userRepository.fetchUser(userId: userId)
-             user.preferences = try await userRepository.loadPreferences(userId: userId)
-         } catch {
-             errorMessage = error.localizedDescription
-         }
-         isLoading = false
+        isLoading = true
+        errorMessage = nil
+        do {
+            user = try await userRepository.fetchUser(userId: userId)
+            user.preferences = try await userRepository.loadPreferences(userId: userId)
+        } catch {
+            errorMessage = error.localizedDescription
+        }
+        isLoading = false
+    }
 
-     }
 }
-

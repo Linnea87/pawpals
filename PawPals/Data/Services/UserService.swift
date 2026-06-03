@@ -47,13 +47,13 @@ final class UserService: UserRepository {
     func fetchUser(userId: String) async throws -> User {
         let doc = try await db.collection("users").document(userId).getDocument()
         guard let data = doc.data() else { throw UserServiceError.notFound }
-
+        
         let dogsSnapshot = try await db.collection("users")
             .document(userId)
             .collection("dogs")
             .getDocuments()
         let dogs = dogsSnapshot.documents.compactMap { try? $0.data(as: Dog.self) }
-
+        
         return User(
             id: userId,
             name: data["name"] as? String ?? "",
@@ -67,7 +67,7 @@ final class UserService: UserRepository {
             longitude: data["longitude"] as? Double
         )
     }
-
+    
     func updateLocation(_ location: GeoPoint, userId: String) async throws {
         
         try await db.collection("users")
@@ -127,7 +127,7 @@ final class UserService: UserRepository {
         }
     }
     
-
+    
     func saveProfile(_ targetId: String, by userId: String) async throws {
         try await db.collection("users")
             .document(userId)
@@ -160,6 +160,7 @@ final class UserService: UserRepository {
             }
         }
         return users
+    }
 
     func uploadProfilePhoto(_ data: Data, userId: String) async throws -> String {
         let ref = Storage.storage().reference().child("profile_photos/\(userId).jpg")
@@ -168,6 +169,5 @@ final class UserService: UserRepository {
         _ = try await ref.putDataAsync(data, metadata: metadata)
         let url = try await ref.downloadURL()
         return url.absoluteString
-
     }
 }
