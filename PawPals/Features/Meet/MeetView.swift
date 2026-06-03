@@ -5,13 +5,13 @@ struct MeetView: View {
     @Binding var selectedTab: Tab
     @Environment(MeetViewModel.self) private var viewModel
     @State private var showFilterSheet = false
-
+    
     var body: some View {
         @Bindable var vm = viewModel
         NavigationStack {
             ZStack {
                 Theme.appBackground.ignoresSafeArea()
-
+                
                 VStack(alignment: .leading, spacing: Spacing.medium) {
                     Text("Meet your new dog buddy!")
                         .font(.headline)
@@ -20,7 +20,7 @@ struct MeetView: View {
                         .padding(.horizontal, Spacing.large)
                         .padding(.top, Spacing.large)
                         .padding(.bottom, Spacing.medium)
-
+                    
                     ScrollView(.horizontal, showsIndicators: false) {
                         HStack(spacing: Spacing.small) {
                             FilterChip(title: "All", isSelected: vm.activeFilters.isEmpty) {
@@ -35,7 +35,7 @@ struct MeetView: View {
                         .padding(.horizontal, Spacing.large)
                         .padding(.bottom, Spacing.large)
                     }
-
+                    
                     ScrollView(.horizontal, showsIndicators: false) {
                         HStack(spacing: Spacing.small) {
                             FilterChip(title: "All sizes", isSelected: vm.activeSizeFilters.isEmpty) {
@@ -50,7 +50,7 @@ struct MeetView: View {
                         .padding(.horizontal, Spacing.large)
                         .padding(.bottom, Spacing.large)
                     }
-    
+                    
                     if vm.isLocating {
                         Spacer()
                         VStack(spacing: Spacing.small) {
@@ -61,7 +61,7 @@ struct MeetView: View {
                         }
                         .frame(maxWidth: .infinity)
                         Spacer()
-                            
+                        
                     } else if
                         vm.locationStatus == .denied || vm.locationStatus == .restricted {
                         Spacer()
@@ -91,7 +91,7 @@ struct MeetView: View {
                         
                         
                     } else if vm.isLoading {
-
+                        
                         Spacer()
                         ProgressView()
                             .frame(maxWidth: .infinity)
@@ -112,7 +112,7 @@ struct MeetView: View {
                         ScrollView {
                             LazyVStack(spacing: Spacing.medium) {
                                 ForEach(vm.filteredUsers) { user in
-                                    MeetCardView(user: user)
+                                    MeetCardView(user: user, isSaved: vm.savedUserIds.contains(user.id))
                                         .onTapGesture { vm.selectedUser = user }
                                 }
                             }
@@ -124,7 +124,7 @@ struct MeetView: View {
             .safeAreaInset(edge: .bottom, spacing: 0) {
                 TabBarView(selectedTab: $selectedTab)
             }
-
+            
             .task { await vm.loadWithLocation() }
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
@@ -136,11 +136,12 @@ struct MeetView: View {
                     }
                 }
             }
-
+            
             .sheet(item: $vm.selectedUser) { user in
                 NavigationStack {
                     ProfileView(user: user, isOwner: false, selectedTab: $selectedTab)
                 }
+                .environment(viewModel)
             }
             .sheet(isPresented: $showFilterSheet) {
                 FilterSheetView()
@@ -171,7 +172,7 @@ private struct FilterChip: View {
     let title: String
     let isSelected: Bool
     let action: () -> Void
-
+    
     var body: some View {
         Button(action: action) {
             Text(title)

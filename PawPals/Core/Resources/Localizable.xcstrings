@@ -639,6 +639,17 @@
         }
       }
     },
+    "profile.savedProfiles" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Liked profiles"
+          }
+        }
+      }
+    },
     "profile.start.chat" : {
       "extractionState" : "manual",
       "localizations" : {

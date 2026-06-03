@@ -8,6 +8,7 @@ final class ProfileViewModel {
     var user: User
     var isLoading = false
     var errorMessage: String?
+    var savedUsers: [User] = []
 
     init(userRepository: UserRepository, user: User) {
         self.userRepository = userRepository
@@ -119,6 +120,14 @@ final class ProfileViewModel {
         isLoading = false
     }
     
+    func loadSavedProfiles() async {
+        do {
+            savedUsers = try await userRepository.fetchSavedProfiles(for: user.id)
+        } catch {
+            errorMessage = error.localizedDescription
+        }
+    }
+
     func uploadProfilePhoto(_ data: Data) async {
          isLoading = true
          errorMessage = nil
