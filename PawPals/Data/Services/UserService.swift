@@ -1,8 +1,14 @@
 import Foundation
 import FirebaseFirestore
 
+enum UserServiceError: Error {
+    case notFound
+}
+
 final class UserService: UserRepository {
     private let db = Firestore.firestore()
+    
+    
 
     func updateProfile(_ user: User) async throws {
         var data: [String: Any] = [
@@ -96,5 +102,29 @@ final class UserService: UserRepository {
             messageBatch.deleteDocument(conversationDoc.reference)
             try await messageBatch.commit()
         }
+    }
+    
+    func fetchUser(userId: String) async throws -> User {
+        let doc = try await db.collection("users").document(userId).getDocument()
+        guard let data = doc.data() else { throw UserServiceError.notFound }
+
+        let dogsSnapshot = try await db.collection("users")
+            .document(userId)
+            .collection("dogs")
+            .getDocuments()
+        let dogs = dogsSnapshot.documents.compactMap { try? $0.data(as: Dog.self) }
+
+        return User(
+            id: userId,
+            name: data["name"] as? String ?? "",
+            photoURL: data["photoURL"] as? String,
+            bio: data["bio"] as? String ?? "",
+            city: data["city"] as? String ?? "",
+            dogs: dogs,
+            preferences: UserPreferences(walkTypes: [], dogSize: .medium, searchRadius: 10.0),
+            distance: nil,
+            latitude: data["latitude"] as? Double,
+            longitude: data["longitude"] as? Double
+        )
     }
 }

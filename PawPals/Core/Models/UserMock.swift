@@ -30,6 +30,8 @@ extension User {
 
 #if DEBUG
 struct MockUserRepository: UserRepository {
+    func fetchUser(userId: String) async throws -> User { .mock }
+    
     func updateProfile(_ user: User) async throws {}
     func saveDog(_ dog: Dog, userId: String) async throws {}
     func removeDog(dogId: String, userId: String) async throws {}
