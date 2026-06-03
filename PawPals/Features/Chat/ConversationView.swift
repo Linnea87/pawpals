@@ -63,7 +63,7 @@ struct ConversationView: View {
                 Button {
                     selectedUser = otherUser
                 } label: {
-                    VStack(spacing: 2) {
+                    VStack(spacing: Spacing.xxSmall) {
                         Group {
                             if let photoURL = otherUser.photoURL,
                                 let url = URL(string: photoURL)
@@ -203,12 +203,12 @@ private struct MessageStatusView: View {
     let isRead: Bool
 
     var body: some View {
-        HStack(spacing: -4) {
+        HStack(spacing: Spacing.negativeXSmall) {
             Image(systemName: "checkmark")
-                .font(.system(size: 9, weight: .semibold))
+                .font(.system(size: FontSize.small, weight: .semibold))
                 .foregroundStyle(isRead ? Theme.terracotta : Theme.warmBrown)
             Image(systemName: "checkmark")
-                .font(.system(size: 9, weight: .semibold))
+                .font(.system(size: FontSize.small, weight: .semibold))
                 .foregroundStyle(isRead ? Theme.terracotta : Theme.warmBrown)
                 .opacity(isDelivered || isRead ? 1 : 0)
         }
@@ -306,7 +306,7 @@ private struct MockThreadRepository: ChatRepository {
         ])
         return {}
     }
-
+    
     func markAsRead(conversationID: String, userID: String) async throws {}
 
     func markAsDelivered(conversationID: String, userID: String) async throws {}
@@ -321,6 +321,16 @@ private struct MockThreadRepository: ChatRepository {
             lastMessageTimestamp: Date()
         )
     }
+}
+
+
+private struct MockConvAuthRepository: AuthRepository {
+    func signUp(email: String, password: String) async throws -> User { .mock }
+    func signUpWithGoogle() async throws -> User { .mock }
+    func signOut() throws {}
+    func signIn(email: String, password: String) async throws -> User { .mock }
+    func signInWithGoogle() async throws -> User { .mock }
+    func deleteAccount() async throws {}
 }
 
 #Preview {
@@ -339,4 +349,6 @@ private struct MockThreadRepository: ChatRepository {
         )
     }
     .environment(viewModel)
+    .environment(AuthViewModel(repository: MockConvAuthRepository(), userRepository: MockUserRepository()))
+    .environment(ProfileViewModel(userRepository: MockUserRepository(), user: .mock))
 }
