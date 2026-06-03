@@ -132,6 +132,18 @@ final class ProfileViewModel {
          } catch {
              errorMessage = error.localizedDescription
          }
+      
+    func loadUser(userId: String) async {
+         isLoading = true
+         errorMessage = nil
+         do {
+             user = try await userRepository.fetchUser(userId: userId)
+             user.preferences = try await userRepository.loadPreferences(userId: userId)
+         } catch {
+             errorMessage = error.localizedDescription
+         }
+         isLoading = false
+
      }
 }
 
