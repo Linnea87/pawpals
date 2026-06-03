@@ -41,5 +41,6 @@ struct MockUserRepository: UserRepository {
     }
     func savePushNotificationToken(_ token: String, userID: String) async throws {}
     func deleteUserData(userId: String) async throws {}
+    func fetchUser(userId: String) async throws -> User { .mock }
 }
 #endif
