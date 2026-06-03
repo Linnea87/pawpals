@@ -3,7 +3,7 @@ import FirebaseFirestore
 
 final class UserService: UserRepository {
     private let db = Firestore.firestore()
-
+    
     func updateProfile(_ user: User) async throws {
         var data: [String: Any] = [
             "name": user.name,
@@ -15,7 +15,7 @@ final class UserService: UserRepository {
         }
         try await db.collection("users").document(user.id).setData(data, merge: true)
     }
-
+    
     func saveDog(_ dog: Dog, userId: String) async throws {
         try db.collection("users")
             .document(userId)
@@ -31,21 +31,21 @@ final class UserService: UserRepository {
             .document(dogId)
             .delete()
     }
-
+    
     func fetchNearbyUsers(location: GeoPoint, radius: Double) async throws -> [User] {
         let snapshot = try await db.collection("users").getDocuments()
         return try snapshot.documents.compactMap { doc in
             try doc.data(as: User.self)
         }
     }
-
+    
     func updateLocation(_ location: GeoPoint, userId: String) async throws {
-
+        
         try await db.collection("users")
             .document(userId)
             .setData(["location": location], merge: true)
     }
-
+    
     func savePreferences(_ prefs: UserPreferences, userId: String) async throws {
         let data: [String: Any] = [
             "preferences": [
@@ -56,7 +56,7 @@ final class UserService: UserRepository {
         ]
         try await db.collection("users").document(userId).setData(data, merge: true)
     }
-
+    
     func loadPreferences(userId: String) async throws -> UserPreferences {
         let doc = try await db.collection("users").document(userId).getDocument()
         guard let data = doc.data(),
@@ -68,7 +68,7 @@ final class UserService: UserRepository {
         let searchRadius = prefsData["searchRadius"] as? Double ?? 10.0
         return UserPreferences(walkTypes: walkTypes, dogSize: dogSize, searchRadius: searchRadius)
     }
-
+    
     func savePushNotificationToken(_ token: String, userID: String) async throws {
         try await db.collection("users")
             .document(userID)
@@ -83,7 +83,7 @@ final class UserService: UserRepository {
         }
         batch.deleteDocument(db.collection("users").document(userId))
         try await batch.commit()
-
+        
         let conversationsSnapshot = try await db.collection("conversations")
             .whereField("participantIDs", arrayContains: userId)
             .getDocuments()
@@ -96,5 +96,39 @@ final class UserService: UserRepository {
             messageBatch.deleteDocument(conversationDoc.reference)
             try await messageBatch.commit()
         }
+    }
+    
+    func saveProfile(_ targetId: String, by userId: String) async throws {
+        try await db.collection("users")
+            .document(userId)
+            .collection("savedProfiles")
+            .document(targetId)
+            .setData(["savedAt": Date()])
+    }
+    
+    func unsaveProfile(_ targetId: String, by userId: String) async throws {
+        try await db.collection("users")
+            .document(userId)
+            .collection("savedProfiles")
+            .document(targetId)
+            .delete()
+    }
+    
+    func fetchSavedProfiles(for userId: String) async throws -> [User] {
+        let snapshot = try await db.collection("users")
+            .document(userId)
+            .collection("savedProfiles")
+            .getDocuments()
+        
+        let savedIds = snapshot.documents.map { $0.documentID }
+        
+        var users: [User] = []
+        for id in savedIds {
+            let doc = try await db.collection("users").document(id).getDocument()
+            if let user = try? doc.data(as: User.self) {
+                users.append(user)
+            }
+        }
+        return users
     }
 }
