@@ -38,16 +38,15 @@ struct ProfileView: View {
                             ) {
                                 avatarCircle
                             }
+                            .buttonStyle(.plain)
+                             .contentShape(Circle())
+                            
                         } else {
                             avatarCircle
                         }
 
                         VStack(alignment: .leading, spacing: Spacing.xSmall) {
-                            Text(
-                                displayUser.dogs.first != nil
-                                    ? "\(displayUser.name) / \(displayUser.dogs.first!.name)"
-                                    : displayUser.name
-                            )
+                            Text(displayUser.name)
                             .font(.title3)
                             .fontWeight(.bold)
                             .foregroundStyle(Theme.darkBrown)
@@ -127,6 +126,12 @@ struct ProfileView: View {
                         await profileViewModel.loadPreferences()
                     }
                 }
+                .task(id: selectedPhoto) {
+                     guard let selectedPhoto,
+                           let data = try? await selectedPhoto.loadTransferable(type: Data.self)
+                     else { return }
+                     await profileViewModel.uploadProfilePhoto(data)
+                 }
                 .safeAreaInset(edge: .bottom, spacing: 0) {
                     if isOwner {
                         TabBarView(selectedTab: $selectedTab)
@@ -230,15 +235,26 @@ struct ProfileView: View {
     }
 
     private var avatarCircle: some View {
-        Circle()
-            .fill(Theme.lightPeach)
-            .frame(width: IconSize.avatar, height: IconSize.avatar)
-            .overlay {
-                Image(systemName: "person")
-                    .font(.system(size: IconSize.avatarIcon))
-                    .foregroundStyle(Theme.offWhite)
-            }
-    }
+          Circle()
+              .fill(Theme.lightPeach)
+              .frame(width: IconSize.avatar, height: IconSize.avatar)
+              .overlay {
+                  if let photoURL = displayUser.photoURL, let url = URL(string: photoURL) {
+                      AsyncImage(url: url) { image in
+                          image.resizable().scaledToFill()
+                      } placeholder: {
+                          Image(systemName: "person")
+                              .font(.system(size: IconSize.avatarIcon))
+                              .foregroundStyle(Theme.offWhite)
+                      }
+                      .clipShape(Circle())
+                  } else {
+                      Image(systemName: "person")
+                          .font(.system(size: IconSize.avatarIcon))
+                          .foregroundStyle(Theme.offWhite)
+                  }
+              }
+      }
 }
 
 #Preview("Owner") {
@@ -391,4 +407,5 @@ private struct MockChatRepository: ChatRepository {
     }
 
     func deleteUserData(userId: String) async throws {}
+    func uploadProfilePhoto(_ data: Data, userId: String) async throws -> String { "" }
 }
