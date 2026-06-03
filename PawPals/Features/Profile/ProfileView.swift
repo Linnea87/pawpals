@@ -47,12 +47,7 @@ struct ProfileView: View {
                         }
                         
                         VStack(alignment: .leading, spacing: Spacing.xSmall) {
-                            Text(
-                                displayUser.dogs.first != nil
-                                ? "\(displayUser.name) / \(displayUser.dogs.first!.name)"
-                                : displayUser.name
-                            )
-
+                         
                             Text(displayUser.name)
 
                             .font(.title3)
