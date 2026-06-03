@@ -211,7 +211,8 @@ struct ProfileView: View {
                 conversation in
                 ConversationView(
                     conversation: conversation,
-                    currentUserID: authViewModel.currentUserId
+                    currentUserID: authViewModel.currentUserId,
+                    otherUser: chatViewModel.otherUser(in: conversation, currentUserID: authViewModel.currentUserId) ?? .mock
                 )
             }
             .alert(
@@ -243,7 +244,7 @@ struct ProfileView: View {
 
 #Preview("Owner") {
     ProfileView(user: .mock, isOwner: true, selectedTab: .constant(.profile))
-        .environment(ChatViewModel(repository: MockChatRepository()))
+        .environment(ChatViewModel(chatRepository: MockChatRepository(), userRepository: MockUserRepository()))
         .environment(AuthViewModel(repository: MockAuthRepository(), userRepository: MockUserRepository()))
         .environment(
             ProfileViewModel(userRepository: MockUserRepository(), user: .mock)
@@ -258,7 +259,7 @@ struct ProfileView: View {
             selectedTab: .constant(.profile)
         )
     }
-    .environment(ChatViewModel(repository: MockChatRepository()))
+    .environment(ChatViewModel(chatRepository: MockChatRepository(), userRepository: MockUserRepository()))
     .environment(AuthViewModel(repository: MockAuthRepository(), userRepository: MockUserRepository()))
     .environment(
         ProfileViewModel(userRepository: MockUserRepository(), user: .mock)
