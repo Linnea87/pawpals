@@ -37,10 +37,13 @@ struct PawPalsApp: App {
                 .environment(locationService)
                 .environment(profileViewModel)
                 .onChange(of: authViewModel.currentUser?.id) { _, _ in
-                    if let user = authViewModel.currentUser {
-                        profileViewModel.user = user
-                    }
-                }
+                     if let user = authViewModel.currentUser {
+                         profileViewModel.user = user
+                         Task { await profileViewModel.loadUser(userId: user.id) }
+                     } else {
+                         profileViewModel.user = .mock
+                     }
+                 }
 
                 .onOpenURL { url in
                     GIDSignIn.sharedInstance.handle(url)

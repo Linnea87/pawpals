@@ -17,6 +17,7 @@ enum Height {
 }
 
 enum Radius {
+    static let xxSmall: CGFloat = 2
     static let small: CGFloat = 8
     static let medium: CGFloat = 16
     static let large: CGFloat = 20
@@ -34,6 +35,10 @@ enum IconSize {
     static let logoIcon: CGFloat = 36
     static let chatAvatar: CGFloat = 50
     static let messageAvatar: CGFloat = 32
+}
+
+enum Opacity {
+    static let xSmal = 0.6
 }
 
 enum AuthLayout {
