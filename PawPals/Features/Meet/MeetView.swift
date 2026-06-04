@@ -21,36 +21,6 @@ struct MeetView: View {
                         .padding(.top, Spacing.large)
                         .padding(.bottom, Spacing.medium)
                     
-                    ScrollView(.horizontal, showsIndicators: false) {
-                        HStack(spacing: Spacing.small) {
-                            FilterChip(title: "All", isSelected: vm.activeFilters.isEmpty) {
-                                vm.clearFilters()
-                            }
-                            ForEach(WalkType.allCases) { walkType in
-                                FilterChip(title: walkType.rawValue, isSelected: vm.activeFilters.contains(walkType.rawValue)) {
-                                    vm.toggleFilter(walkType.rawValue)
-                                }
-                            }
-                        }
-                        .padding(.horizontal, Spacing.large)
-                        .padding(.bottom, Spacing.large)
-                    }
-                    
-                    ScrollView(.horizontal, showsIndicators: false) {
-                        HStack(spacing: Spacing.small) {
-                            FilterChip(title: "All sizes", isSelected: vm.activeSizeFilters.isEmpty) {
-                                vm.clearSizeFilters()
-                            }
-                            ForEach(DogSize.allCases, id: \.self) { size in
-                                FilterChip(title: size.rawValue.capitalized, isSelected: vm.activeSizeFilters.contains(size.rawValue)) {
-                                    vm.toggleSizeFilter(size.rawValue)
-                                }
-                            }
-                        }
-                        .padding(.horizontal, Spacing.large)
-                        .padding(.bottom, Spacing.large)
-                    }
-                    
                     if vm.isLocating {
                         Spacer()
                         VStack(spacing: Spacing.small) {
