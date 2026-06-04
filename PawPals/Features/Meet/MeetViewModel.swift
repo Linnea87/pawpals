@@ -17,11 +17,10 @@ final class MeetViewModel {
     var currentUserLocation: CLLocationCoordinate2D?
     var searchRadius: Double = 5.0
     var savedUserIds: Set<String> = []
-    
-    
+
     private let userRepository: UserRepository
     private let locationService: LocationService
-    
+
     init(
         userRepository: UserRepository = UserService(),
         locationService: LocationService
@@ -29,68 +28,70 @@ final class MeetViewModel {
         self.userRepository = userRepository
         self.locationService = locationService
     }
-    
+
     func loadWithLocation() async {
         guard let userID = Auth.auth().currentUser?.uid else { return }
         isLocating = true
         defer { isLocating = false }
-        
+
         do {
             let location = try await locationService.requestLocationOnce()
             currentUserLocation = location.coordinate
             locationStatus = .authorizedWhenInUse
-            
+
             let geoPoint = GeoPoint(
                 latitude: location.coordinate.latitude,
                 longitude: location.coordinate.longitude
             )
             try await userRepository.updateLocation(geoPoint, userId: userID)
             await loadNearbyUsers()
-            
+
         } catch LocationError.permissionDenied {
             locationStatus = .denied
         } catch {
             errorMessage = error.localizedDescription
         }
     }
-    
+
     func loadNearbyUsers() async {
+        guard let currentLocation = currentUserLocation else { return }
         isLoading = true
         errorMessage = nil
-        allNearbyUsers = [.mock]  // Replace with real firebase later
-        if let currentLocation = currentUserLocation {
-            allNearbyUsers = allNearbyUsers.map { user in
-                var updated = user
-                if let lat = user.latitude, let lon = user.longitude {
-                    let userLocation = CLLocation(latitude: lat, longitude: lon)
-                    let current = CLLocation(
-                        latitude: currentLocation.latitude,
-                        longitude: currentLocation.longitude
-                    )
-                    let distanceKm = current.distance(from: userLocation) / 1000
-                    updated.distance = (distanceKm * 10).rounded() / 10
-                }
-                return updated
-            }
+        defer { isLoading = false }
+
+        do {
+            let geoPoint = GeoPoint(
+                latitude: currentLocation.latitude,
+                longitude: currentLocation.longitude
+            )
+
+            allNearbyUsers = try await userRepository.fetchNearbyUsers(
+                location: geoPoint,
+                radius: searchRadius
+            )
+            applyFilters()
+
+        } catch {
+            errorMessage = error.localizedDescription
         }
-        applyFilters()
-        await loadSavedProfiles()
-        isLoading = false
+
     }
-    
-    
+
     func setRadius(_ km: Double, userId: String) {
         searchRadius = km
         applyFilters()
         Task {
             try? await userRepository.savePreferences(
-                UserPreferences(walkTypes: [], dogSize: .medium, searchRadius: km),
+                UserPreferences(
+                    walkTypes: [],
+                    dogSize: .medium,
+                    searchRadius: km
+                ),
                 userId: userId
             )
         }
     }
-    
-    
+
     func toggleFilter(_ filter: String) {
         if activeFilters.contains(filter) {
             activeFilters.remove(filter)
@@ -99,12 +100,12 @@ final class MeetViewModel {
         }
         applyFilters()
     }
-    
+
     func clearFilters() {
         activeFilters.removeAll()
         applyFilters()
     }
-    
+
     func toggleSizeFilter(_ size: String) {
         if activeSizeFilters.contains(size) {
             activeSizeFilters.remove(size)
@@ -113,15 +114,15 @@ final class MeetViewModel {
         }
         applyFilters()
     }
-    
+
     func clearSizeFilters() {
         activeSizeFilters.removeAll()
         applyFilters()
     }
-    
+
     private func applyFilters() {
         var result = allNearbyUsers
-        
+
         if !activeFilters.isEmpty {
             result = result.filter { user in
                 let userWalkTypes = Set(
@@ -130,22 +131,22 @@ final class MeetViewModel {
                 return !activeFilters.isDisjoint(with: userWalkTypes)
             }
         }
-        
+
         if !activeSizeFilters.isEmpty {
             result = result.filter { user in
                 guard let size = user.dogs.first?.size else { return false }
                 return activeSizeFilters.contains(size.rawValue)
             }
         }
-        
+
         result = result.filter { user in
             guard let distance = user.distance else { return true }
             return distance <= searchRadius
         }
-        
+
         filteredUsers = result
     }
-    
+
     func loadSavedProfiles() async {
         guard let userId = Auth.auth().currentUser?.uid else { return }
         do {
@@ -155,7 +156,7 @@ final class MeetViewModel {
             errorMessage = error.localizedDescription
         }
     }
-    
+
     func toggleSave(targetId: String) async {
         guard let userId = Auth.auth().currentUser?.uid else { return }
         do {
