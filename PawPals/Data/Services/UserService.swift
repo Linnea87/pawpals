@@ -41,7 +41,7 @@ final class UserService: UserRepository {
             .delete()
     }
 
-    func fetchNearbyUsers(location: GeoPoint, radius: Double) async throws
+    func fetchNearbyUsers(location: GeoPoint, radius: Double, excludingUserID: String) async throws
         -> [User]
     {
         let snapshot = try await db.collection("users").getDocuments()
@@ -56,10 +56,10 @@ final class UserService: UserRepository {
         )
 
         return allUsers.compactMap { user in
+            /// Never show the current user in the Meet list
+            guard user.id != excludingUserID else { return nil }
             /// Skip users who have never stored a location
-            guard let lat = user.latitude, let long = user.longitude else {
-                return nil
-            }
+            guard let lat = user.latitude, let long = user.longitude else { return nil }
             /// Calculate distance in km, rounded to 1 decimal place
             let userLocation = CLLocation(latitude: lat, longitude: long)
             let distanceKm = currentLocation.distance(from: userLocation) / 1000

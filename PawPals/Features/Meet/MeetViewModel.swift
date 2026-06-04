@@ -71,10 +71,11 @@ final class MeetViewModel {
                 latitude: currentLocation.latitude,
                 longitude: currentLocation.longitude
             )
-            /// UserService handles geo-filtering and distance calculation - users returned here are already within radius and have distance set
+            /// UserService handles geo-filtering and distance calculation - users returned here are already within radius and have distance set and Exclude the logged-in user
             allNearbyUsers = try await userRepository.fetchNearbyUsers(
                 location: geoPoint,
-                radius: searchRadius
+                radius: searchRadius,
+                excludingUserID: Auth.auth().currentUser?.uid ?? ""
             )
             applyFilters()
 
