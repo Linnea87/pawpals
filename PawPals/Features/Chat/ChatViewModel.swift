@@ -183,7 +183,7 @@ final class ChatViewModel {
 
         do {
             // Upload image to Firebase Storage via repository
-            let url = try await repository.uploadImage(image, conversationId: conversation.id)
+            let url = try await chatRepository.uploadImage(image, conversationId: conversation.id)
 
             // Create message with image URL — text is empty for image messages
             let message = Message(
@@ -196,7 +196,7 @@ final class ChatViewModel {
             )
 
             // Send message to Firestore
-            try await repository.sendMessage(message, to: conversation.id)
+            try await chatRepository.sendMessage(message, to: conversation.id)
 
         } catch {
             errorMessage = error.localizedDescription
