@@ -1,7 +1,7 @@
+import CoreLocation
 import FirebaseFirestore
 import FirebaseStorage
 import Foundation
-import CoreLocation
 
 enum UserServiceError: Error {
     case notFound
@@ -41,19 +41,32 @@ final class UserService: UserRepository {
             .delete()
     }
 
-    func fetchNearbyUsers(location: GeoPoint, radius: Double) async throws -> [User] {
+    func fetchNearbyUsers(location: GeoPoint, radius: Double) async throws
+        -> [User]
+    {
         let snapshot = try await db.collection("users").getDocuments()
-        
-        let allUsers = snapshot.documents.compactMap { try? $0.data(as: User.self) }
-        
-        let currentLocation = CLLocation(latitude: location.latitude, longitude: location.longitude)
-        
+        /// Decode all user documents, silently skip any that fail to decode
+        let allUsers = snapshot.documents.compactMap {
+            try? $0.data(as: User.self)
+        }
+        /// Wrap the caller's location so we can use CLLocation's built-in distance calculation
+        let currentLocation = CLLocation(
+            latitude: location.latitude,
+            longitude: location.longitude
+        )
+
         return allUsers.compactMap { user in
-            guard let lat = user.latitude, let long = user.longitude else { return nil }
+            /// Skip users who have never stored a location
+            guard let lat = user.latitude, let long = user.longitude else {
+                return nil
+            }
+            /// Calculate distance in km, rounded to 1 decimal place
             let userLocation = CLLocation(latitude: lat, longitude: long)
             let distanceKm = currentLocation.distance(from: userLocation) / 1000
             let rounded = (distanceKm * 10).rounded() / 10
+            /// Drop users outside the selected search radius
             guard rounded <= radius else { return nil }
+            /// Return a copy of the user with their distance filled in
             var updatedUser = user
             updatedUser.distance = rounded
             return updatedUser
@@ -92,7 +105,7 @@ final class UserService: UserRepository {
     }
 
     func updateLocation(_ location: GeoPoint, userId: String) async throws {
-
+        /// Store lat/long as top-level Double fields so they match the User model's - latitude and longitude properties when decoded by Firestore
         try await db.collection("users")
             .document(userId)
             .setData(

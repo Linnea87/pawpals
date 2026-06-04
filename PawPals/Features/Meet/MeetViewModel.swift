@@ -35,18 +35,23 @@ final class MeetViewModel {
         defer { isLocating = false }
 
         do {
+            /// Request a single real GPS location using the modern iOS 17 AsyncSequence API
             let location = try await locationService.requestLocationOnce()
             currentUserLocation = location.coordinate
             locationStatus = .authorizedWhenInUse
 
+            /// Convert CLLocation to GeoPoint — the repository layer speaks GeoPoint, not CLLocation
             let geoPoint = GeoPoint(
                 latitude: location.coordinate.latitude,
                 longitude: location.coordinate.longitude
             )
+            /// Persist the user's current location to Firestore so others can find them/
             try await userRepository.updateLocation(geoPoint, userId: userID)
+            /// Now we have a location, fetch users nearby
             await loadNearbyUsers()
 
         } catch LocationError.permissionDenied {
+            /// User denied location access — update status so the View can show the correct UI
             locationStatus = .denied
         } catch {
             errorMessage = error.localizedDescription
@@ -54,17 +59,19 @@ final class MeetViewModel {
     }
 
     func loadNearbyUsers() async {
+        /// If we don't have a location yet = No fetching
         guard let currentLocation = currentUserLocation else { return }
         isLoading = true
         errorMessage = nil
         defer { isLoading = false }
 
         do {
+            /// Convert CLLocationCoordinate2D to GeoPoint — the repository protocol uses GeoPoint
             let geoPoint = GeoPoint(
                 latitude: currentLocation.latitude,
                 longitude: currentLocation.longitude
             )
-
+            /// UserService handles geo-filtering and distance calculation - users returned here are already within radius and have distance set
             allNearbyUsers = try await userRepository.fetchNearbyUsers(
                 location: geoPoint,
                 radius: searchRadius
