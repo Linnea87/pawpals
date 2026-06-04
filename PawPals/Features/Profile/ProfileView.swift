@@ -17,6 +17,7 @@ struct ProfileView: View {
     @State private var showSidebar = false
     @State private var showEditProfile = false
     @State private var showDeleteConfirm = false
+    @State private var showLogoutConfirm = false
     
     private var displayUser: User {
         isOwner ? profileViewModel.user : user
@@ -190,9 +191,9 @@ struct ProfileView: View {
                             .foregroundStyle(Theme.terracotta)
                             .contentShape(Rectangle())
                             .onTapGesture {
-                                showSidebar = false
-                                authViewModel.signOut()
-                            }
+                                 showSidebar = false
+                                 showLogoutConfirm = true
+                             }
                         
                         Text("profile.deleteAccount")
                             .font(.subheadline)
@@ -271,6 +272,17 @@ struct ProfileView: View {
                 Button("sheet.cancel", role: .cancel) {}
             } message: {
                 Text("profile.deleteAccount.message")
+            }
+            .alert(
+                "profile.logout.title",
+                isPresented: $showLogoutConfirm
+            ) {
+                Button("profile.logout.confirm", role: .destructive) {
+                    authViewModel.signOut()
+                }
+                Button("sheet.cancel", role: .cancel) {}
+            } message: {
+                Text("profile.logout.message")
             }
         }
         .environment(profileViewModel)
