@@ -77,7 +77,8 @@ struct ChatView: View {
                             conversation in
                             ConversationView(
                                 conversation: conversation,
-                                currentUserID: currentUserID
+                                currentUserID: currentUserID,
+                                otherUser: chatViewModel.otherUser(in: conversation, currentUserID: currentUserID) ?? .mock
                             )
                         }
 
@@ -213,7 +214,7 @@ private func makePreviewChatViewModel() -> ChatViewModel {
         return URL(string: "https://mock-image-url.com/image.jpg")!
     }
 
-    let viewModel = ChatViewModel(repository: MockChatRepository())
+    let viewModel = ChatViewModel(chatRepository: MockChatRepository(), userRepository: MockUserRepository())
     viewModel.conversations = mockConversations
     return viewModel
 }

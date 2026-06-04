@@ -22,7 +22,7 @@ struct PawPalsApp: App {
         _locationService = State(initialValue: locationService)
         _meetViewModel = State(initialValue: MeetViewModel(locationService: locationService))
         _authViewModel = State(initialValue: AuthViewModel(repository: AuthService(), userRepository: UserService()))
-        _chatViewModel = State(initialValue: ChatViewModel(repository: ChatService()))
+        _chatViewModel = State(initialValue: ChatViewModel(chatRepository: ChatService(), userRepository: UserService()))
         _notificationService = State(initialValue: NotificationService(userRepository: UserService()))
         _profileViewModel = State(initialValue: ProfileViewModel(userRepository: UserService(), user: .mock))
     }
@@ -37,10 +37,13 @@ struct PawPalsApp: App {
                 .environment(locationService)
                 .environment(profileViewModel)
                 .onChange(of: authViewModel.currentUser?.id) { _, _ in
-                    if let user = authViewModel.currentUser {
-                        profileViewModel.user = user
-                    }
-                }
+                     if let user = authViewModel.currentUser {
+                         profileViewModel.user = user
+                         Task { await profileViewModel.loadUser(userId: user.id) }
+                     } else {
+                         profileViewModel.user = .mock
+                     }
+                 }
 
                 .onOpenURL { url in
                     GIDSignIn.sharedInstance.handle(url)
