@@ -8,28 +8,35 @@ final class ChatViewModel {
     var isLoading: Bool = false
     var errorMessage: String?
     var activeConversation: Conversation?
-    var pendingConversationID: String? /// Set when the user taps a push notification for a new message.
+    var pendingConversationID: String?     /// Set when the user taps a push notification for a new message.
+    var participants: [String: User] = [:]
 
     var totalUnread: Int {
         conversations.reduce(0) { $0 + $1.unreadCount }
     }
 
-    private let repository: ChatRepository
+    private let chatRepository: ChatRepository
+    private let userRepository: UserRepository
     private var stopObserving: (() -> Void)?
 
-    init(repository: ChatRepository) {
-        self.repository = repository
+    init(chatRepository: ChatRepository, userRepository: UserRepository) {
+        self.chatRepository = chatRepository
+        self.userRepository = userRepository
     }
 
-    func fetchConversations(for userId: String) async {
+    func fetchConversations(for userID: String) async {
         isLoading = true
         errorMessage = nil
 
         do {
-            let result = try await repository.fetchConversations(for: userId)
+            let result = try await chatRepository.fetchConversations(
+                for: userID
+            )
             conversations = result.sorted {
                 $0.lastMessageTimestamp > $1.lastMessageTimestamp
             }
+            
+            await fetchParticipants(for: result, currentUserID: userID)
         } catch {
             errorMessage = error.localizedDescription
         }
@@ -37,26 +44,26 @@ final class ChatViewModel {
         isLoading = false
 
     }
-    
-    
+
     func startConversation(with user: User, currentUserId: String) async {
         isLoading = true
         errorMessage = nil
         do {
-            let conversation = try await repository.createOrFetchConversation(
-                between: currentUserId,
-                and: user.id
-            )
+            let conversation =
+                try await chatRepository.createOrFetchConversation(
+                    between: currentUserId,
+                    and: user.id
+                )
             activeConversation = conversation
         } catch {
             errorMessage = error.localizedDescription
         }
         isLoading = false
     }
-    
+
     func markAsDelivered(conversationID: String, userID: String) async {
         do {
-            try await repository.markAsDelivered(
+            try await chatRepository.markAsDelivered(
                 conversationID: conversationID,
                 userID: userID
             )
@@ -76,7 +83,7 @@ final class ChatViewModel {
         conversations[index].unreadCount = 0
 
         do {
-            try await repository.markAsRead(
+            try await chatRepository.markAsRead(
                 conversationID: conversationID,
                 userID: userID
             )
@@ -103,10 +110,15 @@ final class ChatViewModel {
         messageText = ""
 
         do {
-            try await repository.sendMessage(message, to: conversation.id)
+            try await chatRepository.sendMessage(message, to: conversation.id)
         } catch {
             errorMessage = error.localizedDescription
         }
+    }
+    
+    func otherUser(in conversation: Conversation, currentUserID: String) -> User? {
+        let otherID = conversation.participantIDs.first { $0 != currentUserID }
+        return otherID.flatMap { participants[$0] }
     }
 
     //========== HELPERS =============================================
@@ -132,7 +144,7 @@ final class ChatViewModel {
 
     func observeMessages(conversationID: String, currentUserID: String) {
         isLoading = true
-        stopObserving = repository.observeMessages(
+        stopObserving = chatRepository.observeMessages(
             conversationID: conversationID
         ) { [weak self] updatedMessages in
             guard let self else { return }
@@ -141,7 +153,8 @@ final class ChatViewModel {
             Task {
                 await self.markAsDelivered(
                     conversationID: conversationID,
-                    userID: currentUserID)
+                    userID: currentUserID
+                )
             }
         }
     }
@@ -159,5 +172,27 @@ final class ChatViewModel {
         stopObserving = nil
     }
     
+    private func fetchParticipants(for conversations: [Conversation], currentUserID: String) async {
+        
+        let otherIDs = Set(
+            conversations.flatMap { $0.participantIDs.filter { $0 != currentUserID } }
+        ).filter { participants[$0] == nil } 
 
+
+        await withTaskGroup(of: (String, User)?.self) { group in
+            for id in otherIDs {
+                group.addTask {
+
+                    guard let user = try? await self.userRepository.fetchUser(userId: id)
+                    else { return nil }
+                    return (id, user)
+                }
+            }
+            for await result in group {
+                if let (id, user) = result {
+                    participants[id] = user
+                }
+            }
+        }
+    }
 }

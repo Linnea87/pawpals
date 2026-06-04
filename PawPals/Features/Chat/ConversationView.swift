@@ -4,6 +4,9 @@ struct ConversationView: View {
     @Environment(ChatViewModel.self) private var chatViewModel
     let conversation: Conversation
     let currentUserID: String
+    let otherUser: User
+
+    @State private var selectedUser: User?
 
     var body: some View {
         @Bindable var chatViewModel = chatViewModel
@@ -55,14 +58,50 @@ struct ConversationView: View {
                 }
             }
         }
-        .navigationTitle(
-            chatViewModel.otherParticipantName(
-                in: conversation,
-                currentUserID: currentUserID
-            )
-        )
-        .navigationBarTitleDisplayMode(.inline)
-        .toolbar(.hidden, for: .tabBar)
+        .toolbar(content: {
+            ToolbarItem(placement: .principal) {
+                Button {
+                    selectedUser = otherUser
+                } label: {
+                    VStack(spacing: Spacing.xxSmall) {
+                        Group {
+                            if let photoURL = otherUser.photoURL,
+                                let url = URL(string: photoURL)
+                            {
+                                AsyncImage(url: url) { image in
+                                    image.resizable().scaledToFill()
+                                } placeholder: {
+                                    Image(systemName: "person.fill")
+                                        .foregroundStyle(Theme.darkBrown)
+                                }
+                            } else {
+                                Image(systemName: "person.fill")
+                                    .foregroundStyle(Theme.darkBrown)
+                            }
+                        }
+                        .frame(width: IconSize.navAvatar, height: IconSize.navAvatar)
+                        .background(Theme.lightPeach)
+                        .clipShape(Circle())
+
+                        Text(otherUser.name)
+                            .font(.headline)
+                            .fontWeight(.semibold)
+                            .foregroundStyle(Theme.darkBrown)
+                    }
+                    .offset(y: 20)
+                }
+            }
+        })
+        .sheet(item: $selectedUser) { user in
+            NavigationStack {
+                ProfileView(
+                    user: user,
+                    isOwner: false,
+                    selectedTab: .constant(.chat)
+                )
+            }
+        }
+        .toolbarVisibility(.hidden, for: .tabBar)
         .onAppear {
             chatViewModel.observeMessages(
                 conversationID: conversation.id,
@@ -143,7 +182,7 @@ private struct MessageBubbleView: View {
                         .clipShape(
                             RoundedRectangle(cornerRadius: Radius.medium)
                         )
-                    HStack (spacing: Spacing.xSmall) {
+                    HStack(spacing: Spacing.xSmall) {
                         Text(message.timestamp, style: .time)
                             .font(.caption2)
                             .foregroundStyle(Theme.warmBrown)
@@ -164,12 +203,12 @@ private struct MessageStatusView: View {
     let isRead: Bool
 
     var body: some View {
-        HStack(spacing: -4) {
+        HStack(spacing: Spacing.negativeXSmall) {
             Image(systemName: "checkmark")
-                .font(.system(size: 9, weight: .semibold))
+                .font(.system(size: FontSize.small, weight: .semibold))
                 .foregroundStyle(isRead ? Theme.terracotta : Theme.warmBrown)
             Image(systemName: "checkmark")
-                .font(.system(size: 9, weight: .semibold))
+                .font(.system(size: FontSize.small, weight: .semibold))
                 .foregroundStyle(isRead ? Theme.terracotta : Theme.warmBrown)
                 .opacity(isDelivered || isRead ? 1 : 0)
         }
@@ -183,14 +222,13 @@ private struct MessageInputBar: View {
     var body: some View {
         HStack(spacing: Spacing.small) {
             HStack(spacing: Spacing.small) {
-                Image(systemName: "face.smiling")
-                    .foregroundStyle(Theme.warmBrown)
+                
 
                 TextField("chat.messagePlaceholder", text: $text)
             }
             .padding(.horizontal, Spacing.medium)
             .padding(.vertical, Spacing.small)
-            .background(Theme.lightPeach)
+            .background(Theme.offWhite)
             .clipShape(Capsule())
 
             Button(action: onSend) {
@@ -209,7 +247,7 @@ private struct MessageInputBar: View {
         }
         .padding(.horizontal, Spacing.medium)
         .padding(.vertical, Spacing.medium)
-        .background(Theme.offWhite)
+        
     }
 }
 
@@ -239,7 +277,8 @@ private struct MockThreadRepository: ChatRepository {
                 receiverID: "user2",
                 text: "Oh that sounds perfect! When are you free?",
                 timestamp: Date().addingTimeInterval(-240),
-                isRead: true, isDelivered: true
+                isRead: true,
+                isDelivered: true
             ),
             Message(
                 id: "3",
@@ -254,7 +293,8 @@ private struct MockThreadRepository: ChatRepository {
                 receiverID: "user2",
                 text: "Yes! 10am works great for us 🐕",
                 timestamp: Date().addingTimeInterval(-120),
-                 isRead: true, isDelivered: true
+                isRead: true,
+                isDelivered: true
             ),
             Message(
                 id: "5",
@@ -266,9 +306,9 @@ private struct MockThreadRepository: ChatRepository {
         ])
         return {}
     }
-
-    func markAsRead(conversationID: String, userID: String) async throws {}
     
+    func markAsRead(conversationID: String, userID: String) async throws {}
+
     func markAsDelivered(conversationID: String, userID: String) async throws {}
 
     func createOrFetchConversation(between userId1: String, and userId2: String)
@@ -283,8 +323,18 @@ private struct MockThreadRepository: ChatRepository {
     }
 }
 
+
+private struct MockConvAuthRepository: AuthRepository {
+    func signUp(email: String, password: String) async throws -> User { .mock }
+    func signUpWithGoogle() async throws -> User { .mock }
+    func signOut() throws {}
+    func signIn(email: String, password: String) async throws -> User { .mock }
+    func signInWithGoogle() async throws -> User { .mock }
+    func deleteAccount() async throws {}
+}
+
 #Preview {
-    let viewModel = ChatViewModel(repository: MockThreadRepository())
+    let viewModel = ChatViewModel(chatRepository: MockThreadRepository(), userRepository: MockUserRepository())
     let conversation = Conversation(
         id: "conv1",
         participantIDs: ["user1", "user2"],
@@ -292,7 +342,13 @@ private struct MockThreadRepository: ChatRepository {
         lastMessageTimestamp: Date().addingTimeInterval(-60)
     )
     NavigationStack {
-        ConversationView(conversation: conversation, currentUserID: "user1")
+        ConversationView(
+            conversation: conversation,
+            currentUserID: "user1",
+            otherUser: .mock
+        )
     }
     .environment(viewModel)
+    .environment(AuthViewModel(repository: MockConvAuthRepository(), userRepository: MockUserRepository()))
+    .environment(ProfileViewModel(userRepository: MockUserRepository(), user: .mock))
 }
