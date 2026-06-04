@@ -139,11 +139,6 @@ final class MeetViewModel {
             }
         }
 
-        result = result.filter { user in
-            guard let distance = user.distance else { return true }
-            return distance <= searchRadius
-        }
-
         filteredUsers = result
     }
 
