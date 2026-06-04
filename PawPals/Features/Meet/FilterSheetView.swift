@@ -13,8 +13,53 @@ struct FilterSheetView: View {
                     .ignoresSafeArea()
 
                 VStack(alignment: .leading, spacing: Spacing.large) {
-                    // Preference chips/pills card can go here later (above the slider+map card)
-                    Spacer()
+                    VStack(alignment: .leading, spacing: Spacing.small) {
+                        Text("Walk type")
+                            .font(.subheadline)
+                            .fontWeight(.semibold)
+                            .foregroundStyle(Theme.darkBrown)
+
+                        ScrollView(.horizontal, showsIndicators: false) {
+                            HStack(spacing: Spacing.small) {
+                                FilterChip(title: "All", isSelected: viewModel.activeFilters.isEmpty) {
+                                    viewModel.clearFilters()
+                                }
+                                ForEach(WalkType.allCases) { walkType in
+                                    FilterChip(
+                                        title: walkType.rawValue,
+                                        isSelected: viewModel.activeFilters.contains(walkType.rawValue)
+                                    ) {
+                                        viewModel.toggleFilter(walkType.rawValue)
+                                    }
+                                }
+                            }
+                        }
+
+                        Text("Dog size")
+                            .font(.subheadline)
+                            .fontWeight(.semibold)
+                            .foregroundStyle(Theme.darkBrown)
+                            .padding(.top, Spacing.small)
+
+                        ScrollView(.horizontal, showsIndicators: false) {
+                            HStack(spacing: Spacing.small) {
+                                FilterChip(title: "All sizes", isSelected: viewModel.activeSizeFilters.isEmpty) {
+                                    viewModel.clearSizeFilters()
+                                }
+                                ForEach(DogSize.allCases, id: \.self) { size in
+                                    FilterChip(
+                                        title: size.rawValue.capitalized,
+                                        isSelected: viewModel.activeSizeFilters.contains(size.rawValue)
+                                    ) {
+                                        viewModel.toggleSizeFilter(size.rawValue)
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    .padding(Spacing.medium)
+                    .background(Theme.offWhite.opacity(0.6))
+                    .clipShape(RoundedRectangle(cornerRadius: Radius.medium))
 
                     VStack(alignment: .leading, spacing: Spacing.medium) {
 
@@ -147,6 +192,24 @@ struct FilterSheetView: View {
                 .background(Color.white)
                 .clipShape(Circle())
                 .shadow(radius: Radius.xxSmall)
+        }
+    }
+    
+    private struct FilterChip: View {
+        let title: String
+        let isSelected: Bool
+        let action: () -> Void
+
+        var body: some View {
+            Button(action: action) {
+                Text(title)
+                    .font(.footnote)
+                    .padding(.horizontal, Spacing.medium)
+                    .padding(.vertical, Spacing.medium)
+                    .background(isSelected ? Theme.sageGreen : Theme.offWhite)
+                    .foregroundStyle(isSelected ? Theme.offWhite : Theme.darkBrown)
+                    .clipShape(Capsule())
+            }
         }
     }
 }
