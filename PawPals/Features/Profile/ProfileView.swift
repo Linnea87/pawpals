@@ -450,7 +450,12 @@ private struct MockChatRepository: ChatRepository {
             distance: nil
         )
     }
-    
+
+    // Mock implementation — required by ChatRepository protocol (PP-028)
+    // Not used in ChatView, added only to satisfy protocol conformance
+    func uploadImage(_ image: UIImage, conversationId: String) async throws -> URL {
+        return URL(string: "https://mock-image-url.com/image.jpg")!
+    }
     func deleteUserData(userId: String) async throws {}
     func uploadProfilePhoto(_ data: Data, userId: String) async throws -> String { "" }
 }

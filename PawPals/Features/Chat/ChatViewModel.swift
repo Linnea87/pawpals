@@ -1,4 +1,5 @@
 import Foundation
+import UIKit 
 
 @Observable
 final class ChatViewModel {
@@ -8,8 +9,10 @@ final class ChatViewModel {
     var isLoading: Bool = false
     var errorMessage: String?
     var activeConversation: Conversation?
-    var pendingConversationID: String?     /// Set when the user taps a push notification for a new message.
+    var pendingConversationID: String? /// Set when the user taps a push notification for a new message.
+    var isUploadingImage: Bool = false
     var participants: [String: User] = [:]
+
 
     var totalUnread: Int {
         conversations.reduce(0) { $0 + $1.unreadCount }
@@ -170,6 +173,36 @@ final class ChatViewModel {
     func stopListening() {
         stopObserving?()
         stopObserving = nil
+    }
+
+    func sendImage(_ image: UIImage, in conversation: Conversation, senderID: String) async {
+        isUploadingImage = true
+        errorMessage = nil
+
+        let receiverID = conversation.participantIDs.first { $0 != senderID } ?? ""
+
+        do {
+            // Upload image to Firebase Storage via repository
+            let url = try await repository.uploadImage(image, conversationId: conversation.id)
+
+            // Create message with image URL — text is empty for image messages
+            let message = Message(
+                id: UUID().uuidString,
+                senderID: senderID,
+                receiverID: receiverID,
+                text: "",
+                imageURL: url.absoluteString,
+                timestamp: Date()
+            )
+
+            // Send message to Firestore
+            try await repository.sendMessage(message, to: conversation.id)
+
+        } catch {
+            errorMessage = error.localizedDescription
+        }
+
+        isUploadingImage = false
     }
     
     private func fetchParticipants(for conversations: [Conversation], currentUserID: String) async {

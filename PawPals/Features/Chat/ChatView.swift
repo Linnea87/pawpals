@@ -177,6 +177,11 @@ private struct MockChatRepository: ChatRepository {
     func markAsRead(conversationID: String, userID: String) async throws {}
     
     func markAsDelivered(conversationID: String, userID: String) async throws {}
+    // Mock implementation — required by ChatRepository protocol (PP-028)
+    // Not used in ChatView, added only to satisfy protocol conformance
+    func uploadImage(_ image: UIImage, conversationId: String) async throws -> URL {
+            return URL(string: "https://mock-image-url.com/image.jpg")!
+        }
 }
 
 private func makePreviewChatViewModel() -> ChatViewModel {
@@ -205,6 +210,9 @@ private func makePreviewChatViewModel() -> ChatViewModel {
 
         ),
     ]
+    func uploadImage(_ image: UIImage, conversationId: String) async throws -> URL {
+        return URL(string: "https://mock-image-url.com/image.jpg")!
+    }
 
     let viewModel = ChatViewModel(chatRepository: MockChatRepository(), userRepository: MockUserRepository())
     viewModel.conversations = mockConversations
