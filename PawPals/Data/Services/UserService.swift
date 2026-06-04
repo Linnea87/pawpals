@@ -6,9 +6,11 @@ enum UserServiceError: Error {
      case notFound
  }
 
+
 final class UserService: UserRepository {
     private let db = Firestore.firestore()
     
+ 
     func updateProfile(_ user: User) async throws {
         var data: [String: Any] = [
             "name": user.name,
