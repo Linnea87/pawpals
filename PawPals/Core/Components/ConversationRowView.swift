@@ -1,24 +1,39 @@
 import SwiftUI
 
+/// A single row in the chat list showing the other participant's avatar, name,
+/// message preview, timestamp, and unread badge.
+///
+/// Previously this view used conversation.participantIDs.first as the display name,
+/// which showed the raw Firebase UID string instead of the actual user's name.
+/// It now receives otherUserName and otherUserPhotoURL from ChatView, which resolves
+/// them from the participants cache in ChatViewModel before passing them in.
 struct ConversationRowView: View {
     let conversation: Conversation
     let timestampText: String
+    let otherUserName: String
+    let otherUserPhotoURL: String?
 
     var body: some View {
         HStack(spacing: Spacing.medium) {
-            Circle()
-                .fill(Theme.lightPeach)
-                .frame(width: IconSize.chatAvatar, height: IconSize.chatAvatar)
-                .overlay {
+            Group {
+                if let photoURL = otherUserPhotoURL, let url = URL(string: photoURL) {
+                    AsyncImage(url: url) { image in
+                        image.resizable().scaledToFill()
+                    } placeholder: {
+                        Image(systemName: "person")
+                            .foregroundStyle(Theme.warmBrown)
+                    }
+                } else {
                     Image(systemName: "person")
                         .foregroundStyle(Theme.warmBrown)
                 }
+            }
+            .frame(width: IconSize.chatAvatar, height: IconSize.chatAvatar)
+            .background(Theme.lightPeach)
+            .clipShape(Circle())
 
             VStack(alignment: .leading, spacing: Spacing.xSmall) {
-                Text(
-                    conversation.participantIDs.first
-                        ?? String(localized: "common.unknown")
-                )
+                Text(otherUserName)
                 .font(.headline)
                 .foregroundStyle(Theme.darkBrown)
 
@@ -60,6 +75,6 @@ struct ConversationRowView: View {
         lastMessageTimestamp: Date(),
         unreadCount: 2
     )
-    ConversationRowView(conversation: mockConversation, timestampText: "Today")
+    ConversationRowView(conversation: mockConversation, timestampText: "Today", otherUserName: "Anna", otherUserPhotoURL: nil)
            .padding()
 }

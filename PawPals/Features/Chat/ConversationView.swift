@@ -1,6 +1,7 @@
 import PhotosUI
 import SwiftUI
 
+
 struct ConversationView: View {
     @Environment(ChatViewModel.self) private var chatViewModel
     let conversation: Conversation
@@ -18,8 +19,10 @@ struct ConversationView: View {
 
             VStack(spacing: Spacing.none) {
                 if chatViewModel.isLoading {
+                    Spacer()
                     ProgressView()
-                        .frame(maxWidth: .infinity, maxHeight: .infinity)
+                        .frame(maxWidth: .infinity)
+                    Spacer()
                 } else {
                     ScrollViewReader { proxy in
                         ScrollView {
@@ -108,7 +111,6 @@ struct ConversationView: View {
                             .fontWeight(.semibold)
                             .foregroundStyle(Theme.darkBrown)
                     }
-                    .offset(y: 20)
                 }
             }
         })
@@ -139,7 +141,10 @@ struct ConversationView: View {
         }
         .alert(
             String(localized: "common.error"),
-            isPresented: .constant(chatViewModel.errorMessage != nil)
+            isPresented: Binding(
+                get: { chatViewModel.errorMessage != nil },
+                set: { if !$0 { chatViewModel.errorMessage = nil } }
+            )
         ) {
             Button(String(localized: "common.ok")) {
                 chatViewModel.errorMessage = nil
@@ -320,8 +325,6 @@ private struct MessageInputBar: View {
 }
 
 private struct MockThreadRepository: ChatRepository {
-    func fetchConversations(for userId: String) async throws -> [Conversation] { [] }
-
     func sendMessage(_ message: Message, to conversationID: String) async throws {}
 
     func observeMessages(
@@ -374,6 +377,7 @@ private struct MockThreadRepository: ChatRepository {
 
     func markAsRead(conversationID: String, userID: String) async throws {}
     func markAsDelivered(conversationID: String, userID: String) async throws {}
+    func observeConversations(for userID: String, onUpdate: @escaping ([Conversation]) -> Void) -> (() -> Void) { return {} }
     func createOrFetchConversation(between userId1: String, and userId2: String) async throws -> Conversation {
         Conversation(
             id: "mock-conv",
