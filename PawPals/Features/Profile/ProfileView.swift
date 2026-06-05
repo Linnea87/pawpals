@@ -451,9 +451,6 @@ private struct MockAuthRepository: AuthRepository {
 }
 
 private struct MockChatRepository: ChatRepository {
-    func fetchConversations(for userId: String) async throws -> [Conversation] {
-        []
-    }
     func sendMessage(_ message: Message, to conversationID: String) async throws
     {}
     func observeMessages(
@@ -472,6 +469,7 @@ private struct MockChatRepository: ChatRepository {
     }
     func markAsRead(conversationID: String, userID: String) async throws {}
     func markAsDelivered(conversationID: String, userID: String) async throws {}
+    func observeConversations(for userID: String, onUpdate: @escaping ([Conversation]) -> Void) -> (() -> Void) { return {} }
     func signIn(email: String, password: String) async throws -> User {
         User(
             id: "preview",

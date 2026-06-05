@@ -59,19 +59,17 @@ final class MeetViewModel {
     }
 
     func loadNearbyUsers() async {
-        /// If we don't have a location yet = No fetching
         guard let currentLocation = currentUserLocation else { return }
         isLoading = true
         errorMessage = nil
         defer { isLoading = false }
 
         do {
-            /// Convert CLLocationCoordinate2D to GeoPoint — the repository protocol uses GeoPoint
+            
             let geoPoint = GeoPoint(
                 latitude: currentLocation.latitude,
                 longitude: currentLocation.longitude
             )
-            /// UserService handles geo-filtering and distance calculation - users returned here are already within radius and have distance set and Exclude the logged-in user
             allNearbyUsers = try await userRepository.fetchNearbyUsers(
                 location: geoPoint,
                 radius: searchRadius,
@@ -82,7 +80,6 @@ final class MeetViewModel {
         } catch {
             errorMessage = error.localizedDescription
         }
-
     }
 
     func setRadius(_ km: Double, userId: String) {
