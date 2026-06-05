@@ -6,14 +6,7 @@ import UIKit
 final class ChatService: ChatRepository {
     private let db = Firestore.firestore()
 
-    func fetchConversations(for userId: String) async throws -> [Conversation] {
-        let snapshot = try await db.collection("conversations")
-            .whereField("participantIDs", arrayContains: userId)
-            .getDocuments()
-
-        return snapshot.documents.compactMap { try? $0.data(as: Conversation.self) }
-    }
-
+    /// Returns an existing conversation between two users, or creates a new one.
     func createOrFetchConversation(between userId1: String, and userId2: String) async throws -> Conversation {
         let snapshot = try await db.collection("conversations")
             .whereField("participantIDs", arrayContains: userId1)
@@ -38,6 +31,8 @@ final class ChatService: ChatRepository {
         return conversation
     }
 
+    /// Writes the message to the messages subcollection, then updates the parent
+    /// conversation document with the latest preview text, timestamp, and unread count.
     func sendMessage(_ message: Message, to conversationID: String) async throws {
         let ref = db.collection("conversations")
             .document(conversationID)
@@ -54,8 +49,17 @@ final class ChatService: ChatRepository {
             "isDelivered": false
         ]
         try await ref.setData(data)
+
+        /// Update the conversation document so the chat list shows the correct preview, and the receiver's unread badge increments in real time.
+        let conversationRef = db.collection("conversations").document(conversationID)
+        try await conversationRef.updateData([
+            "lastMessage": message.text.isEmpty ? "📷 Photo" : message.text,
+            "lastMessageTimestamp": Timestamp(date: message.timestamp),
+            "unreadCount": FieldValue.increment(Int64(1)) /// Firestore increments this on the server so two messages arriving at the same time never cancel each other out. Int64 is just what the SDK expects for whole numbers.
+        ])
     }
 
+    /// Attaches a real-time Firestore listener to the messages subcollection for one conversation.
     func observeMessages(
         conversationID: String,
         onUpdate: @escaping ([Message]) -> Void
@@ -63,39 +67,61 @@ final class ChatService: ChatRepository {
         let listener = db.collection("conversations")
             .document(conversationID)
             .collection("messages")
+            /// Order by timestamp so messages always render oldest → newest
             .order(by: "timestamp")
             .addSnapshotListener { snapshot, _ in
                 guard let documents = snapshot?.documents else { return }
 
+                /// Decode each message document — silently skip any that fail to decode
                 let messages = documents.compactMap { doc in
                     try? doc.data(as: Message.self)
                 }
 
                 onUpdate(messages)
             }
-
+        
         return { listener.remove() }
     }
-  
+
+    /// Attaches a real-time Firestore listener to the conversations collection.
+    func observeConversations(
+        for userID: String,
+        onUpdate: @escaping ([Conversation]) -> Void
+    ) -> (() -> Void) {
+        let listener = db.collection("conversations")
+            /// Only listen to conversations this user is part of
+            .whereField("participantIDs", arrayContains: userID)
+            .addSnapshotListener { snapshot, _ in
+                guard let documents = snapshot?.documents else { return }
+                /// Decode each conversation document — silently skip any that fail
+                let conversations = documents.compactMap { try? $0.data(as: Conversation.self) }
+                /// Sort newest-first so the most recent conversation always appears at the top
+                onUpdate(conversations.sorted { $0.lastMessageTimestamp > $1.lastMessageTimestamp })
+            }
+        return { listener.remove() }
+    }
+
+    /// Resets the unread badge to 0 and marks all messages sent to this user as read.
     func markAsRead(conversationID: String, userID: String) async throws {
         try await db.collection("conversations")
             .document(conversationID)
-        .updateData(["unreadCount": 0])
-        
+            .updateData(["unreadCount": 0])
+
         let snapshot = try await db.collection("conversations")
             .document(conversationID)
             .collection("messages")
             .whereField("receiverID", isEqualTo: userID)
             .whereField("isRead", isEqualTo: false)
             .getDocuments()
-        
+
         let batch = db.batch()
         for doc in snapshot.documents {
             batch.updateData(["isRead": true], forDocument: doc.reference)
         }
         try await batch.commit()
     }
-    
+
+    /// Marks all undelivered messages sent to this user as delivered (second checkmark).
     func markAsDelivered(conversationID: String, userID: String) async throws {
         let snapshot = try await db.collection("conversations")
             .document(conversationID)
