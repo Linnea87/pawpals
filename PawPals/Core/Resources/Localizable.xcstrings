@@ -636,7 +636,7 @@
         }
       }
     },
-    "profile.dog_info" : {
+    "profile.dogInfo" : {
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
@@ -757,7 +757,7 @@
         }
       }
     },
-    "profile.walk_preferences" : {
+    "profile.walkPreferences" : {
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
