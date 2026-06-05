@@ -1,5 +1,7 @@
 import Foundation
 import FirebaseFirestore
+import FirebaseStorage
+import UIKit
 
 final class ChatService: ChatRepository {
     private let db = Firestore.firestore()
@@ -109,5 +111,24 @@ final class ChatService: ChatRepository {
             batch.updateData(["isDelivered": true], forDocument: doc.reference)
         }
         try await batch.commit()
+    }
+
+    func uploadImage(_ image: UIImage, conversationId: String) async throws -> URL {
+
+        guard let imageData = image.jpegData(compressionQuality: 0.7) else {
+            throw URLError(.badServerResponse)
+        }
+        guard imageData.count < 5_000_000 else {
+            throw URLError(.dataLengthExceedsMaximum)
+        }
+
+        let storageRef = Storage.storage()
+            .reference()
+            .child("conversations/\(conversationId)/\(UUID().uuidString).jpg")
+
+        _ = try await storageRef.putDataAsync(imageData)
+
+        let url = try await storageRef.downloadURL()
+        return url
     }
 }

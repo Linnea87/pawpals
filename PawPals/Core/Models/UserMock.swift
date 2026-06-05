@@ -29,11 +29,11 @@ extension User {
 }
 
 #if DEBUG
-struct MockUserRepository: UserRepository {
+struct MockUserRepository: UserRepository {    
     func updateProfile(_ user: User) async throws {}
     func saveDog(_ dog: Dog, userId: String) async throws {}
     func removeDog(dogId: String, userId: String) async throws {}
-    func fetchNearbyUsers(location: GeoPoint, radius: Double) async throws -> [User] { [] }
+    func fetchNearbyUsers(location: GeoPoint, radius: Double, excludingUserID: String) async throws -> [User] { [] }
     func updateLocation(_ location: GeoPoint, userId: String) async throws {}
     func savePreferences(_ prefs: UserPreferences, userId: String) async throws {}
     func loadPreferences(userId: String) async throws -> UserPreferences {

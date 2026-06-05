@@ -1,9 +1,13 @@
+import PhotosUI
 import SwiftUI
 
 struct ConversationView: View {
     @Environment(ChatViewModel.self) private var chatViewModel
     let conversation: Conversation
     let currentUserID: String
+    let otherUser: User
+
+    @State private var selectedUser: User?
 
     var body: some View {
         @Bindable var chatViewModel = chatViewModel
@@ -25,19 +29,30 @@ struct ConversationView: View {
                                 ForEach(chatViewModel.messages) { message in
                                     MessageBubbleView(
                                         message: message,
-                                        isFromCurrentUser: message.senderID
-                                            == currentUserID
+                                        isFromCurrentUser: message.senderID == currentUserID
                                     )
-
                                     .id(message.id)
+                                }
+                                // TODO [PP-028]: Remove temporary uploading placeholder message
+                                // when real message with imageURL arrives from Firestore observer
+                                if chatViewModel.isUploadingImage {
+                                    MessageBubbleView(
+                                        message: Message(
+                                            id: "uploading",
+                                            senderID: currentUserID,
+                                            receiverID: "",
+                                            text: "",
+                                            timestamp: Date()
+                                        ),
+                                        isFromCurrentUser: true,
+                                        isUploadingImage: true
+                                    )
                                 }
                             }
                             .padding(Spacing.medium)
                         }
                         .onChange(of: chatViewModel.messages.count) { _, _ in
-                            guard let last = chatViewModel.messages.last else {
-                                return
-                            }
+                            guard let last = chatViewModel.messages.last else { return }
                             withAnimation {
                                 proxy.scrollTo(last.id, anchor: .bottom)
                             }
@@ -52,17 +67,61 @@ struct ConversationView: View {
                             senderID: currentUserID
                         )
                     }
+                } onImagePick: { image in
+                    Task {
+                        await chatViewModel.sendImage(
+                            image,
+                            in: conversation,
+                            senderID: currentUserID
+                        )
+                    }
                 }
             }
         }
-        .navigationTitle(
-            chatViewModel.otherParticipantName(
-                in: conversation,
-                currentUserID: currentUserID
-            )
-        )
-        .navigationBarTitleDisplayMode(.inline)
-        .toolbar(.hidden, for: .tabBar)
+        .toolbar(content: {
+            ToolbarItem(placement: .principal) {
+                Button {
+                    selectedUser = otherUser
+                } label: {
+                    VStack(spacing: Spacing.xxSmall) {
+                        Group {
+                            if let photoURL = otherUser.photoURL,
+                                let url = URL(string: photoURL)
+                            {
+                                AsyncImage(url: url) { image in
+                                    image.resizable().scaledToFill()
+                                } placeholder: {
+                                    Image(systemName: "person.fill")
+                                        .foregroundStyle(Theme.darkBrown)
+                                }
+                            } else {
+                                Image(systemName: "person.fill")
+                                    .foregroundStyle(Theme.darkBrown)
+                            }
+                        }
+                        .frame(width: IconSize.navAvatar, height: IconSize.navAvatar)
+                        .background(Theme.lightPeach)
+                        .clipShape(Circle())
+
+                        Text(otherUser.name)
+                            .font(.headline)
+                            .fontWeight(.semibold)
+                            .foregroundStyle(Theme.darkBrown)
+                    }
+                    .offset(y: 20)
+                }
+            }
+        })
+        .sheet(item: $selectedUser) { user in
+            NavigationStack {
+                ProfileView(
+                    user: user,
+                    isOwner: false,
+                    selectedTab: .constant(.chat)
+                )
+            }
+        }
+        .toolbarVisibility(.hidden, for: .tabBar)
         .onAppear {
             chatViewModel.observeMessages(
                 conversationID: conversation.id,
@@ -113,20 +172,13 @@ private struct DateSeparatorView: View {
 private struct MessageBubbleView: View {
     let message: Message
     let isFromCurrentUser: Bool
+    var isUploadingImage: Bool = false
 
     var body: some View {
         HStack {
             if !isFromCurrentUser {
                 VStack(alignment: .leading, spacing: Spacing.xSmall) {
-                    Text(message.text)
-                        .padding(.horizontal, Spacing.medium)
-                        .padding(.vertical, Spacing.small)
-                        .background(Theme.offWhite)
-                        .foregroundStyle(Theme.darkBrown)
-                        .clipShape(
-                            RoundedRectangle(cornerRadius: Radius.medium)
-                        )
-
+                    bubbleContent
                     Text(message.timestamp, style: .time)
                         .font(.caption2)
                         .foregroundStyle(Theme.warmBrown)
@@ -135,15 +187,9 @@ private struct MessageBubbleView: View {
             } else {
                 Spacer()
                 VStack(alignment: .trailing, spacing: Spacing.xSmall) {
-                    Text(message.text)
-                        .padding(.horizontal, Spacing.medium)
-                        .padding(.vertical, Spacing.small)
-                        .background(Theme.terracotta)
-                        .foregroundStyle(.white)
-                        .clipShape(
-                            RoundedRectangle(cornerRadius: Radius.medium)
-                        )
-                    HStack (spacing: Spacing.xSmall) {
+                    bubbleContent
+
+                    HStack(spacing: Spacing.xSmall) {
                         Text(message.timestamp, style: .time)
                             .font(.caption2)
                             .foregroundStyle(Theme.warmBrown)
@@ -152,9 +198,48 @@ private struct MessageBubbleView: View {
                             isRead: message.isRead
                         )
                     }
-
                 }
             }
+        }
+    }
+
+    @ViewBuilder
+    private var bubbleContent: some View {
+        if isUploadingImage {
+            ProgressView()
+                .frame(width: 200, height: 150)
+                .background(isFromCurrentUser ? Theme.terracotta.opacity(0.3) : Theme.offWhite)
+                .clipShape(RoundedRectangle(cornerRadius: Radius.medium))
+
+        } else if let imageURL = message.imageURL,
+                  let url = URL(string: imageURL) {
+            AsyncImage(url: url) { phase in
+                switch phase {
+                case .empty:
+                    ProgressView()
+                        .frame(width: 200, height: 150)
+                case .success(let image):
+                    image
+                        .resizable()
+                        .scaledToFill()
+                        .frame(maxWidth: 200, maxHeight: 200)
+                        .clipShape(RoundedRectangle(cornerRadius: Radius.medium))
+                case .failure:
+                    Image(systemName: "photo")
+                        .foregroundStyle(Theme.warmBrown)
+                        .frame(width: 200, height: 150)
+                @unknown default:
+                    EmptyView()
+                }
+            }
+
+        } else {
+            Text(message.text)
+                .padding(.horizontal, Spacing.medium)
+                .padding(.vertical, Spacing.small)
+                .background(isFromCurrentUser ? Theme.terracotta : Theme.offWhite)
+                .foregroundStyle(isFromCurrentUser ? .white : Theme.darkBrown)
+                .clipShape(RoundedRectangle(cornerRadius: Radius.medium))
         }
     }
 }
@@ -164,12 +249,12 @@ private struct MessageStatusView: View {
     let isRead: Bool
 
     var body: some View {
-        HStack(spacing: -4) {
+        HStack(spacing: Spacing.negativeXSmall) {
             Image(systemName: "checkmark")
-                .font(.system(size: 9, weight: .semibold))
+                .font(.system(size: FontSize.small, weight: .semibold))
                 .foregroundStyle(isRead ? Theme.terracotta : Theme.warmBrown)
             Image(systemName: "checkmark")
-                .font(.system(size: 9, weight: .semibold))
+                .font(.system(size: FontSize.small, weight: .semibold))
                 .foregroundStyle(isRead ? Theme.terracotta : Theme.warmBrown)
                 .opacity(isDelivered || isRead ? 1 : 0)
         }
@@ -179,19 +264,40 @@ private struct MessageStatusView: View {
 private struct MessageInputBar: View {
     @Binding var text: String
     let onSend: () -> Void
+    let onImagePick: (UIImage) -> Void
+    
+    // TODO [PP-028]: Reset selectedPhoto after upload
+    // so user can pick the same image twice
+    @State private var selectedPhoto: PhotosPickerItem?
 
     var body: some View {
         HStack(spacing: Spacing.small) {
             HStack(spacing: Spacing.small) {
-                Image(systemName: "face.smiling")
-                    .foregroundStyle(Theme.warmBrown)
+                
 
                 TextField("chat.messagePlaceholder", text: $text)
             }
             .padding(.horizontal, Spacing.medium)
             .padding(.vertical, Spacing.small)
-            .background(Theme.lightPeach)
+            .background(Theme.offWhite)
             .clipShape(Capsule())
+
+            PhotosPicker(selection: $selectedPhoto, matching: .images) {
+                Image(systemName: "photo")
+                    .font(.system(size: Spacing.large, weight: .semibold))
+                    .foregroundStyle(Theme.warmBrown)
+                    .padding(Spacing.medium)
+                    .background(Theme.lightPeach)
+                    .clipShape(Circle())
+            }
+            .onChange(of: selectedPhoto) { _, newItem in
+                Task {
+                    if let data = try? await newItem?.loadTransferable(type: Data.self),
+                       let image = UIImage(data: data) {
+                        onImagePick(image)
+                    }
+                }
+            }
 
             Button(action: onSend) {
                 Image(systemName: "paperplane.fill")
@@ -209,18 +315,15 @@ private struct MessageInputBar: View {
         }
         .padding(.horizontal, Spacing.medium)
         .padding(.vertical, Spacing.medium)
-        .background(Theme.offWhite)
+        
     }
 }
 
-// ------------------- Preview --------------------------//
-
 private struct MockThreadRepository: ChatRepository {
-    func fetchConversations(for userId: String) async throws -> [Conversation] {
-        []
-    }
-    func sendMessage(_ message: Message, to conversationID: String) async throws
-    {}
+    func fetchConversations(for userId: String) async throws -> [Conversation] { [] }
+
+    func sendMessage(_ message: Message, to conversationID: String) async throws {}
+
     func observeMessages(
         conversationID: String,
         onUpdate: @escaping ([Message]) -> Void
@@ -239,7 +342,8 @@ private struct MockThreadRepository: ChatRepository {
                 receiverID: "user2",
                 text: "Oh that sounds perfect! When are you free?",
                 timestamp: Date().addingTimeInterval(-240),
-                isRead: true, isDelivered: true
+                isRead: true,
+                isDelivered: true
             ),
             Message(
                 id: "3",
@@ -254,7 +358,8 @@ private struct MockThreadRepository: ChatRepository {
                 receiverID: "user2",
                 text: "Yes! 10am works great for us 🐕",
                 timestamp: Date().addingTimeInterval(-120),
-                 isRead: true, isDelivered: true
+                isRead: true,
+                isDelivered: true
             ),
             Message(
                 id: "5",
@@ -268,12 +373,8 @@ private struct MockThreadRepository: ChatRepository {
     }
 
     func markAsRead(conversationID: String, userID: String) async throws {}
-    
     func markAsDelivered(conversationID: String, userID: String) async throws {}
-
-    func createOrFetchConversation(between userId1: String, and userId2: String)
-        async throws -> Conversation
-    {
+    func createOrFetchConversation(between userId1: String, and userId2: String) async throws -> Conversation {
         Conversation(
             id: "mock-conv",
             participantIDs: [userId1, userId2],
@@ -281,10 +382,23 @@ private struct MockThreadRepository: ChatRepository {
             lastMessageTimestamp: Date()
         )
     }
+    func uploadImage(_ image: UIImage, conversationId: String) async throws -> URL {
+        return URL(string: "https://mock-image-url.com/image.jpg")!
+    }
+}
+
+
+private struct MockConvAuthRepository: AuthRepository {
+    func signUp(email: String, password: String) async throws -> User { .mock }
+    func signUpWithGoogle() async throws -> User { .mock }
+    func signOut() throws {}
+    func signIn(email: String, password: String) async throws -> User { .mock }
+    func signInWithGoogle() async throws -> User { .mock }
+    func deleteAccount() async throws {}
 }
 
 #Preview {
-    let viewModel = ChatViewModel(repository: MockThreadRepository())
+    let viewModel = ChatViewModel(chatRepository: MockThreadRepository(), userRepository: MockUserRepository())
     let conversation = Conversation(
         id: "conv1",
         participantIDs: ["user1", "user2"],
@@ -292,7 +406,13 @@ private struct MockThreadRepository: ChatRepository {
         lastMessageTimestamp: Date().addingTimeInterval(-60)
     )
     NavigationStack {
-        ConversationView(conversation: conversation, currentUserID: "user1")
+        ConversationView(
+            conversation: conversation,
+            currentUserID: "user1",
+            otherUser: .mock
+        )
     }
     .environment(viewModel)
+    .environment(AuthViewModel(repository: MockConvAuthRepository(), userRepository: MockUserRepository()))
+    .environment(ProfileViewModel(userRepository: MockUserRepository(), user: .mock))
 }
