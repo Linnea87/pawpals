@@ -216,9 +216,8 @@ final class UserService: UserRepository {
 
         var users: [User] = []
         for id in savedIds {
-            let doc = try await db.collection("users").document(id)
-                .getDocument()
-            if let user = try? doc.data(as: User.self) {
+            let doc = try await db.collection("users").document(id).getDocument()
+            if let user = try? await fetchUser(userId: id) {
                 users.append(user)
             }
         }
