@@ -1,5 +1,5 @@
 import Foundation
-import UIKit 
+import UIKit
 
 @Observable
 final class ChatViewModel {
@@ -11,8 +11,9 @@ final class ChatViewModel {
     var activeConversation: Conversation?
     var pendingConversationID: String? /// Set when the user taps a push notification for a new message.
     var isUploadingImage: Bool = false
-    var participants: [String: User] = [:]
 
+    /// Cache of resolved User objects keyed by their Firestore user ID.
+    var participants: [String: User] = [:]
 
     var totalUnread: Int {
         conversations.reduce(0) { $0 + $1.unreadCount }
@@ -20,44 +21,30 @@ final class ChatViewModel {
 
     private let chatRepository: ChatRepository
     private let userRepository: UserRepository
+
+
     private var stopObserving: (() -> Void)?
+
+
+    private var stopObservingConversations: (() -> Void)?
 
     init(chatRepository: ChatRepository, userRepository: UserRepository) {
         self.chatRepository = chatRepository
         self.userRepository = userRepository
     }
 
-    func fetchConversations(for userID: String) async {
-        isLoading = true
-        errorMessage = nil
-
-        do {
-            let result = try await chatRepository.fetchConversations(
-                for: userID
-            )
-            conversations = result.sorted {
-                $0.lastMessageTimestamp > $1.lastMessageTimestamp
-            }
-            
-            await fetchParticipants(for: result, currentUserID: userID)
-        } catch {
-            errorMessage = error.localizedDescription
-        }
-
-        isLoading = false
-
-    }
-
+    /// Creates or fetches a conversation with another user and navigates to it.
+    /// Also stores the other user in the participants cache immediately so the conversation header shows the correct name and photo.
     func startConversation(with user: User, currentUserId: String) async {
         isLoading = true
         errorMessage = nil
         do {
-            let conversation =
-                try await chatRepository.createOrFetchConversation(
-                    between: currentUserId,
-                    and: user.id
-                )
+            let conversation = try await chatRepository.createOrFetchConversation(
+                between: currentUserId,
+                and: user.id
+            )
             activeConversation = conversation
+            participants[user.id] = user
         } catch {
             errorMessage = error.localizedDescription
         }
@@ -75,11 +62,10 @@ final class ChatViewModel {
         }
     }
 
+    /// Optimistically resets the unread badge in the local array before writing to Firestore.
+    /// If the Firestore write fails, the previous count is restored so the UI stays accurate.
     func markAsRead(conversationID: String, userID: String) async {
-        guard
-            let index = conversations.firstIndex(where: {
-                $0.id == conversationID
-            })
+        guard let index = conversations.firstIndex(where: { $0.id == conversationID })
         else { return }
 
         let previous = conversations[index].unreadCount
@@ -97,8 +83,7 @@ final class ChatViewModel {
     }
 
     func sendMessage(in conversation: Conversation, senderID: String) async {
-        let receiverID =
-            conversation.participantIDs.first { $0 != senderID } ?? ""
+        let receiverID = conversation.participantIDs.first { $0 != senderID } ?? ""
         let trimmedMessage = messageText.trimmingCharacters(in: .whitespaces)
         guard !trimmedMessage.isEmpty else { return }
 
@@ -118,13 +103,15 @@ final class ChatViewModel {
             errorMessage = error.localizedDescription
         }
     }
-    
+
+    /// Looks up the other participant in the local participants cache.
+    /// Returns nil if the user hasn't been fetched yet — callers fall back to .mock.
     func otherUser(in conversation: Conversation, currentUserID: String) -> User? {
         let otherID = conversation.participantIDs.first { $0 != currentUserID }
         return otherID.flatMap { participants[$0] }
     }
 
-    //========== HELPERS =============================================
+    // ================= Helpers =================
 
     func formattedTimeStamp(for conversation: Conversation) -> String {
         let calendar = Calendar.current
@@ -134,8 +121,7 @@ final class ChatViewModel {
             return String(localized: "date.today")
         }
 
-        let days =
-            calendar.dateComponents([.day], from: date, to: .now).day ?? 0
+        let days = calendar.dateComponents([.day], from: date, to: .now).day ?? 0
         if days < 7 {
             return String(localized: "\(days) days ago")
         }
@@ -145,7 +131,9 @@ final class ChatViewModel {
         return formatter.string(from: date)
     }
 
+    /// Starts the Firestore listener for messages in a single conversation.
     func observeMessages(conversationID: String, currentUserID: String) {
+        messages = []
         isLoading = true
         stopObserving = chatRepository.observeMessages(
             conversationID: conversationID
@@ -162,14 +150,23 @@ final class ChatViewModel {
         }
     }
 
-    func otherParticipantName(
-        in conversation: Conversation,
-        currentUserID: String
-    ) -> String {
-        conversation.participantIDs.first { $0 != currentUserID }
-            ?? "common.unknown"
+    /// Starts a real-time Firestore listener for the full conversations list.
+    /// Each update also triggers a participant fetch so names and avatars stay current.
+    func observeConversations(for userID: String) {
+        stopObservingConversations = chatRepository.observeConversations(for: userID) { [weak self] updated in
+            guard let self else { return }
+            self.conversations = updated
+            Task { await self.fetchParticipants(for: updated, currentUserID: userID) }
+        }
     }
 
+    /// Removes the conversations Firestore listener.
+    func stopListeningToConversations() {
+        stopObservingConversations?()
+        stopObservingConversations = nil
+    }
+
+    /// Removes the messages Firestore listener.
     func stopListening() {
         stopObserving?()
         stopObserving = nil
@@ -182,10 +179,8 @@ final class ChatViewModel {
         let receiverID = conversation.participantIDs.first { $0 != senderID } ?? ""
 
         do {
-            // Upload image to Firebase Storage via repository
             let url = try await chatRepository.uploadImage(image, conversationId: conversation.id)
 
-            // Create message with image URL — text is empty for image messages
             let message = Message(
                 id: UUID().uuidString,
                 senderID: senderID,
@@ -195,27 +190,23 @@ final class ChatViewModel {
                 timestamp: Date()
             )
 
-            // Send message to Firestore
             try await chatRepository.sendMessage(message, to: conversation.id)
-
         } catch {
             errorMessage = error.localizedDescription
         }
 
         isUploadingImage = false
     }
-    
+
+    /// Fetches Firestore user documents for all participants we don't have cached yet.
     private func fetchParticipants(for conversations: [Conversation], currentUserID: String) async {
-        
         let otherIDs = Set(
             conversations.flatMap { $0.participantIDs.filter { $0 != currentUserID } }
-        ).filter { participants[$0] == nil } 
-
+        ).filter { participants[$0] == nil }
 
         await withTaskGroup(of: (String, User)?.self) { group in
             for id in otherIDs {
                 group.addTask {
-
                     guard let user = try? await self.userRepository.fetchUser(userId: id)
                     else { return nil }
                     return (id, user)

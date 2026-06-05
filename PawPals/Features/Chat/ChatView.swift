@@ -48,19 +48,15 @@ struct ChatView: View {
                         .frame(maxWidth: .infinity, maxHeight: .infinity)
                     } else {
                         List(filteredConversations) { conversation in
-                            ZStack {
-                                NavigationLink(value: conversation) {
-                                    EmptyView()
-                                }
-                                .opacity(0)
+                            NavigationLink(value: conversation) {
                                 ConversationRowView(
                                     conversation: conversation,
-                                    timestampText:
-                                        chatViewModel.formattedTimeStamp(
-                                            for: conversation
-                                        )
+                                    timestampText: chatViewModel.formattedTimeStamp(for: conversation),
+                                    otherUserName: chatViewModel.otherUser(in: conversation, currentUserID: currentUserID)?.name ?? String(localized: "common.unknown"),
+                                    otherUserPhotoURL: chatViewModel.otherUser(in: conversation, currentUserID: currentUserID)?.photoURL
                                 )
                             }
+                            .buttonStyle(.plain)
                             .listRowBackground(Color.clear)
                             .listRowSeparator(.hidden)
                             .listRowInsets(
@@ -73,19 +69,17 @@ struct ChatView: View {
                             )
                         }
                         .scrollContentBackground(.hidden)
-                        .navigationDestination(for: Conversation.self) {
-                            conversation in
-                            ConversationView(
-                                conversation: conversation,
-                                currentUserID: currentUserID,
-                                otherUser: chatViewModel.otherUser(in: conversation, currentUserID: currentUserID) ?? .mock
-                            )
-                        }
-
                     }
 
                 }
 
+            }
+            .navigationDestination(for: Conversation.self) { conversation in
+                ConversationView(
+                    conversation: conversation,
+                    currentUserID: currentUserID,
+                    otherUser: chatViewModel.otherUser(in: conversation, currentUserID: currentUserID) ?? .mock
+                )
             }
             .safeAreaInset(edge: .bottom, spacing: Spacing.none) {
                 TabBarView(
@@ -103,11 +97,17 @@ struct ChatView: View {
                 Text(chatViewModel.errorMessage ?? "")
             }
         }
-        // Handles the case where the notification tap arrives while the app is already open
+        .task {
+            chatViewModel.observeConversations(for: currentUserID)
+        }
+        .onDisappear {
+            chatViewModel.stopListeningToConversations()
+        }
+        /// Handles the case where the notification tap arrives while the app is already open.
         .onChange(of: chatViewModel.pendingConversationID) { _, _ in
             navigateToPendingConversationIfNeeded()
         }
-        // Handles the case where the notification tap arrived before conversations were loaded
+        /// Handles the case where the notification tap arrived before conversations were loaded.
         .onChange(of: chatViewModel.conversations) { _, _ in
             navigateToPendingConversationIfNeeded()
         }
@@ -153,15 +153,14 @@ struct ChatView: View {
 }
 
 private struct MockChatRepository: ChatRepository {
-    func fetchConversations(for userId: String) async throws -> [Conversation] {
-        []
-    }
     func sendMessage(_ message: Message, to conversationID: String) async throws
     {}
     func observeMessages(
         conversationID: String,
         onUpdate: @escaping ([Message]) -> Void
     ) -> (() -> Void) { return {} }
+
+    func observeConversations(for userID: String, onUpdate: @escaping ([Conversation]) -> Void) -> (() -> Void) { return {} }
 
     func createOrFetchConversation(between userId1: String, and userId2: String)
         async throws -> Conversation

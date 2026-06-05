@@ -15,7 +15,7 @@ struct MeetCardView: View {
                 }
             
             VStack(alignment: .leading, spacing: Spacing.xSmall) {
-                Text("\(user.name) / \(user.dogs.first?.name ?? "")")
+                Text(user.dogs.first.map { "\(user.name) / \($0.name)" } ?? user.name)
                     .font(.headline)
                     .foregroundStyle(Theme.darkBrown)
                 
