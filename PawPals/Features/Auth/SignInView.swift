@@ -3,14 +3,14 @@ import SwiftUI
 struct SignInView: View {
     @Environment(AuthViewModel.self) private var viewModel
     @Environment(\.dismiss) private var dismiss
-    
+
     @State private var email = ""
     @State private var password = ""
-    
+
     var body: some View {
         ZStack {
             Theme.appBackground.ignoresSafeArea()
-            
+
             ScrollView {
                 VStack(spacing: Spacing.none) {
                     fieldsSection
@@ -24,13 +24,16 @@ struct SignInView: View {
         .onChange(of: viewModel.isAuthenticated) { _, isAuthenticated in
             if isAuthenticated { dismiss() }
         }
-        .alert(String(localized: "common.error"), isPresented: .constant(viewModel.errorMessage != nil)) {
+        .alert(
+            String(localized: "common.error"),
+            isPresented: .constant(viewModel.errorMessage != nil)
+        ) {
             Button(String(localized: "common.ok")) {}
         } message: {
             Text(viewModel.errorMessage ?? "")
         }
     }
-    
+
     private var fieldsSection: some View {
         VStack(spacing: Spacing.medium) {
             HStack {
@@ -44,7 +47,7 @@ struct SignInView: View {
             .padding(Spacing.medium)
             .background(Theme.offWhite)
             .clipShape(RoundedRectangle(cornerRadius: Radius.small))
-            
+
             HStack {
                 Image(systemName: "lock")
                     .foregroundStyle(Theme.sageGreen)
@@ -53,11 +56,10 @@ struct SignInView: View {
             .padding(Spacing.medium)
             .background(Theme.offWhite)
             .clipShape(RoundedRectangle(cornerRadius: Radius.small))
-            
+
             HStack {
                 Spacer()
                 Button {
-                    // TODO: PP-003 — Wire up forgot password flow
                 } label: {
                     Text(String(localized: "auth.forgot.password"))
                         .font(.footnote)
@@ -67,11 +69,13 @@ struct SignInView: View {
         }
         .padding(.vertical, Spacing.large)
     }
-    
+
     private var buttonsSection: some View {
         VStack(spacing: Spacing.medium) {
             Button {
-                Task { await viewModel.signIn(email: email, password: password) }
+                Task {
+                    await viewModel.signIn(email: email, password: password)
+                }
             } label: {
                 if viewModel.isLoading {
                     ProgressView()
@@ -89,42 +93,89 @@ struct SignInView: View {
             .background(Theme.terracotta)
             .clipShape(Capsule())
             .disabled(viewModel.isLoading)
-            
+
             SocialAuthButtons(label: "auth.signin.google") {
                 await viewModel.signInWithGoogle()
             }
         }
     }
 }
-    
-    #Preview {
-        SignInView()
-            .environment(AuthViewModel(repository: MockAuthRepository(), userRepository: MockUserRepository()))
-    }
-    
-    private struct MockAuthRepository: AuthRepository {
-        func signUp(email: String, password: String) async throws -> User {
-            User(id: "preview", name: "", photoURL: nil, bio: "", city: "",
-                 dogs: [], preferences: UserPreferences(walkTypes: [], dogSize: .medium, searchRadius: 10),
-                 distance: nil)
-        }
-        func signIn(email: String, password: String) async throws -> User {
-            User(id: "preview", name: "", photoURL: nil, bio: "", city: "",
-                 dogs: [], preferences: UserPreferences(walkTypes: [], dogSize: .medium, searchRadius: 10),
-                 distance: nil)
-        }
-        func signInWithGoogle() async throws -> User {
-            User(id: "preview", name: "", photoURL: nil, bio: "", city: "",
-                 dogs: [], preferences: UserPreferences(walkTypes: [], dogSize: .medium, searchRadius: 10),
-                 distance: nil)
-        }
-        func signUpWithGoogle() async throws -> User {
-            User(id: "preview", name: "", photoURL: nil, bio: "", city: "",
-                 dogs: [], preferences: UserPreferences(walkTypes: [], dogSize: .medium, searchRadius: 10),
-                 distance: nil)
-        }
-        func signOut() throws {}
-        func deleteAccount() async throws {}
-    }
-    
 
+#Preview {
+    SignInView()
+        .environment(
+            AuthViewModel(
+                repository: MockAuthRepository(),
+                userRepository: MockUserRepository()
+            )
+        )
+}
+
+private struct MockAuthRepository: AuthRepository {
+    func signUp(email: String, password: String) async throws -> User {
+        User(
+            id: "preview",
+            name: "",
+            photoURL: nil,
+            bio: "",
+            city: "",
+            dogs: [],
+            preferences: UserPreferences(
+                walkTypes: [],
+                dogSize: .medium,
+                searchRadius: 10
+            ),
+            distance: nil
+        )
+    }
+    func signIn(email: String, password: String) async throws -> User {
+        User(
+            id: "preview",
+            name: "",
+            photoURL: nil,
+            bio: "",
+            city: "",
+            dogs: [],
+            preferences: UserPreferences(
+                walkTypes: [],
+                dogSize: .medium,
+                searchRadius: 10
+            ),
+            distance: nil
+        )
+    }
+    func signInWithGoogle() async throws -> User {
+        User(
+            id: "preview",
+            name: "",
+            photoURL: nil,
+            bio: "",
+            city: "",
+            dogs: [],
+            preferences: UserPreferences(
+                walkTypes: [],
+                dogSize: .medium,
+                searchRadius: 10
+            ),
+            distance: nil
+        )
+    }
+    func signUpWithGoogle() async throws -> User {
+        User(
+            id: "preview",
+            name: "",
+            photoURL: nil,
+            bio: "",
+            city: "",
+            dogs: [],
+            preferences: UserPreferences(
+                walkTypes: [],
+                dogSize: .medium,
+                searchRadius: 10
+            ),
+            distance: nil
+        )
+    }
+    func signOut() throws {}
+    func deleteAccount() async throws {}
+}
