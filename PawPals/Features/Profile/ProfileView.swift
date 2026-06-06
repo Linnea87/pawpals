@@ -38,13 +38,15 @@ struct ProfileView: View {
                                 selection: $selectedPhoto,
                                 matching: .images
                             ) {
-                                avatarCircle
+                                AvatarView(photoURL: displayUser.photoURL, size: IconSize.avatar, iconSize:
+                                  IconSize.avatarIcon)
                             }
                             .buttonStyle(.plain)
                             .contentShape(Circle())
 
                         } else {
-                            avatarCircle
+                            AvatarView(photoURL: displayUser.photoURL, size: IconSize.avatar, iconSize:
+                              IconSize.avatarIcon)
                         }
 
                         VStack(alignment: .leading, spacing: Spacing.xSmall) {
@@ -126,21 +128,13 @@ struct ProfileView: View {
                         Section {
                             ForEach(profileViewModel.savedUsers) { savedUser in
                                 HStack(spacing: Spacing.medium) {
-                                    Circle()
-                                        .fill(Theme.lightPeach)
-                                        .frame(width: 40, height: 40)
-                                        .overlay {
-                                            Image(systemName: "person.fill")
-                                                .foregroundStyle(Theme.offWhite)
-                                        }
+                                    AvatarView(photoURL: savedUser.photoURL, size: IconSize.savedAvatar, iconSize:
+                                     IconSize.avatarIcon)
                                     VStack(
                                         alignment: .leading,
                                         spacing: Spacing.xSmall
                                     ) {
-                                        Text(
-                                            "\(savedUser.name) / \(savedUser.dogs.first?.name ?? "")"
-                                        )
-                                        .fontWeight(.medium)
+                                        Text(savedUser.name)                                       .fontWeight(.medium)
                                         Text(savedUser.city)
                                             .font(.caption)
                                             .foregroundStyle(Theme.warmBrown)
@@ -327,30 +321,6 @@ struct ProfileView: View {
             }
         }
         .environment(profileViewModel)
-    }
-
-    private var avatarCircle: some View {
-        Circle()
-            .fill(Theme.lightPeach)
-            .frame(width: IconSize.avatar, height: IconSize.avatar)
-            .overlay {
-                if let photoURL = displayUser.photoURL,
-                    let url = URL(string: photoURL)
-                {
-                    AsyncImage(url: url) { image in
-                        image.resizable().scaledToFill()
-                    } placeholder: {
-                        Image(systemName: "person")
-                            .font(.system(size: IconSize.avatarIcon))
-                            .foregroundStyle(Theme.offWhite)
-                    }
-                    .clipShape(Circle())
-                } else {
-                    Image(systemName: "person")
-                        .font(.system(size: IconSize.avatarIcon))
-                        .foregroundStyle(Theme.offWhite)
-                }
-            }
     }
 }
 
