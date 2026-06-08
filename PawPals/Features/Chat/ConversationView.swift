@@ -1,7 +1,6 @@
 import PhotosUI
 import SwiftUI
 
-
 struct ConversationView: View {
     @Environment(ChatViewModel.self) private var chatViewModel
     let conversation: Conversation
@@ -32,7 +31,8 @@ struct ConversationView: View {
                                 ForEach(chatViewModel.messages) { message in
                                     MessageBubbleView(
                                         message: message,
-                                        isFromCurrentUser: message.senderID == currentUserID
+                                        isFromCurrentUser: message.senderID
+                                            == currentUserID
                                     )
                                     .id(message.id)
                                 }
@@ -55,7 +55,9 @@ struct ConversationView: View {
                             .padding(Spacing.medium)
                         }
                         .onChange(of: chatViewModel.messages.count) { _, _ in
-                            guard let last = chatViewModel.messages.last else { return }
+                            guard let last = chatViewModel.messages.last else {
+                                return
+                            }
                             withAnimation {
                                 proxy.scrollTo(last.id, anchor: .bottom)
                             }
@@ -87,24 +89,8 @@ struct ConversationView: View {
                     selectedUser = otherUser
                 } label: {
                     VStack(spacing: Spacing.xxSmall) {
-                        Group {
-                            if let photoURL = otherUser.photoURL,
-                                let url = URL(string: photoURL)
-                            {
-                                AsyncImage(url: url) { image in
-                                    image.resizable().scaledToFill()
-                                } placeholder: {
-                                    Image(systemName: "person.fill")
-                                        .foregroundStyle(Theme.darkBrown)
-                                }
-                            } else {
-                                Image(systemName: "person.fill")
-                                    .foregroundStyle(Theme.darkBrown)
-                            }
-                        }
-                        .frame(width: IconSize.navAvatar, height: IconSize.navAvatar)
-                        .background(Theme.lightPeach)
-                        .clipShape(Circle())
+                        AvatarView(photoURL: otherUser.photoURL, size: IconSize.messageAvatar, iconSize:
+                        IconSize.avatarIcon)
 
                         Text(otherUser.name)
                             .font(.headline)
@@ -213,11 +199,15 @@ private struct MessageBubbleView: View {
         if isUploadingImage {
             ProgressView()
                 .frame(width: 200, height: 150)
-                .background(isFromCurrentUser ? Theme.terracotta.opacity(0.3) : Theme.offWhite)
+                .background(
+                    isFromCurrentUser
+                        ? Theme.terracotta.opacity(0.3) : Theme.offWhite
+                )
                 .clipShape(RoundedRectangle(cornerRadius: Radius.medium))
 
         } else if let imageURL = message.imageURL,
-                  let url = URL(string: imageURL) {
+            let url = URL(string: imageURL)
+        {
             AsyncImage(url: url) { phase in
                 switch phase {
                 case .empty:
@@ -228,7 +218,9 @@ private struct MessageBubbleView: View {
                         .resizable()
                         .scaledToFill()
                         .frame(maxWidth: 200, maxHeight: 200)
-                        .clipShape(RoundedRectangle(cornerRadius: Radius.medium))
+                        .clipShape(
+                            RoundedRectangle(cornerRadius: Radius.medium)
+                        )
                 case .failure:
                     Image(systemName: "photo")
                         .foregroundStyle(Theme.warmBrown)
@@ -242,7 +234,9 @@ private struct MessageBubbleView: View {
             Text(message.text)
                 .padding(.horizontal, Spacing.medium)
                 .padding(.vertical, Spacing.small)
-                .background(isFromCurrentUser ? Theme.terracotta : Theme.offWhite)
+                .background(
+                    isFromCurrentUser ? Theme.terracotta : Theme.offWhite
+                )
                 .foregroundStyle(isFromCurrentUser ? .white : Theme.darkBrown)
                 .clipShape(RoundedRectangle(cornerRadius: Radius.medium))
         }
@@ -270,7 +264,7 @@ private struct MessageInputBar: View {
     @Binding var text: String
     let onSend: () -> Void
     let onImagePick: (UIImage) -> Void
-    
+
     // TODO [PP-028]: Reset selectedPhoto after upload
     // so user can pick the same image twice
     @State private var selectedPhoto: PhotosPickerItem?
@@ -278,7 +272,6 @@ private struct MessageInputBar: View {
     var body: some View {
         HStack(spacing: Spacing.small) {
             HStack(spacing: Spacing.small) {
-                
 
                 TextField("chat.messagePlaceholder", text: $text)
             }
@@ -297,8 +290,11 @@ private struct MessageInputBar: View {
             }
             .onChange(of: selectedPhoto) { _, newItem in
                 Task {
-                    if let data = try? await newItem?.loadTransferable(type: Data.self),
-                       let image = UIImage(data: data) {
+                    if let data = try? await newItem?.loadTransferable(
+                        type: Data.self
+                    ),
+                        let image = UIImage(data: data)
+                    {
                         onImagePick(image)
                     }
                 }
@@ -320,7 +316,7 @@ private struct MessageInputBar: View {
         }
         .padding(.horizontal, Spacing.medium)
         .padding(.vertical, Spacing.medium)
-        
+
     }
 }
 

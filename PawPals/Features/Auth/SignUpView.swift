@@ -25,7 +25,10 @@ struct SignUpView: View {
         .onChange(of: viewModel.isAuthenticated) { _, isAuthenticated in
             if isAuthenticated { dismiss() }
         }
-        .alert(String(localized: "common.error"), isPresented: .constant(viewModel.errorMessage != nil)) {
+        .alert(
+            String(localized: "common.error"),
+            isPresented: .constant(viewModel.errorMessage != nil)
+        ) {
             Button(String(localized: "common.ok")) {}
         } message: {
             Text(viewModel.errorMessage ?? "")
@@ -74,10 +77,15 @@ struct SignUpView: View {
     }
 
     private var buttonsSection: some View {
-        // TODO: PP-003 — Extract shared auth buttons (Google + Or divider) to Core/Components/AuthButtonsView
         VStack(spacing: Spacing.medium) {
             Button {
-                Task { await viewModel.signUp(name: name, email: email, password: password) }
+                Task {
+                    await viewModel.signUp(
+                        name: name,
+                        email: email,
+                        password: password
+                    )
+                }
             } label: {
                 if viewModel.isLoading {
                     ProgressView()
@@ -96,39 +104,19 @@ struct SignUpView: View {
             .clipShape(Capsule())
             .disabled(viewModel.isLoading)
 
-            HStack {
-                Rectangle()
-                    .fill(Theme.creamWhite)
-                    .frame(height: AuthLayout.borderWidth)
-                Text("Or")
-                    .font(.footnote)
-                    .foregroundStyle(Theme.creamWhite)
-                Rectangle()
-                    .fill(Theme.creamWhite)
-                    .frame(height: AuthLayout.borderWidth)
+            SocialAuthButtons(label: "auth.signup.google") {
+                await viewModel.signUpWithGoogle()
             }
-            .padding(.top, Spacing.medium)
-
-            Button {
-                Task { await viewModel.signUpWithGoogle() }
-            } label: {
-                HStack {
-                    Image(systemName: "globe")
-                    Text(String(localized: "auth.signup.google"))
-                }
-                .fontWeight(.medium)
-                .foregroundStyle(Theme.darkBrown)
-                .frame(maxWidth: .infinity)
-                .padding(.vertical, Spacing.small)
-            }
-            .background(Theme.creamWhite)
-            .clipShape(Capsule())
-            .overlay(Capsule().stroke(Theme.darkBrown.opacity(AuthLayout.borderOpacity), lineWidth: AuthLayout.borderWidth))
         }
     }
 }
 
 #Preview {
     SignUpView()
-        .environment(AuthViewModel(repository: MockAuthRepository(), userRepository: MockUserRepository()))
+        .environment(
+            AuthViewModel(
+                repository: MockAuthRepository(),
+                userRepository: MockUserRepository()
+            )
+        )
 }
