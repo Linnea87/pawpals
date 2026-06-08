@@ -217,62 +217,7 @@ struct FilterSheetView: View {
 #Preview {
     let vm = MeetViewModel(userRepository: MockUserRepository(), locationService: LocationService())
     vm.currentUserLocation = CLLocationCoordinate2D(latitude: 59.3293, longitude: 18.0686)
-    vm.allNearbyUsers = [
-        // ~2 km north — visible at low radius
-        User.mock,
-        // ~5 km east
-        User(
-            id: "preview-2",
-            name: "Erik",
-            photoURL: nil,
-            bio: "",
-            city: "Stockholm",
-            dogs: [],
-            preferences: UserPreferences(walkTypes: [.evening], dogSize: .medium, searchRadius: 10.0),
-            distance: 5.0,
-            latitude: 59.3300,
-            longitude: 18.1400
-        ),
-        // ~10 km south-west
-        User(
-            id: "preview-3",
-            name: "Lisa",
-            photoURL: nil,
-            bio: "",
-            city: "Stockholm",
-            dogs: [],
-            preferences: UserPreferences(walkTypes: [.forest], dogSize: .small, searchRadius: 10.0),
-            distance: 10.0,
-            latitude: 59.2500,
-            longitude: 17.9800
-        ),
-        // ~18 km north-west
-        User(
-            id: "preview-4",
-            name: "Johan",
-            photoURL: nil,
-            bio: "",
-            city: "Solna",
-            dogs: [],
-            preferences: UserPreferences(walkTypes: [.morning], dogSize: .large, searchRadius: 20.0),
-            distance: 18.0,
-            latitude: 59.4200,
-            longitude: 17.9000
-        ),
-        // ~30 km south — only visible at max radius
-        User(
-            id: "preview-5",
-            name: "Anna",
-            photoURL: nil,
-            bio: "",
-            city: "Huddinge",
-            dogs: [],
-            preferences: UserPreferences(walkTypes: [.evening], dogSize: .medium, searchRadius: 30.0),
-            distance: 30.0,
-            latitude: 59.1200,
-            longitude: 17.9800
-        )
-    ]
+    vm.allNearbyUsers = User.mockUsers
 
     return FilterSheetView()
         .environment(vm)
