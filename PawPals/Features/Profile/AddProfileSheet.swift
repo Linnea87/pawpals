@@ -1,13 +1,13 @@
 import SwiftUI
 
 struct AddProfileSheet: View {
-
+    
     let user: User?
-
+    
     @Environment(ProfileViewModel.self) private var profileViewModel
     @Environment(\.dismiss) private var dismiss
     @Environment(AuthViewModel.self) private var authViewModel
-
+    
     @State private var name = ""
     @State private var bio = ""
     @State private var city = ""
@@ -15,24 +15,24 @@ struct AddProfileSheet: View {
     @State private var dogBreed = ""
     @State private var dogSize: DogSize? = nil
     @State private var selectedWalkTypes: Set<WalkType> = []
-
+    
     @State private var showDeleteConfirm = false
-
+    
     @State private var showAddDogForm = false
-
+    
     init(user: User? = nil) {
         self.user = user
     }
-
+    
     private var isFormValid: Bool {
         !name.trimmingCharacters(in: .whitespaces).isEmpty
     }
-
+    
     var body: some View {
         ZStack {
             Theme.appBackground
                 .ignoresSafeArea()
-
+            
             List {
                 Section {
                     TextField("profile.name", text: $name)
@@ -46,7 +46,7 @@ struct AddProfileSheet: View {
                     SectionHeader(title: "profile.aboutUs")
                 }
                 .padding(.top, Spacing.large)
-
+                
                 Section {
                     ForEach(profileViewModel.user.dogs) { dog in
                         VStack(alignment: .leading, spacing: Spacing.xSmall) {
@@ -71,7 +71,7 @@ struct AddProfileSheet: View {
                     HStack {
                         SectionHeader(
                             title: profileViewModel.user.dogs.count == 1
-                                ? "profile.dog" : "profile.dogs"
+                            ? "profile.dog" : "profile.dogs"
                         )
                         Spacer()
                         Button {
@@ -83,7 +83,7 @@ struct AddProfileSheet: View {
                     .font(.subheadline)
                     .foregroundStyle(Theme.darkBrown)
                 }
-
+                
                 if showAddDogForm {
                     Section {
                         TextField("dog.name", text: $dogName)
@@ -103,7 +103,7 @@ struct AddProfileSheet: View {
                         .listRowBackground(Theme.offWhite.opacity(0.6))
                         Button {
                             guard !dogName.isEmpty, !dogBreed.isEmpty,
-                                let size = dogSize
+                                  let size = dogSize
                             else { return }
                             let newDog = Dog(
                                 id: UUID().uuidString,
@@ -132,7 +132,7 @@ struct AddProfileSheet: View {
                         SectionHeader(title: "dog.section")
                     }
                 }
-
+                
                 Section {
                     ForEach(WalkType.allCases) { walkType in
                         Button {
@@ -157,7 +157,7 @@ struct AddProfileSheet: View {
                 } header: {
                     SectionHeader(title: "profile.walkPreferences")
                 }
-
+                
                 Button {
                     guard isFormValid else { return }
                     Task {
@@ -182,7 +182,7 @@ struct AddProfileSheet: View {
                 .listRowBackground(Color.clear)
                 .listRowSeparator(.hidden)
                 .padding(.vertical, Spacing.medium)
-
+                
             }
             .listStyle(.insetGrouped)
             .scrollContentBackground(.hidden)
@@ -195,7 +195,7 @@ struct AddProfileSheet: View {
             selectedWalkTypes = Set(user.preferences.walkTypes)
         }
     }
-
+    
     #Preview("Add") {
         NavigationStack { AddProfileSheet() }
             .environment(
@@ -211,7 +211,7 @@ struct AddProfileSheet: View {
                 )
             )
     }
-
+    
     #Preview("Edit") {
         NavigationStack { AddProfileSheet(user: .mock) }
             .environment(
@@ -227,7 +227,7 @@ struct AddProfileSheet: View {
                 )
             )
     }
-
+    
     private struct MockAuthRepository: AuthRepository {
         func signUp(email: String, password: String) async throws -> User {
             .mock
@@ -240,5 +240,5 @@ struct AddProfileSheet: View {
         func signOut() throws {}
         func deleteAccount() async throws {}
     }
-
+}
 
