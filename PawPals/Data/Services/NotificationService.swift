@@ -3,6 +3,7 @@ import Foundation
 import UIKit
 import UserNotifications
 
+// ** Current state NOT testet only reviewd code se Todo in extension NotificationService: MessagingDelegate **
 /// Handles everything related to push notifications:
 /// - Requesting permission from the user
 /// - Receiving and storing the device push notification token
@@ -83,8 +84,12 @@ extension NotificationService: UNUserNotificationCenterDelegate {
 
 }
 extension NotificationService: MessagingDelegate {
-
-    /// Called by Firebase when the device receives a new push notification token.
+    // TODO: [PP-057] Full end-to-end testing requires:
+    // 1. A paid Apple Developer account — APNs certificates cannot be issued on a free account.
+    // 2. A physical device — APNs tokens are not issued to the simulator.
+    // 3. Firebase Cloud Functions (or a server) to trigger the FCM send call.
+    //    Without a server, no notification is ever sent to FCM even if the token is stored.
+    //
     func messaging(
         _ messaging: Messaging,
         didReceiveRegistrationToken fcmToken: String?
