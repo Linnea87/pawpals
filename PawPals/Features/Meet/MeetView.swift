@@ -4,6 +4,7 @@ import CoreLocation
 struct MeetView: View {
     @Binding var selectedTab: Tab
     @Environment(MeetViewModel.self) private var viewModel
+    @Environment(FilterViewModel.self) private var filterViewModel
     @State private var showFilterSheet = false
     
     var body: some View {
@@ -72,7 +73,7 @@ struct MeetView: View {
                             .foregroundStyle(Theme.warmBrown)
                             .frame(maxWidth: .infinity)
                         Spacer()
-                    } else if vm.filteredUsers.isEmpty {
+                    } else if filterViewModel.applyFilters(to: vm.allNearbyUsers).isEmpty {
                         Spacer()
                         Text("No matches nearby")
                             .foregroundStyle(Theme.darkBrown.opacity(0.5))
@@ -81,7 +82,7 @@ struct MeetView: View {
                     } else {
                         ScrollView {
                             LazyVStack(spacing: Spacing.medium) {
-                                ForEach(vm.filteredUsers) { user in
+                                ForEach(filterViewModel.applyFilters(to: vm.allNearbyUsers)) { user in
                                     MeetCardView(user: user, isSaved: vm.savedUserIds.contains(user.id))
                                         .onTapGesture { vm.selectedUser = user }
                                 }
@@ -114,6 +115,7 @@ struct MeetView: View {
             .sheet(isPresented: $showFilterSheet) {
                 FilterSheetView()
                     .environment(viewModel)
+                    .environment(filterViewModel)
             }
         }
     }
@@ -125,31 +127,11 @@ struct MeetView: View {
 }
 
 #Preview("Active filters") {
-    let vm: MeetViewModel = {
-        let m = MeetViewModel(locationService: LocationService())
-        m.activeFilters = ["Evening walk", "City walk"]
-        m.activeSizeFilters = ["medium"]
-        m.filteredUsers = [.mock]
-        return m
-    }()
-    MeetView(selectedTab: .constant(.meet))
+    let vm = MeetViewModel(locationService: LocationService())
+    let filterVM = FilterViewModel()
+    filterVM.activeFilters = ["Evening walk", "City walk"]
+    filterVM.activeSizeFilters = ["medium"]
+    return MeetView(selectedTab: .constant(.meet))
         .environment(vm)
-}
-
-private struct FilterChip: View {
-    let title: String
-    let isSelected: Bool
-    let action: () -> Void
-    
-    var body: some View {
-        Button(action: action) {
-            Text(title)
-                .font(.footnote)
-                .padding(.horizontal, Spacing.medium)
-                .padding(.vertical, Spacing.medium)
-                .background(isSelected ? Theme.sageGreen : Theme.offWhite)
-                .foregroundStyle(isSelected ? Theme.offWhite : Theme.darkBrown)
-                .clipShape(Capsule())
-        }
-    }
+        .environment(filterVM)
 }
