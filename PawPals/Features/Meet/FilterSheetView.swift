@@ -114,8 +114,6 @@ struct FilterSheetView: View {
                 }
                 .padding(Spacing.medium)
             }
-            .navigationTitle("common.filter")
-            .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
                     Button("common.done") {
