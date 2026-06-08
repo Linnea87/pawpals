@@ -6,13 +6,8 @@ struct MeetCardView: View {
     
     var body: some View {
         HStack(spacing: Spacing.medium) {
-            Circle()
-                .fill(Theme.lightPeach)
-                .frame(width: IconSize.chatAvatar, height: IconSize.chatAvatar)
-                .overlay {
-                    Image(systemName: "person.fill")
-                        .foregroundStyle(Theme.offWhite)
-                }
+            AvatarView(photoURL: user.photoURL, size: IconSize.chatAvatar, iconSize:
+             IconSize.avatarIcon)
             
             VStack(alignment: .leading, spacing: Spacing.xSmall) {
                 Text(user.dogs.first.map { "\(user.name) / \($0.name)" } ?? user.name)

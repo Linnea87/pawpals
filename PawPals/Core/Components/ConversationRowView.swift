@@ -15,22 +15,8 @@ struct ConversationRowView: View {
 
     var body: some View {
         HStack(spacing: Spacing.medium) {
-            Group {
-                if let photoURL = otherUserPhotoURL, let url = URL(string: photoURL) {
-                    AsyncImage(url: url) { image in
-                        image.resizable().scaledToFill()
-                    } placeholder: {
-                        Image(systemName: "person")
-                            .foregroundStyle(Theme.warmBrown)
-                    }
-                } else {
-                    Image(systemName: "person")
-                        .foregroundStyle(Theme.warmBrown)
-                }
-            }
-            .frame(width: IconSize.chatAvatar, height: IconSize.chatAvatar)
-            .background(Theme.lightPeach)
-            .clipShape(Circle())
+            AvatarView(photoURL: otherUserPhotoURL, size: IconSize.chatAvatar, iconSize:
+             IconSize.avatarIcon)
 
             VStack(alignment: .leading, spacing: Spacing.xSmall) {
                 Text(otherUserName)

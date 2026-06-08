@@ -38,13 +38,23 @@ struct ProfileView: View {
                                 selection: $selectedPhoto,
                                 matching: .images
                             ) {
-                                avatarCircle
+                                AvatarView(
+                                    photoURL: displayUser.photoURL,
+                                    size: IconSize.avatar,
+                                    iconSize:
+                                        IconSize.avatarIcon
+                                )
                             }
                             .buttonStyle(.plain)
                             .contentShape(Circle())
 
                         } else {
-                            avatarCircle
+                            AvatarView(
+                                photoURL: displayUser.photoURL,
+                                size: IconSize.avatar,
+                                iconSize:
+                                    IconSize.avatarIcon
+                            )
                         }
 
                         VStack(alignment: .leading, spacing: Spacing.xSmall) {
@@ -92,9 +102,7 @@ struct ProfileView: View {
                             .listRowBackground(Theme.offWhite.opacity(0.6))
                         }
                     } header: {
-                        Text("profile.aboutUs")
-                            .font(.subheadline)
-                            .foregroundStyle(Theme.darkBrown)
+                        SectionHeader(title: "profile.aboutUs")
                     }
 
                     if !displayUser.dogs.isEmpty {
@@ -113,34 +121,24 @@ struct ProfileView: View {
                                 .listRowBackground(Theme.offWhite.opacity(0.6))
                             }
                         } header: {
-                            Text(
-                                displayUser.dogs.count == 1
-                                    ? "profile.dog" : "profile.dogs"
-                            )
-                            .font(.subheadline)
-                            .foregroundStyle(Theme.darkBrown)
-                        }
+                            SectionHeader(title: displayUser.dogs.count == 1 ? "profile.dog" : "profile.dogs")                        }
                     }
 
                     if isOwner && !profileViewModel.savedUsers.isEmpty {
                         Section {
                             ForEach(profileViewModel.savedUsers) { savedUser in
                                 HStack(spacing: Spacing.medium) {
-                                    Circle()
-                                        .fill(Theme.lightPeach)
-                                        .frame(width: 40, height: 40)
-                                        .overlay {
-                                            Image(systemName: "person.fill")
-                                                .foregroundStyle(Theme.offWhite)
-                                        }
+                                    AvatarView(
+                                        photoURL: savedUser.photoURL,
+                                        size: IconSize.savedAvatar,
+                                        iconSize:
+                                            IconSize.avatarIcon
+                                    )
                                     VStack(
                                         alignment: .leading,
                                         spacing: Spacing.xSmall
                                     ) {
-                                        Text(
-                                            "\(savedUser.name) / \(savedUser.dogs.first?.name ?? "")"
-                                        )
-                                        .fontWeight(.medium)
+                                        Text(savedUser.name).fontWeight(.medium)
                                         Text(savedUser.city)
                                             .font(.caption)
                                             .foregroundStyle(Theme.warmBrown)
@@ -149,10 +147,7 @@ struct ProfileView: View {
                                 .listRowBackground(Theme.offWhite.opacity(0.6))
                             }
                         } header: {
-                            Text("profile.savedProfiles")
-                                .font(.subheadline)
-                                .foregroundStyle(Theme.darkBrown)
-                        }
+                            SectionHeader(title: "profile.savedProfiles")                        }
                     }
 
                     if !isOwner {
@@ -223,10 +218,10 @@ struct ProfileView: View {
                             .contentShape(Rectangle())
                             .onTapGesture {
 
-                                 showSidebar = false
-                                 showLogoutConfirm = true
-                             }
-                        
+                                showSidebar = false
+                                showLogoutConfirm = true
+                            }
+
                         Text("profile.deleteAccount")
                             .font(.subheadline)
                             .foregroundStyle(.red)
@@ -300,7 +295,10 @@ struct ProfileView: View {
                 ConversationView(
                     conversation: conversation,
                     currentUserID: authViewModel.currentUserId,
-                    otherUser: chatViewModel.otherUser(in: conversation, currentUserID: authViewModel.currentUserId) ?? .mock
+                    otherUser: chatViewModel.otherUser(
+                        in: conversation,
+                        currentUserID: authViewModel.currentUserId
+                    ) ?? .mock
                 )
             }
             .alert(
@@ -328,36 +326,22 @@ struct ProfileView: View {
         }
         .environment(profileViewModel)
     }
-
-    private var avatarCircle: some View {
-        Circle()
-            .fill(Theme.lightPeach)
-            .frame(width: IconSize.avatar, height: IconSize.avatar)
-            .overlay {
-                if let photoURL = displayUser.photoURL,
-                    let url = URL(string: photoURL)
-                {
-                    AsyncImage(url: url) { image in
-                        image.resizable().scaledToFill()
-                    } placeholder: {
-                        Image(systemName: "person")
-                            .font(.system(size: IconSize.avatarIcon))
-                            .foregroundStyle(Theme.offWhite)
-                    }
-                    .clipShape(Circle())
-                } else {
-                    Image(systemName: "person")
-                        .font(.system(size: IconSize.avatarIcon))
-                        .foregroundStyle(Theme.offWhite)
-                }
-            }
-    }
 }
 
 #Preview("Owner") {
     ProfileView(user: .mock, isOwner: true, selectedTab: .constant(.profile))
-        .environment(ChatViewModel(chatRepository: MockChatRepository(), userRepository: MockUserRepository()))
-        .environment(AuthViewModel(repository: MockAuthRepository(), userRepository: MockUserRepository()))
+        .environment(
+            ChatViewModel(
+                chatRepository: MockChatRepository(),
+                userRepository: MockUserRepository()
+            )
+        )
+        .environment(
+            AuthViewModel(
+                repository: MockAuthRepository(),
+                userRepository: MockUserRepository()
+            )
+        )
         .environment(
             ProfileViewModel(userRepository: MockUserRepository(), user: .mock)
         )
@@ -372,8 +356,18 @@ struct ProfileView: View {
             selectedTab: .constant(.profile)
         )
     }
-    .environment(ChatViewModel(chatRepository: MockChatRepository(), userRepository: MockUserRepository()))
-    .environment(AuthViewModel(repository: MockAuthRepository(), userRepository: MockUserRepository()))
+    .environment(
+        ChatViewModel(
+            chatRepository: MockChatRepository(),
+            userRepository: MockUserRepository()
+        )
+    )
+    .environment(
+        AuthViewModel(
+            repository: MockAuthRepository(),
+            userRepository: MockUserRepository()
+        )
+    )
     .environment(
         ProfileViewModel(userRepository: MockUserRepository(), user: .mock)
     )
@@ -469,7 +463,10 @@ private struct MockChatRepository: ChatRepository {
     }
     func markAsRead(conversationID: String, userID: String) async throws {}
     func markAsDelivered(conversationID: String, userID: String) async throws {}
-    func observeConversations(for userID: String, onUpdate: @escaping ([Conversation]) -> Void) -> (() -> Void) { return {} }
+    func observeConversations(
+        for userID: String,
+        onUpdate: @escaping ([Conversation]) -> Void
+    ) -> (() -> Void) { return {} }
     func signIn(email: String, password: String) async throws -> User {
         User(
             id: "preview",
@@ -505,7 +502,9 @@ private struct MockChatRepository: ChatRepository {
 
     // Mock implementation — required by ChatRepository protocol (PP-028)
     // Not used in ChatView, added only to satisfy protocol conformance
-    func uploadImage(_ image: UIImage, conversationId: String) async throws -> URL {
+    func uploadImage(_ image: UIImage, conversationId: String) async throws
+        -> URL
+    {
         return URL(string: "https://mock-image-url.com/image.jpg")!
     }
     func deleteUserData(userId: String) async throws {}
