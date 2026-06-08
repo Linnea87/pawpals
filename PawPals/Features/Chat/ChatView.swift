@@ -152,46 +152,15 @@ struct ChatView: View {
 
 }
 
-private struct MockChatRepository: ChatRepository {
-    func sendMessage(_ message: Message, to conversationID: String) async throws
-    {}
-    func observeMessages(
-        conversationID: String,
-        onUpdate: @escaping ([Message]) -> Void
-    ) -> (() -> Void) { return {} }
-
-    func observeConversations(for userID: String, onUpdate: @escaping ([Conversation]) -> Void) -> (() -> Void) { return {} }
-
-    func createOrFetchConversation(between userId1: String, and userId2: String)
-        async throws -> Conversation
-    {
-        Conversation(
-            id: "mock-conv",
-            participantIDs: [userId1, userId2],
-            lastMessage: "",
-            lastMessageTimestamp: Date()
-        )
-    }
-
-    func markAsRead(conversationID: String, userID: String) async throws {}
-    
-    func markAsDelivered(conversationID: String, userID: String) async throws {}
-    // Mock implementation — required by ChatRepository protocol (PP-028)
-    // Not used in ChatView, added only to satisfy protocol conformance
-    func uploadImage(_ image: UIImage, conversationId: String) async throws -> URL {
-            return URL(string: "https://mock-image-url.com/image.jpg")!
-        }
-}
-
 private func makePreviewChatViewModel() -> ChatViewModel {
-    let mockConversations = [
+    let viewModel = ChatViewModel(chatRepository: MockChatRepository(), userRepository: MockUserRepository())
+    viewModel.conversations = [
         Conversation(
             id: "1",
             participantIDs: ["Anna", "Patrik"],
             lastMessage: "Hey, want to go for a walk?",
             lastMessageTimestamp: Date(),
             unreadCount: 3
-
         ),
         Conversation(
             id: "2",
@@ -199,22 +168,14 @@ private func makePreviewChatViewModel() -> ChatViewModel {
             lastMessage: "My dog loved meeting yours!",
             lastMessageTimestamp: Date().addingTimeInterval(-3600),
             unreadCount: 1
-
         ),
         Conversation(
             id: "3",
             participantIDs: ["Johan", "Patrik"],
             lastMessage: "See you at the park!",
-            lastMessageTimestamp: Date().addingTimeInterval(-7200),
-
-        ),
+            lastMessageTimestamp: Date().addingTimeInterval(-7200)
+        )
     ]
-    func uploadImage(_ image: UIImage, conversationId: String) async throws -> URL {
-        return URL(string: "https://mock-image-url.com/image.jpg")!
-    }
-
-    let viewModel = ChatViewModel(chatRepository: MockChatRepository(), userRepository: MockUserRepository())
-    viewModel.conversations = mockConversations
     return viewModel
 }
 

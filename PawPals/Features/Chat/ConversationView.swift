@@ -324,85 +324,8 @@ private struct MessageInputBar: View {
     }
 }
 
-private struct MockThreadRepository: ChatRepository {
-    func sendMessage(_ message: Message, to conversationID: String) async throws {}
-
-    func observeMessages(
-        conversationID: String,
-        onUpdate: @escaping ([Message]) -> Void
-    ) -> (() -> Void) {
-        onUpdate([
-            Message(
-                id: "1",
-                senderID: "user2",
-                receiverID: "user1",
-                text: "Hey! Bella would love to meet May 🐾",
-                timestamp: Date().addingTimeInterval(-300)
-            ),
-            Message(
-                id: "2",
-                senderID: "user1",
-                receiverID: "user2",
-                text: "Oh that sounds perfect! When are you free?",
-                timestamp: Date().addingTimeInterval(-240),
-                isRead: true,
-                isDelivered: true
-            ),
-            Message(
-                id: "3",
-                senderID: "user2",
-                receiverID: "user1",
-                text: "How about Saturday morning at Humlegården?",
-                timestamp: Date().addingTimeInterval(-180)
-            ),
-            Message(
-                id: "4",
-                senderID: "user1",
-                receiverID: "user2",
-                text: "Yes! 10am works great for us 🐕",
-                timestamp: Date().addingTimeInterval(-120),
-                isRead: true,
-                isDelivered: true
-            ),
-            Message(
-                id: "5",
-                senderID: "user2",
-                receiverID: "user1",
-                text: "Can't wait! See you there 🌿",
-                timestamp: Date().addingTimeInterval(-60)
-            ),
-        ])
-        return {}
-    }
-
-    func markAsRead(conversationID: String, userID: String) async throws {}
-    func markAsDelivered(conversationID: String, userID: String) async throws {}
-    func observeConversations(for userID: String, onUpdate: @escaping ([Conversation]) -> Void) -> (() -> Void) { return {} }
-    func createOrFetchConversation(between userId1: String, and userId2: String) async throws -> Conversation {
-        Conversation(
-            id: "mock-conv",
-            participantIDs: [userId1, userId2],
-            lastMessage: "",
-            lastMessageTimestamp: Date()
-        )
-    }
-    func uploadImage(_ image: UIImage, conversationId: String) async throws -> URL {
-        return URL(string: "https://mock-image-url.com/image.jpg")!
-    }
-}
-
-
-private struct MockConvAuthRepository: AuthRepository {
-    func signUp(email: String, password: String) async throws -> User { .mock }
-    func signUpWithGoogle() async throws -> User { .mock }
-    func signOut() throws {}
-    func signIn(email: String, password: String) async throws -> User { .mock }
-    func signInWithGoogle() async throws -> User { .mock }
-    func deleteAccount() async throws {}
-}
-
 #Preview {
-    let viewModel = ChatViewModel(chatRepository: MockThreadRepository(), userRepository: MockUserRepository())
+    let viewModel = ChatViewModel(chatRepository: MockChatRepository(), userRepository: MockUserRepository())
     let conversation = Conversation(
         id: "conv1",
         participantIDs: ["user1", "user2"],
@@ -417,6 +340,6 @@ private struct MockConvAuthRepository: AuthRepository {
         )
     }
     .environment(viewModel)
-    .environment(AuthViewModel(repository: MockConvAuthRepository(), userRepository: MockUserRepository()))
+    .environment(AuthViewModel(repository: MockAuthRepository(), userRepository: MockUserRepository()))
     .environment(ProfileViewModel(userRepository: MockUserRepository(), user: .mock))
 }
