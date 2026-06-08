@@ -211,12 +211,3 @@ struct AddProfileSheet: View {
         .environment(AuthViewModel(repository: MockAuthRepository(), userRepository: MockUserRepository()))
 }
 
-private struct MockAuthRepository: AuthRepository {
-    func signUp(email: String, password: String) async throws -> User { .mock }
-    func signUpWithGoogle() async throws -> User { .mock }
-    func signIn(email: String, password: String) async throws -> User { .mock }
-    func signInWithGoogle() async throws -> User { .mock }
-    func signOut() throws {}
-    func deleteAccount() async throws {}
-}
-
