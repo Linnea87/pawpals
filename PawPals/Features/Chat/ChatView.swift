@@ -1,32 +1,14 @@
 import SwiftUI
 
-private enum ChatFilter: CaseIterable {
-    case all, unread, favorite
 
-    var label: LocalizedStringKey {
-        switch self {
-        case .all: return "chat.filter.all"
-        case .unread: return "chat.filter.unread"
-        case .favorite: return "chat.filter.favorite"
-        }
-    }
-}
 
 struct ChatView: View {
     @Binding var selectedTab: Tab
     @Environment(ChatViewModel.self) private var chatViewModel
-    @State private var selectedFilter: ChatFilter = .all
     @State private var navigationPath = NavigationPath() /// Controls which conversation is currently pushed onto the navigation stack.
     var currentUserID: String = ""
 
-    private var filteredConversations: [Conversation] {
-        switch selectedFilter {
-        case .all: return chatViewModel.conversations
-        case .unread:
-            return chatViewModel.conversations.filter { $0.unreadCount > 0 }
-        case .favorite: return []
-        }
-    }
+    
 
     var body: some View {
         NavigationStack(path: $navigationPath) {
@@ -40,14 +22,14 @@ struct ChatView: View {
                     if chatViewModel.isLoading {
                         ProgressView()
                             .frame(maxWidth: .infinity, maxHeight: .infinity)
-                    } else if filteredConversations.isEmpty {
+                    } else if chatViewModel.filteredConversations.isEmpty {
                         ContentUnavailableView(
                             "chat.noConversations",
                             systemImage: "bubble.left.and.bubble.right"
                         )
                         .frame(maxWidth: .infinity, maxHeight: .infinity)
                     } else {
-                        List(filteredConversations) { conversation in
+                        List(chatViewModel.filteredConversations) { conversation in
                             NavigationLink(value: conversation) {
                                 ConversationRowView(
                                     conversation: conversation,
@@ -117,18 +99,18 @@ struct ChatView: View {
         HStack(spacing: Spacing.small) {
             ForEach(ChatFilter.allCases, id: \.self) { filter in
                 Button {
-                    selectedFilter = filter
+                    chatViewModel.selectedFilter = filter
                 } label: {
-                    Text(filter.label)
+                    Text(LocalizedStringKey(filter.label))
                         .font(.subheadline)
                         .fontWeight(.medium)
                         .foregroundStyle(
-                            selectedFilter == filter ? .white : Theme.darkBrown
+                            chatViewModel.selectedFilter == filter ? .white : Theme.darkBrown
                         )
                         .padding(.horizontal, Spacing.large)
                         .padding(.vertical, Spacing.small)
                         .background(
-                            selectedFilter == filter
+                            chatViewModel.selectedFilter == filter
                                 ? Theme.sageGreen : Theme.offWhite
                         )
                         .clipShape(Capsule())

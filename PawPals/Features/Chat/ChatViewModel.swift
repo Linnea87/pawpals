@@ -1,6 +1,18 @@
 import Foundation
 import UIKit
 
+enum ChatFilter: CaseIterable {
+    case all, unread, favorite
+
+    var label: String {
+        switch self {
+        case .all: return "chat.filter.all"
+        case .unread: return "chat.filter.unread"
+        case .favorite: return "chat.filter.favorite"
+        }
+    }
+}
+
 @Observable
 final class ChatViewModel {
     var conversations: [Conversation] = []
@@ -11,6 +23,15 @@ final class ChatViewModel {
     var activeConversation: Conversation?
     var pendingConversationID: String? /// Set when the user taps a push notification for a new message.
     var isUploadingImage: Bool = false
+    var selectedFilter: ChatFilter = .all
+
+    var filteredConversations: [Conversation] {
+        switch selectedFilter {
+        case .all: return conversations
+        case .unread: return conversations.filter { $0.unreadCount > 0 }
+        case .favorite: return []
+        }
+    }
 
     /// Cache of resolved User objects keyed by their Firestore user ID.
     var participants: [String: User] = [:]
