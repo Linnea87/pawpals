@@ -132,29 +132,3 @@ struct SignUpView: View {
     SignUpView()
         .environment(AuthViewModel(repository: MockAuthRepository(), userRepository: MockUserRepository()))
 }
-
-private struct MockAuthRepository: AuthRepository {
-    func signUp(email: String, password: String) async throws -> User {
-        User(id: "preview", name: "", photoURL: nil, bio: "", city: "",
-             dogs: [], preferences: UserPreferences(walkTypes: [], dogSize: .medium, searchRadius: 10),
-             distance: nil)
-    }
-    func signUpWithGoogle() async throws -> User {
-            User(id: "preview", name: "", photoURL: nil, bio: "", city: "",
-                 dogs: [], preferences: UserPreferences(walkTypes: [], dogSize: .medium, searchRadius: 10),
-                 distance: nil)
-    }
-    func signOut() throws {}
-    
-    func signIn(email: String, password: String) async throws -> User {
-        User(id: "preview", name: "", photoURL: nil, bio: "", city: "",
-             dogs: [], preferences: UserPreferences(walkTypes: [], dogSize: .medium, searchRadius: 10),
-             distance: nil)
-    }
-    func signInWithGoogle() async throws -> User {
-        User(id: "preview", name: "", photoURL: nil, bio: "", city: "",
-             dogs: [], preferences: UserPreferences(walkTypes: [], dogSize: .medium, searchRadius: 10),
-             distance: nil)
-    }
-    func deleteAccount() async throws {}
-}

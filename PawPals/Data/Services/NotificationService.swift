@@ -4,12 +4,6 @@ import UIKit
 import UserNotifications
 
 /// Handles everything related to push notifications:
-/// - Requesting permission from the user
-/// - Receiving and storing the device push notification token
-/// - Reacting to notification taps and exposing the conversation to navigate to
-///
-/// Conforms to UNUserNotificationCenterDelegate (Apple) and MessagingDelegate (Firebase).
-/// NSObject is required because Apple's delegate protocols need an Objective-C compatible base.
 @Observable
 final class NotificationService: NSObject {
 
