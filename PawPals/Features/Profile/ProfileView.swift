@@ -89,13 +89,7 @@ struct ProfileView: View {
                                 HStack(spacing: Spacing.small) {
                                     ForEach(displayUser.preferences.walkTypes) {
                                         walkType in
-                                        Text(walkType.rawValue)
-                                            .font(.caption)
-                                            .padding(.horizontal, Spacing.small)
-                                            .padding(.vertical, Spacing.xSmall)
-                                            .background(Theme.terracotta)
-                                            .foregroundStyle(Theme.offWhite)
-                                            .clipShape(Capsule())
+                                        WalkTypeTag(walkType: walkType)
                                     }
                                 }
                             }
