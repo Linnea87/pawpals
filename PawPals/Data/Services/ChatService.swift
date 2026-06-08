@@ -1,28 +1,28 @@
-import Foundation
 import FirebaseFirestore
 import FirebaseStorage
+import Foundation
 import UIKit
 
 final class ChatService: ChatRepository {
     private let db = Firestore.firestore()
 
     /// Returns an existing conversation between two users, or creates a new one.
-    func createOrFetchConversation(between userId1: String, and userId2: String) async throws -> Conversation {
-        let snapshot = try await db.collection("conversations")
-            .whereField("participantIDs", arrayContains: userId1)
-            .getDocuments()
+    func createOrFetchConversation(between userID1: String, and userID2: String)
+        async throws -> Conversation
+    {
+        let conversationID = [userID1, userID2].sorted().joined(separator: "_")
 
-        if let existing = snapshot.documents.first(where: { doc in
-            let ids = doc.data()["participantIDs"] as? [String] ?? []
-            return ids.contains(userId2)
-        }) {
-            return try existing.data(as: Conversation.self)
+        let ref = db.collection("conversations").document(conversationID)
+
+        let snapshot = try await ref.getDocument()
+
+        if snapshot.exists {
+            return try snapshot.data(as: Conversation.self)
         }
 
-        let ref = db.collection("conversations").document()
         let conversation = Conversation(
-            id: ref.documentID,
-            participantIDs: [userId1, userId2],
+            id: conversationID,
+            participantIDs: [userID1, userID2],
             lastMessage: "",
             lastMessageTimestamp: Date(),
             unreadCount: 0
@@ -33,7 +33,8 @@ final class ChatService: ChatRepository {
 
     /// Writes the message to the messages subcollection, then updates the parent
     /// conversation document with the latest preview text, timestamp, and unread count.
-    func sendMessage(_ message: Message, to conversationID: String) async throws {
+    func sendMessage(_ message: Message, to conversationID: String) async throws
+    {
         let ref = db.collection("conversations")
             .document(conversationID)
             .collection("messages")
@@ -46,16 +47,19 @@ final class ChatService: ChatRepository {
             "text": message.text,
             "timestamp": Timestamp(date: message.timestamp),
             "isRead": false,
-            "isDelivered": false
+            "isDelivered": false,
         ]
         try await ref.setData(data)
 
         /// Update the conversation document so the chat list shows the correct preview, and the receiver's unread badge increments in real time.
-        let conversationRef = db.collection("conversations").document(conversationID)
+        let conversationRef = db.collection("conversations").document(
+            conversationID
+        )
         try await conversationRef.updateData([
-            "lastMessage": message.text.isEmpty ? "📷 Photo" : message.text,
+            "lastMessage": message.text.isEmpty
+                ? String(localized: "chat.lastMessage.photo") : message.text,
             "lastMessageTimestamp": Timestamp(date: message.timestamp),
-            "unreadCount": FieldValue.increment(Int64(1)) /// Firestore increments this on the server so two messages arriving at the same time never cancel each other out. Int64 is just what the SDK expects for whole numbers.
+            "unreadCount": FieldValue.increment(Int64(1)),/// Firestore increments this on the server so two messages arriving at the same time never cancel each other out. Int64 is just what the SDK expects for whole numbers.
         ])
     }
 
@@ -79,7 +83,7 @@ final class ChatService: ChatRepository {
 
                 onUpdate(messages)
             }
-        
+
         return { listener.remove() }
     }
 
@@ -94,9 +98,15 @@ final class ChatService: ChatRepository {
             .addSnapshotListener { snapshot, _ in
                 guard let documents = snapshot?.documents else { return }
                 /// Decode each conversation document — silently skip any that fail
-                let conversations = documents.compactMap { try? $0.data(as: Conversation.self) }
+                let conversations = documents.compactMap {
+                    try? $0.data(as: Conversation.self)
+                }
                 /// Sort newest-first so the most recent conversation always appears at the top
-                onUpdate(conversations.sorted { $0.lastMessageTimestamp > $1.lastMessageTimestamp })
+                onUpdate(
+                    conversations.sorted {
+                        $0.lastMessageTimestamp > $1.lastMessageTimestamp
+                    }
+                )
             }
         return { listener.remove() }
     }
@@ -129,9 +139,9 @@ final class ChatService: ChatRepository {
             .whereField("receiverID", isEqualTo: userID)
             .whereField("isDelivered", isEqualTo: false)
             .getDocuments()
-        
+
         guard !snapshot.documents.isEmpty else { return }
-        
+
         let batch = db.batch()
         for doc in snapshot.documents {
             batch.updateData(["isDelivered": true], forDocument: doc.reference)
@@ -139,7 +149,9 @@ final class ChatService: ChatRepository {
         try await batch.commit()
     }
 
-    func uploadImage(_ image: UIImage, conversationId: String) async throws -> URL {
+    func uploadImage(_ image: UIImage, conversationId: String) async throws
+        -> URL
+    {
 
         guard let imageData = image.jpegData(compressionQuality: 0.7) else {
             throw URLError(.badServerResponse)

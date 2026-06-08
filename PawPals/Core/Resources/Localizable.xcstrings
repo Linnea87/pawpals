@@ -253,6 +253,17 @@
         }
       }
     },
+    "chat.lastMessage.photo" : {
+          "extractionState" : "manual",
+          "localizations" : {
+            "en" : {
+              "stringUnit" : {
+                "state" : "translated",
+                "value" : "📷 Photo"
+              }
+            }
+          }
+        },
     "chat.tab" : {
       "extractionState" : "manual",
       "localizations" : {
