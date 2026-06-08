@@ -51,5 +51,11 @@ struct AppNavigationView: View {
                 }
             }
         }
+        .onChange(of: notificationService.pushNotificationToken) { _, token in
+            guard let token, let userID = authVM.currentUser?.id else { return }
+            Task {
+                await notificationService.savePushNotificationToken(token, for: userID)
+            }
+        }
     }
 }
