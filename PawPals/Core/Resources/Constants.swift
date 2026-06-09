@@ -2,6 +2,7 @@ import Foundation
 
 enum Spacing {
     static let negativeXSmall: CGFloat = -4
+    static let negativeSmall: CGFloat = -6
     static let none: CGFloat = 0
     static let xxSmall: CGFloat = 2
     static let xSmall: CGFloat = 4
@@ -25,10 +26,13 @@ enum Radius {
 }
 
 enum FontSize {
+    static let xxSmall: CGFloat = 8
+    static let xSmall: CGFloat = 9
     static let small: CGFloat = 10
 }
 
 enum IconSize {
+    static let tabBarIcon: CGFloat = 22
     static let savedAvatar: CGFloat = 40
     static let avatar: CGFloat = 90
     static let navAvatar: CGFloat = 60
@@ -54,4 +58,8 @@ enum AuthLayout {
     static let borderWidth: CGFloat = 1
     static let borderOpacity: CGFloat = 0.2
     static let sheetFraction: CGFloat = 0.65
+}
+
+enum Duration {
+    static let standard: Double = 0.2
 }
