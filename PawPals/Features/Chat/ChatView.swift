@@ -69,7 +69,6 @@ struct ChatView: View {
                     chatUnreadCount: chatViewModel.totalUnread
                 )
             }
-            .navigationTitle(Text("chat.title"))
             .alert(
                 "common.error",
                 isPresented: .constant(chatViewModel.errorMessage != nil)
