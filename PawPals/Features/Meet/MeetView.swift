@@ -87,7 +87,7 @@ struct MeetView: View {
                                         .onTapGesture { vm.selectedUser = user }
                                 }
                             }
-                            .padding(.horizontal, Spacing.large)
+                            .padding(.horizontal, Spacing.xLarge)
                         }
                     }
                 }
