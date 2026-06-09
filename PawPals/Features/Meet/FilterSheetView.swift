@@ -179,7 +179,7 @@ struct FilterSheetView: View {
             Spacer()
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .background(Theme.offWhite.opacity(Opacity.xSmal))
+        .background(Theme.offWhite.opacity(Opacity.xSmall))
         .clipShape(RoundedRectangle(cornerRadius: Radius.medium))
     }
     
