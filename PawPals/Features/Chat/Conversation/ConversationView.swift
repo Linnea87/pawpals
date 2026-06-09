@@ -202,7 +202,7 @@ private struct MessageBubbleView: View {
     private var bubbleContent: some View {
         if isUploadingImage {
             ProgressView()
-                .frame(width: BubbleContentConversationView.width, height: BubbleContentConversationView.height)
+                .frame(width: 200, height: 150)
                 .background(
                     isFromCurrentUser
                     ? Theme.terracotta.opacity(Opacity.xxSmall) : Theme.offWhite
@@ -216,12 +216,12 @@ private struct MessageBubbleView: View {
                 switch phase {
                 case .empty:
                     ProgressView()
-                        .frame(width: BubbleContentConversationView.width, height: BubbleContentConversationView.height)
+                        .frame(width: 200, height: 150)
                 case .success(let image):
                     image
                         .resizable()
                         .scaledToFill()
-                        .frame(maxWidth: BubbleContentConversationView.width, maxHeight: BubbleContentConversationView.maxHeight)
+                        .frame(maxWidth: 200, maxHeight: 200)
                         .clipShape(
                             RoundedRectangle(cornerRadius: Radius.medium)
                         )
