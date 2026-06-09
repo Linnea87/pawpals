@@ -206,12 +206,13 @@ final class ChatViewModel {
                 id: UUID().uuidString,
                 senderID: senderID,
                 receiverID: receiverID,
-                text: "",
+                text: messageText,
                 imageURL: url.absoluteString,
                 timestamp: Date()
             )
 
             try await chatRepository.sendMessage(message, to: conversation.id)
+                    messageText = ""   
         } catch {
             errorMessage = error.localizedDescription
         }
