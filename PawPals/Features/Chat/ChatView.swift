@@ -62,6 +62,7 @@ struct ChatView: View {
                     currentUserID: currentUserID,
                     otherUser: chatViewModel.otherUser(in: conversation, currentUserID: currentUserID) ?? .mock
                 )
+                .environment(chatViewModel.makeConversationViewModel())
             }
             .safeAreaInset(edge: .bottom, spacing: Spacing.none) {
                 TabBarView(
@@ -83,7 +84,7 @@ struct ChatView: View {
             chatViewModel.observeConversations(for: currentUserID)
         }
         .onDisappear {
-            chatViewModel.stopListeningToConversations()
+            chatViewModel.stopObservingConversations()
         }
         /// Handles the case where the notification tap arrives while the app is already open.
         .onChange(of: chatViewModel.pendingConversationID) { _, _ in

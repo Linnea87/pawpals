@@ -89,8 +89,12 @@ struct ConversationView: View {
                     selectedUser = otherUser
                 } label: {
                     VStack(spacing: Spacing.xxSmall) {
-                        AvatarView(photoURL: otherUser.photoURL, size: IconSize.messageAvatar, iconSize:
-                        IconSize.avatarIcon)
+                        AvatarView(
+                            photoURL: otherUser.photoURL,
+                            size: IconSize.messageAvatar,
+                            iconSize:
+                                IconSize.avatarIcon
+                        )
 
                         Text(otherUser.name)
                             .font(.headline)
@@ -123,7 +127,7 @@ struct ConversationView: View {
             }
         }
         .onDisappear {
-            conversationVM.stopListening()
+            conversationViewModel.stopObservingMessages()
         }
         .alert(
             String(localized: "common.error"),
@@ -198,10 +202,10 @@ private struct MessageBubbleView: View {
     private var bubbleContent: some View {
         if isUploadingImage {
             ProgressView()
-                .frame(width: 200, height: 150)
+                .frame(width: BubbleContentConversationView.width, height: BubbleContentConversationView.height)
                 .background(
                     isFromCurrentUser
-                        ? Theme.terracotta.opacity(0.3) : Theme.offWhite
+                    ? Theme.terracotta.opacity(Opacity.xxSmall) : Theme.offWhite
                 )
                 .clipShape(RoundedRectangle(cornerRadius: Radius.medium))
 
@@ -212,19 +216,19 @@ private struct MessageBubbleView: View {
                 switch phase {
                 case .empty:
                     ProgressView()
-                        .frame(width: 200, height: 150)
+                        .frame(width: BubbleContentConversationView.width, height: BubbleContentConversationView.height)
                 case .success(let image):
                     image
                         .resizable()
                         .scaledToFill()
-                        .frame(maxWidth: 200, maxHeight: 200)
+                        .frame(maxWidth: BubbleContentConversationView.width, maxHeight: BubbleContentConversationView.maxHeight)
                         .clipShape(
                             RoundedRectangle(cornerRadius: Radius.medium)
                         )
                 case .failure:
                     Image(systemName: "photo")
                         .foregroundStyle(Theme.warmBrown)
-                        .frame(width: 200, height: 150)
+                        .frame(width: BubbleContentConversationView.width, height: BubbleContentConversationView.height)
                 @unknown default:
                     EmptyView()
                 }
@@ -321,7 +325,9 @@ private struct MessageInputBar: View {
 }
 
 #Preview {
-    let conversationViewModel = ConversationViewModel(chatRepository: MockChatRepository())
+    let conversationViewModel = ConversationViewModel(
+        chatRepository: MockChatRepository()
+    )
     let conversation = Conversation(
         id: "conv1",
         participantIDs: ["user1", "user2"],
@@ -336,6 +342,13 @@ private struct MessageInputBar: View {
         )
     }
     .environment(conversationViewModel)
-    .environment(AuthViewModel(repository: MockAuthRepository(), userRepository: MockUserRepository()))
-    .environment(ProfileViewModel(userRepository: MockUserRepository(), user: .mock))
+    .environment(
+        AuthViewModel(
+            repository: MockAuthRepository(),
+            userRepository: MockUserRepository()
+        )
+    )
+    .environment(
+        ProfileViewModel(userRepository: MockUserRepository(), user: .mock)
+    )
 }
