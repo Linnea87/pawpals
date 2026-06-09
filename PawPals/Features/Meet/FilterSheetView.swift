@@ -60,7 +60,7 @@ struct FilterSheetView: View {
                         }
                     }
                     .padding(Spacing.medium)
-                    .background(Theme.offWhite.opacity(0.6))
+                    .background(Theme.offWhite.opacity(Opacity.xSmall))
                     .clipShape(RoundedRectangle(cornerRadius: Radius.medium))
 
                     VStack(alignment: .leading, spacing: Spacing.medium) {
@@ -109,7 +109,7 @@ struct FilterSheetView: View {
                         mapSection
                     }
                     .padding(Spacing.medium)
-                    .background(Theme.offWhite.opacity(0.6))
+                    .background(Theme.offWhite.opacity(Opacity.xSmall))
                     .clipShape(RoundedRectangle(cornerRadius: Radius.medium))
                     .frame(maxHeight: .infinity)
                 }
@@ -178,7 +178,7 @@ struct FilterSheetView: View {
             Spacer()
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .background(Theme.offWhite.opacity(Opacity.xSmal))
+        .background(Theme.offWhite.opacity(Opacity.xSmall))
         .clipShape(RoundedRectangle(cornerRadius: Radius.medium))
     }
     

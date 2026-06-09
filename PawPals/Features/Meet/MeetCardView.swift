@@ -42,7 +42,7 @@ struct MeetCardView: View {
         }
         .padding(Spacing.large)
         .background(Theme.offWhite)
-        .clipShape(RoundedRectangle(cornerRadius: 20))
+        .clipShape(RoundedRectangle(cornerRadius: Radius.large))
     }
 }
 
