@@ -228,7 +228,7 @@ private struct MessageBubbleView: View {
                 case .failure:
                     Image(systemName: "photo")
                         .foregroundStyle(Theme.warmBrown)
-                        .frame(width: BubbleContentConversationView.width, height: BubbleContentConversationView.height)
+                        .frame(width: 200, height: 150)
                 @unknown default:
                     EmptyView()
                 }
