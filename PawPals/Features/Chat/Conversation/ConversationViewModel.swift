@@ -8,19 +8,23 @@ final class ConversationViewModel {
     var isLoading: Bool = false
     var errorMessage: String?
     var isUploadingImage: Bool = false
+    var isNew: Bool = false /// True when this conversation hasn't been written to Firestore yet.
+  
+    var onCreate: (() async throws -> Void)? /// Called once before the first message send to create the conversation in Firestore.
 
-    private let chatRepository: ChatRepository
+    private let conversationRepository: ConversationRepository
     private var stopObserving: (() -> Void)?
 
-    init(chatRepository: ChatRepository) {
-        self.chatRepository = chatRepository
+    init(conversationRepository: ConversationRepository) {
+        self.conversationRepository = conversationRepository
     }
 
     /// Starts the Firestore listener for messages in a single conversation.
     func observeMessages(conversationID: String, currentUserID: String) {
+        guard !isNew else { return }
         messages = []
         isLoading = true
-        stopObserving = chatRepository.observeMessages(
+        stopObserving = conversationRepository.observeMessages(
             conversationID: conversationID
         ) { [weak self] updatedMessages in
             guard let self else { return }
@@ -58,11 +62,20 @@ final class ConversationViewModel {
         messageText = ""
 
         do {
-            try await chatRepository.sendMessage(message, to: conversation.id)
-        } catch {
-            errorMessage = error.localizedDescription
+                /// If this is a new conversation, create it in Firestore before sending.
+                if isNew, let create = onCreate {
+                    try await create()
+                    isNew = false
+                    onCreate = nil
+                    /// Now the conversation exists — start observing messages.
+                    observeMessages(conversationID: conversation.id, currentUserID: senderID)
+                }
+                try await conversationRepository.sendMessage(message, to: conversation.id)
+                try await conversationRepository.markAsRead(conversationID: conversation.id, userID: senderID)
+            } catch {
+                errorMessage = error.localizedDescription
+            }
         }
-    }
 
     func sendImage(
         _ image: UIImage,
@@ -76,7 +89,7 @@ final class ConversationViewModel {
             conversation.participantIDs.first { $0 != senderID } ?? ""
 
         do {
-            let url = try await chatRepository.uploadImage(
+            let url = try await conversationRepository.uploadImage(
                 image,
                 conversationId: conversation.id
             )
@@ -90,7 +103,7 @@ final class ConversationViewModel {
                 timestamp: Date()
             )
 
-            try await chatRepository.sendMessage(message, to: conversation.id)
+            try await conversationRepository.sendMessage(message, to: conversation.id)
         } catch {
             errorMessage = error.localizedDescription
         }
@@ -100,7 +113,7 @@ final class ConversationViewModel {
 
     func markAsDelivered(conversationID: String, userID: String) async {
         do {
-            try await chatRepository.markAsDelivered(
+            try await conversationRepository.markAsDelivered(
                 conversationID: conversationID,
                 userID: userID
             )
@@ -111,7 +124,7 @@ final class ConversationViewModel {
 
     func markAsRead(conversationID: String, userID: String) async {
         do {
-            try await chatRepository.markAsRead(
+            try await conversationRepository.markAsRead(
                 conversationID: conversationID,
                 userID: userID
             )
