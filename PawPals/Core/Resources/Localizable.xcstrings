@@ -231,6 +231,17 @@
         }
       }
     },
+    "chat.lastMessage.photo" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "📷 Photo"
+          }
+        }
+      }
+    },
     "chat.messagePlaceholder" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -253,17 +264,6 @@
         }
       }
     },
-    "chat.lastMessage.photo" : {
-          "extractionState" : "manual",
-          "localizations" : {
-            "en" : {
-              "stringUnit" : {
-                "state" : "translated",
-                "value" : "📷 Photo"
-              }
-            }
-          }
-        },
     "chat.tab" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -755,9 +755,6 @@
           }
         }
       }
-    },
-    "profile.walk_preferences" : {
-
     },
     "profile.walkPreferences" : {
       "extractionState" : "manual",
