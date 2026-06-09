@@ -75,76 +75,10 @@ final class MeetViewModel {
                 radius: searchRadius,
                 excludingUserID: Auth.auth().currentUser?.uid ?? ""
             )
-            applyFilters()
 
         } catch {
             errorMessage = error.localizedDescription
         }
-    }
-
-    func setRadius(_ km: Double, userId: String) {
-        searchRadius = km
-        applyFilters()
-        Task {
-            try? await userRepository.savePreferences(
-                UserPreferences(
-                    walkTypes: [],
-                    dogSize: .medium,
-                    searchRadius: km
-                ),
-                userId: userId
-            )
-        }
-    }
-
-    func toggleFilter(_ filter: String) {
-        if activeFilters.contains(filter) {
-            activeFilters.remove(filter)
-        } else {
-            activeFilters.insert(filter)
-        }
-        applyFilters()
-    }
-
-    func clearFilters() {
-        activeFilters.removeAll()
-        applyFilters()
-    }
-
-    func toggleSizeFilter(_ size: String) {
-        if activeSizeFilters.contains(size) {
-            activeSizeFilters.remove(size)
-        } else {
-            activeSizeFilters.insert(size)
-        }
-        applyFilters()
-    }
-
-    func clearSizeFilters() {
-        activeSizeFilters.removeAll()
-        applyFilters()
-    }
-
-    private func applyFilters() {
-        var result = allNearbyUsers
-
-        if !activeFilters.isEmpty {
-            result = result.filter { user in
-                let userWalkTypes = Set(
-                    user.preferences.walkTypes.map { $0.rawValue }
-                )
-                return !activeFilters.isDisjoint(with: userWalkTypes)
-            }
-        }
-
-        if !activeSizeFilters.isEmpty {
-            result = result.filter { user in
-                guard let size = user.dogs.first?.size else { return false }
-                return activeSizeFilters.contains(size.rawValue)
-            }
-        }
-
-        filteredUsers = result
     }
 
     func loadSavedProfiles() async {
