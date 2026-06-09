@@ -38,8 +38,15 @@ enum IconSize {
     static let messageAvatar: CGFloat = 32
 }
 
+enum BubbleContentConversationView {
+    static let width: CGFloat = 200
+    static let height: CGFloat = 150
+    static let maxHeight: CGFloat = 200
+}
+
 enum Opacity {
-    static let xSmal = 0.6
+    static let xxSmall: CGFloat = 0.3
+    static let xSmall: CGFloat = 0.6
 }
 
 enum AuthLayout {
