@@ -5,14 +5,17 @@ final class ChatService: ChatRepository {
     private let db = Firestore.firestore()
 
     func createOrFetchConversation(between userID1: String, and userID2: String) async throws -> Conversation {
+        /// Sorting guarantees the same ID regardless of which user initiates.
         let conversationID = [userID1, userID2].sorted().joined(separator: "_")
         let ref = db.collection("conversations").document(conversationID)
         let snapshot = try await ref.getDocument()
 
+        /// Conversation already in Firestore — decode and return it.
         if snapshot.exists {
             return try snapshot.data(as: Conversation.self)
         }
-
+        
+        /// First time these two users connect — create the document.
         let conversation = Conversation(
             id: conversationID,
             participantIDs: [userID1, userID2],
@@ -36,18 +39,20 @@ final class ChatService: ChatRepository {
         onUpdate: @escaping ([Conversation]) -> Void
     ) -> (() -> Void) {
         let listener = db.collection("conversations")
-            .whereField("participantIDs", arrayContains: userID)
+            .whereField("participantIDs", arrayContains: userID) /// Only conversations this user belongs to.
             .addSnapshotListener { snapshot, _ in
                 guard let documents = snapshot?.documents else { return }
                 let conversations = documents.compactMap {
-                    try? $0.data(as: Conversation.self)
+                    try? $0.data(as: Conversation.self) /// Silently skip malformed documents
                 }
+                /// Sort newest-first so the most recent conversation appears at the top.
                 onUpdate(
                     conversations.sorted {
                         $0.lastMessageTimestamp > $1.lastMessageTimestamp
                     }
                 )
             }
+        /// Caller stores this and calls it on view disappear to detach the listener.
         return { listener.remove() }
     }
 }

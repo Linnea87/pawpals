@@ -71,6 +71,7 @@ final class ConversationViewModel {
                     observeMessages(conversationID: conversation.id, currentUserID: senderID)
                 }
                 try await conversationRepository.sendMessage(message, to: conversation.id)
+            /// Reset unread count for the sender immediately — prevents the badge incrementing for your own messages.
                 try await conversationRepository.markAsRead(conversationID: conversation.id, userID: senderID)
             } catch {
                 errorMessage = error.localizedDescription

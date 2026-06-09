@@ -20,20 +20,21 @@ final class ChatViewModel {
     var errorMessage: String?
     var activeConversation: Conversation?
     var pendingConversationID: String? /// Set when the user taps a push notification for a new message.
-    var isActiveConversationNew: Bool = false
+    var isActiveConversationNew: Bool = false /// True when activeConversation is a local draft not yet saved to Firestore.
     var selectedFilter: ChatFilter = .all
 
     var filteredConversations: [Conversation] {
         switch selectedFilter {
         case .all: return conversations
         case .unread: return conversations.filter { $0.unreadCount > 0 }
-        case .favorite: return []
+        case .favorite: return [] // TODO: Needs implementation
         }
     }
 
     /// Cache of resolved User objects keyed by their Firestore user ID.
     var participants: [String: User] = [:]
 
+    /// Sum of unread counts across all conversations — drives the tab bar badge.
     var totalUnread: Int {
         conversations.reduce(0) { $0 + $1.unreadCount }
     }
@@ -42,15 +43,15 @@ final class ChatViewModel {
     private let userRepository: UserRepository
 
 
-    private var stopConversationsListener: (() -> Void)?
+    private var stopConversationsListener: (() -> Void)? /// Holds the Firestore cleanup closure
 
     init(chatRepository: ChatRepository, userRepository: UserRepository) {
         self.chatRepository = chatRepository
         self.userRepository = userRepository
     }
 
-    /// Creates or fetches a conversation with another user and navigates to it.
-    /// Also stores the other user in the participants cache immediately so the conversation header shows the correct name and photo.
+    /// Navigates to an existing conversation or creates a local draft if none exists yet.
+    /// Nothing is written to Firestore until the first message is sent.
     func startConversation(with user: User, currentUserId: String) async {
         isLoading = true
         errorMessage = nil
@@ -64,7 +65,7 @@ final class ChatViewModel {
                 participants[user.id] = user
                 isActiveConversationNew = false
             } else {
-            
+                /// Build a local draft with the deterministic ID — no Firestore write yet.
                 let conversationID = [currentUserId, user.id].sorted().joined(separator: "_")
                 let draft = Conversation(
                     id: conversationID,
