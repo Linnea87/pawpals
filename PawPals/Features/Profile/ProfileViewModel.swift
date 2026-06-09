@@ -38,7 +38,7 @@ final class ProfileViewModel {
         user.preferences.walkTypes = walkTypes
         do {
             try await userRepository.updateProfile(user)
-            try await userRepository.savePreferences(user.preferences, userId: user.id)
+            try await userRepository.savePreferences(user.preferences, userID: user.id)
         } catch {
             errorMessage = error.localizedDescription
         }
@@ -49,7 +49,7 @@ final class ProfileViewModel {
         isLoading = true
         errorMessage = nil
         do {
-            try await userRepository.saveDog(dog, userId: user.id)
+            try await userRepository.saveDog(dog, userID: user.id)
             user.dogs.append(dog)
         } catch {
             errorMessage = error.localizedDescription
@@ -57,12 +57,12 @@ final class ProfileViewModel {
         isLoading = false
     }
     
-    func removeDog(_ dogId: String) async {
+    func removeDog(_ dogID: String) async {
         isLoading = true
         errorMessage = nil
         do {
-            try await userRepository.removeDog(dogId: dogId, userId: user.id)
-            user.dogs.removeAll { $0.id == dogId }
+            try await userRepository.removeDog(dogID: dogID, userID: user.id)
+            user.dogs.removeAll { $0.id == dogID }
         } catch {
             errorMessage = error.localizedDescription
         }
@@ -91,8 +91,8 @@ final class ProfileViewModel {
         user.preferences.walkTypes = walkTypes
         do {
             try await userRepository.updateProfile(user)
-            try await userRepository.saveDog(dog, userId: user.id)
-            try await userRepository.savePreferences(user.preferences, userId: user.id)
+            try await userRepository.saveDog(dog, userID: user.id)
+            try await userRepository.savePreferences(user.preferences, userID: user.id)
         } catch {
             errorMessage = error.localizedDescription
         }
@@ -103,7 +103,7 @@ final class ProfileViewModel {
         isLoading = true
         errorMessage = nil
         do {
-            user.preferences = try await userRepository.loadPreferences(userId: user.id)
+            user.preferences = try await userRepository.loadPreferences(userID: user.id)
         } catch {
             errorMessage = error.localizedDescription
         }
@@ -114,7 +114,7 @@ final class ProfileViewModel {
         isLoading = true
         errorMessage = nil
         do {
-            try await userRepository.savePreferences(user.preferences, userId: user.id)
+            try await userRepository.savePreferences(user.preferences, userID: user.id)
         } catch {
             errorMessage = error.localizedDescription
         }
@@ -136,7 +136,7 @@ final class ProfileViewModel {
         do {
             guard let uiImage = UIImage(data: data),
                   let jpegData = uiImage.jpegData(compressionQuality: 0.8) else { return }
-            let url = try await userRepository.uploadProfilePhoto(jpegData, userId: user.id)
+            let url = try await userRepository.uploadProfilePhoto(jpegData, userID: user.id)
             user.photoURL = url
             try await userRepository.updateProfile(user)
         } catch {
@@ -144,12 +144,12 @@ final class ProfileViewModel {
         }
     }
 
-    func loadUser(userId: String) async {
+    func loadUser(userID: String) async {
         isLoading = true
         errorMessage = nil
         do {
-            user = try await userRepository.fetchUser(userId: userId)
-            user.preferences = try await userRepository.loadPreferences(userId: userId)
+            user = try await userRepository.fetchUser(userID: userID)
+            user.preferences = try await userRepository.loadPreferences(userID: userID)
         } catch {
             errorMessage = error.localizedDescription
         }

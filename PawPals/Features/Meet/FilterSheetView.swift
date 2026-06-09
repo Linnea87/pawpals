@@ -23,14 +23,14 @@ struct FilterSheetView: View {
                         ScrollView(.horizontal, showsIndicators: false) {
                             HStack(spacing: Spacing.small) {
                                 FilterChip(title: "All", isSelected: filterViewModel.activeFilters.isEmpty) {
-                                    filterViewModel.clearFilters(userId: authVM.currentUserId)
+                                    filterViewModel.clearFilters(userID: authVM.currentUserID)
                                 }
                                 ForEach(WalkType.allCases) { walkType in
                                     FilterChip(
                                         title: walkType.rawValue,
                                         isSelected: filterViewModel.activeFilters.contains(walkType.rawValue)
                                     ) {
-                                        filterViewModel.toggleFilter(walkType.rawValue, userId: authVM.currentUserId)
+                                        filterViewModel.toggleFilter(walkType.rawValue, userID: authVM.currentUserID)
 
                                     }
                                 }
@@ -46,14 +46,14 @@ struct FilterSheetView: View {
                         ScrollView(.horizontal, showsIndicators: false) {
                             HStack(spacing: Spacing.small) {
                                 FilterChip(title: "All sizes", isSelected: filterViewModel.activeSizeFilters.isEmpty) {
-                                    filterViewModel.clearSizeFilters(userId: authVM.currentUserId)
+                                    filterViewModel.clearSizeFilters(userID: authVM.currentUserID)
                                 }
                                 ForEach(DogSize.allCases, id: \.self) { size in
                                     FilterChip(
                                         title: size.rawValue.capitalized,
                                         isSelected: filterViewModel.activeSizeFilters.contains(size.rawValue)
                                     ) {
-                                        filterViewModel.toggleSizeFilter(size.rawValue, userId: authVM.currentUserId)
+                                        filterViewModel.toggleSizeFilter(size.rawValue, userID: authVM.currentUserID)
                                     }
                                 }
                             }
@@ -82,7 +82,7 @@ struct FilterSheetView: View {
                                     get: { filterViewModel.searchRadius },
                                     set: { filterViewModel.setRadius(
                                             $0,
-                                            userId: authVM.currentUserId
+                                            userID: authVM.currentUserID
                                         )
                                     }
                                 ),

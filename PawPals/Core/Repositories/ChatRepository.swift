@@ -37,5 +37,5 @@ protocol ChatRepository {
     func markAsDelivered(conversationID: String, userID: String) async throws
 
     /// Uploads an image to Firebase Storage and returns its download URL.
-    func uploadImage(_ image: UIImage, conversationId: String) async throws -> URL
+    func uploadImage(_ image: UIImage, conversationID: String) async throws -> URL
 }

@@ -150,7 +150,7 @@ final class ChatService: ChatRepository {
         try await batch.commit()
     }
 
-    func uploadImage(_ image: UIImage, conversationId: String) async throws
+    func uploadImage(_ image: UIImage, conversationID: String) async throws
         -> URL
     {
 
@@ -163,7 +163,7 @@ final class ChatService: ChatRepository {
 
         let storageRef = Storage.storage()
             .reference()
-            .child("conversations/\(conversationId)/\(UUID().uuidString).jpg")
+            .child("conversations/\(conversationID)/\(UUID().uuidString).jpg")
 
         _ = try await storageRef.putDataAsync(imageData)
 

@@ -6,7 +6,7 @@ final class AuthViewModel {
     var errorMessage: String? = nil
     var currentUser: User? = nil
     var isAuthenticated: Bool { currentUser != nil }
-    var currentUserId: String { currentUser?.id ?? "" }
+    var currentUserID: String { currentUser?.id ?? "" }
     var activeOption: AuthOption = .signIn
 
     private let repository: AuthRepository
@@ -107,9 +107,9 @@ final class AuthViewModel {
         isLoading = true
         errorMessage = nil
         defer { isLoading = false }
-        guard let userId = currentUser?.id else { return }
+        guard let userID = currentUser?.id else { return }
         do {
-            try await userRepository.deleteUserData(userId: userId)
+            try await userRepository.deleteUserData(userID: userID)
             try await repository.deleteAccount()
             currentUser = nil
         } catch let error as AuthError {

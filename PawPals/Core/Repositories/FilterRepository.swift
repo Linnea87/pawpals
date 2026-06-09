@@ -7,6 +7,6 @@ struct FilterPreferences {
 }
 
 protocol FilterRepository {
-    func saveFilterPreferences(_ prefs: FilterPreferences, userId: String) async throws
-    func fetchFilterPreferences(userId: String) async throws -> FilterPreferences
+    func saveFilterPreferences(_ prefs: FilterPreferences, userID: String) async throws
+    func fetchFilterPreferences(userID: String) async throws -> FilterPreferences
 }

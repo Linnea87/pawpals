@@ -149,7 +149,7 @@ struct ProfileView: View {
                             Task {
                                 await chatViewModel.startConversation(
                                     with: user,
-                                    currentUserId: authViewModel.currentUserId
+                                    currentUserID: authViewModel.currentUserID
                                 )
                             }
                         } label: {
@@ -267,12 +267,12 @@ struct ProfileView: View {
                         Button {
                             Task {
                                 await meetViewModel.toggleSave(
-                                    targetId: user.id
+                                    targetID: user.id
                                 )
                             }
                         } label: {
                             Image(
-                                systemName: meetViewModel.savedUserIds.contains(
+                                systemName: meetViewModel.savedUserIDs.contains(
                                     user.id
                                 ) ? "heart.fill" : "heart"
                             )
@@ -288,10 +288,10 @@ struct ProfileView: View {
                 conversation in
                 ConversationView(
                     conversation: conversation,
-                    currentUserID: authViewModel.currentUserId,
+                    currentUserID: authViewModel.currentUserID,
                     otherUser: chatViewModel.otherUser(
                         in: conversation,
-                        currentUserID: authViewModel.currentUserId
+                        currentUserID: authViewModel.currentUserID
                     ) ?? .mock
                 )
             }

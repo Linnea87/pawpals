@@ -16,7 +16,7 @@ final class MeetViewModel {
     var locationStatus: CLAuthorizationStatus = .notDetermined
     var currentUserLocation: CLLocationCoordinate2D?
     var searchRadius: Double = 5.0
-    var savedUserIds: Set<String> = []
+    var savedUserIDs: Set<String> = []
 
     private let userRepository: UserRepository
     private let locationService: LocationService
@@ -46,7 +46,7 @@ final class MeetViewModel {
                 longitude: location.coordinate.longitude
             )
             /// Persist the user's current location to Firestore so others can find them/
-            try await userRepository.updateLocation(geoPoint, userId: userID)
+            try await userRepository.updateLocation(geoPoint, userID: userID)
             /// Now we have a location, fetch users nearby
             await loadNearbyUsers()
 
@@ -82,24 +82,24 @@ final class MeetViewModel {
     }
 
     func loadSavedProfiles() async {
-        guard let userId = Auth.auth().currentUser?.uid else { return }
+        guard let userID = Auth.auth().currentUser?.uid else { return }
         do {
-            let users = try await userRepository.fetchSavedProfiles(for: userId)
-            savedUserIds = Set(users.map { $0.id })
+            let users = try await userRepository.fetchSavedProfiles(for: userID)
+            savedUserIDs = Set(users.map { $0.id })
         } catch {
             errorMessage = error.localizedDescription
         }
     }
 
-    func toggleSave(targetId: String) async {
-        guard let userId = Auth.auth().currentUser?.uid else { return }
+    func toggleSave(targetID: String) async {
+        guard let userID = Auth.auth().currentUser?.uid else { return }
         do {
-            if savedUserIds.contains(targetId) {
-                try await userRepository.unsaveProfile(targetId, by: userId)
-                savedUserIds.remove(targetId)
+            if savedUserIDs.contains(targetID) {
+                try await userRepository.unsaveProfile(targetID, by: userID)
+                savedUserIDs.remove(targetID)
             } else {
-                try await userRepository.saveProfile(targetId, by: userId)
-                savedUserIds.insert(targetId)
+                try await userRepository.saveProfile(targetID, by: userID)
+                savedUserIDs.insert(targetID)
             }
         } catch {
             errorMessage = error.localizedDescription

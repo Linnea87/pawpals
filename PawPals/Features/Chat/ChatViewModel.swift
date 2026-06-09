@@ -56,12 +56,12 @@ final class ChatViewModel {
 
     /// Creates or fetches a conversation with another user and navigates to it.
     /// Also stores the other user in the participants cache immediately so the conversation header shows the correct name and photo.
-    func startConversation(with user: User, currentUserId: String) async {
+    func startConversation(with user: User, currentUserID: String) async {
         isLoading = true
         errorMessage = nil
         do {
             let conversation = try await chatRepository.createOrFetchConversation(
-                between: currentUserId,
+                between: currentUserID,
                 and: user.id
             )
             activeConversation = conversation
@@ -200,7 +200,7 @@ final class ChatViewModel {
         let receiverID = conversation.participantIDs.first { $0 != senderID } ?? ""
 
         do {
-            let url = try await chatRepository.uploadImage(image, conversationId: conversation.id)
+            let url = try await chatRepository.uploadImage(image, conversationID: conversation.id)
 
             let message = Message(
                 id: UUID().uuidString,
@@ -229,7 +229,7 @@ final class ChatViewModel {
         await withTaskGroup(of: (String, User)?.self) { group in
             for id in otherIDs {
                 group.addTask {
-                    guard let user = try? await self.userRepository.fetchUser(userId: id)
+                    guard let user = try? await self.userRepository.fetchUser(userID: id)
                     else { return nil }
                     return (id, user)
                 }

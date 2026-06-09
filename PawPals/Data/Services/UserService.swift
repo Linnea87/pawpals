@@ -26,19 +26,19 @@ final class UserService: UserRepository {
         )
     }
 
-    func saveDog(_ dog: Dog, userId: String) async throws {
+    func saveDog(_ dog: Dog, userID: String) async throws {
         try db.collection("users")
-            .document(userId)
+            .document(userID)
             .collection("dogs")
             .document(dog.id)
             .setData(from: dog)
     }
 
-    func removeDog(dogId: String, userId: String) async throws {
+    func removeDog(dogID: String, userID: String) async throws {
         try await db.collection("users")
-            .document(userId)
+            .document(userID)
             .collection("dogs")
-            .document(dogId)
+            .document(dogID)
             .delete()
     }
     
@@ -98,13 +98,13 @@ final class UserService: UserRepository {
         }
     }
 
-    func fetchUser(userId: String) async throws -> User {
-        let doc = try await db.collection("users").document(userId)
+    func fetchUser(userID: String) async throws -> User {
+        let doc = try await db.collection("users").document(userID)
             .getDocument()
         guard let data = doc.data() else { throw UserServiceError.notFound }
 
         let dogsSnapshot = try await db.collection("users")
-            .document(userId)
+            .document(userID)
             .collection("dogs")
             .getDocuments()
         let dogs = dogsSnapshot.documents.compactMap {
@@ -112,7 +112,7 @@ final class UserService: UserRepository {
         }
 
         return User(
-            id: userId,
+            id: userID,
             name: data["name"] as? String ?? "",
             photoURL: data["photoURL"] as? String,
             bio: data["bio"] as? String ?? "",
@@ -129,10 +129,10 @@ final class UserService: UserRepository {
         )
     }
 
-    func updateLocation(_ location: GeoPoint, userId: String) async throws {
+    func updateLocation(_ location: GeoPoint, userID: String) async throws {
         /// Store lat/long as top-level Double fields so they match the User model's - latitude and longitude properties when decoded by Firestore
         try await db.collection("users")
-            .document(userId)
+            .document(userID)
             .setData(
                 [
                     "latitude": location.latitude,
@@ -142,7 +142,7 @@ final class UserService: UserRepository {
             )
     }
 
-    func savePreferences(_ prefs: UserPreferences, userId: String) async throws
+    func savePreferences(_ prefs: UserPreferences, userID: String) async throws
     {
         let data: [String: Any] = [
             "preferences": [
@@ -151,14 +151,14 @@ final class UserService: UserRepository {
                 "searchRadius": prefs.searchRadius,
             ]
         ]
-        try await db.collection("users").document(userId).setData(
+        try await db.collection("users").document(userID).setData(
             data,
             merge: true
         )
     }
 
-    func loadPreferences(userId: String) async throws -> UserPreferences {
-        let doc = try await db.collection("users").document(userId)
+    func loadPreferences(userID: String) async throws -> UserPreferences {
+        let doc = try await db.collection("users").document(userID)
             .getDocument()
         guard let data = doc.data(),
             let prefsData = data["preferences"] as? [String: Any]
@@ -189,18 +189,18 @@ final class UserService: UserRepository {
             .setData(["pushNotificationToken": token], merge: true)
     }
 
-    func deleteUserData(userId: String) async throws {
+    func deleteUserData(userID: String) async throws {
         let batch = db.batch()
-        let dogsSnapshot = try await db.collection("users").document(userId)
+        let dogsSnapshot = try await db.collection("users").document(userID)
             .collection("dogs").getDocuments()
         for doc in dogsSnapshot.documents {
             batch.deleteDocument(doc.reference)
         }
-        batch.deleteDocument(db.collection("users").document(userId))
+        batch.deleteDocument(db.collection("users").document(userID))
         try await batch.commit()
 
         let conversationsSnapshot = try await db.collection("conversations")
-            .whereField("participantIDs", arrayContains: userId)
+            .whereField("participantIDs", arrayContains: userID)
             .getDocuments()
         for conversationDoc in conversationsSnapshot.documents {
             let messagesSnapshot = try await conversationDoc.reference
@@ -214,25 +214,25 @@ final class UserService: UserRepository {
         }
     }
 
-    func saveProfile(_ targetId: String, by userId: String) async throws {
+    func saveProfile(_ targetID: String, by userID: String) async throws {
         try await db.collection("users")
-            .document(userId)
+            .document(userID)
             .collection("savedProfiles")
-            .document(targetId)
+            .document(targetID)
             .setData(["savedAt": Date()])
     }
 
-    func unsaveProfile(_ targetId: String, by userId: String) async throws {
+    func unsaveProfile(_ targetID: String, by userID: String) async throws {
         try await db.collection("users")
-            .document(userId)
+            .document(userID)
             .collection("savedProfiles")
-            .document(targetId)
+            .document(targetID)
             .delete()
     }
 
-    func fetchSavedProfiles(for userId: String) async throws -> [User] {
+    func fetchSavedProfiles(for userID: String) async throws -> [User] {
         let snapshot = try await db.collection("users")
-            .document(userId)
+            .document(userID)
             .collection("savedProfiles")
             .getDocuments()
 
@@ -241,17 +241,17 @@ final class UserService: UserRepository {
         var users: [User] = []
         for id in savedIds {
             let doc = try await db.collection("users").document(id).getDocument()
-            if let user = try? await fetchUser(userId: id) {
+            if let user = try? await fetchUser(userID: id) {
                 users.append(user)
             }
         }
         return users
     }
 
-    func uploadProfilePhoto(_ data: Data, userId: String) async throws -> String
+    func uploadProfilePhoto(_ data: Data, userID: String) async throws -> String
     {
         let ref = Storage.storage().reference().child(
-            "profile_photos/\(userId).jpg"
+            "profile_photos/\(userID).jpg"
         )
         let metadata = StorageMetadata()
         metadata.contentType = "image/jpeg"
