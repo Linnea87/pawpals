@@ -10,9 +10,9 @@ final class AuthViewModel {
     var activeOption: AuthOption = .signIn
 
     private let repository: AuthRepository
-    private let userRepository: UserRepository
+    private let userRepository: ProfileRepository
 
-    init(repository: AuthRepository, userRepository: UserRepository) {
+    init(repository: AuthRepository, userRepository: ProfileRepository) {
         self.repository = repository
         self.userRepository = userRepository
     }

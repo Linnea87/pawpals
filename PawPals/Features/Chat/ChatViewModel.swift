@@ -41,7 +41,7 @@ final class ChatViewModel {
     }
 
     private let chatRepository: ChatRepository
-    private let userRepository: UserRepository
+    private let userRepository: ProfileRepository
 
 
     private var stopObserving: (() -> Void)?
@@ -49,7 +49,7 @@ final class ChatViewModel {
 
     private var stopObservingConversations: (() -> Void)?
 
-    init(chatRepository: ChatRepository, userRepository: UserRepository) {
+    init(chatRepository: ChatRepository, userRepository: ProfileRepository) {
         self.chatRepository = chatRepository
         self.userRepository = userRepository
     }
