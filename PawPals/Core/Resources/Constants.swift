@@ -13,7 +13,7 @@ enum Spacing {
     static let sidebarTop: CGFloat = 150
 }
 
-enum Height {
+enum Size {
     static let imagePlaceholder: CGFloat = 150
     static let imagePreview: CGFloat = 200
          
