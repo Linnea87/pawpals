@@ -134,6 +134,7 @@ struct MockUserRepository: UserRepository {
     func saveProfile(_ targetId: String, by userId: String) async throws {}
     func unsaveProfile(_ targetId: String, by userId: String) async throws {}
     func fetchSavedProfiles(for userId: String) async throws -> [User] { [] }
+    func fetchSavedProfileIds(for userId: String) async throws -> Set<String> { [] }
     func uploadProfilePhoto(_ data: Data, userId: String) async throws -> String { "" }
     func fetchUser(userId: String) async throws -> User { .mock }
 }

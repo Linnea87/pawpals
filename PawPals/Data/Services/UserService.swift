@@ -247,6 +247,14 @@ final class UserService: UserRepository {
         }
         return users
     }
+    
+    func fetchSavedProfileIds(for userId: String) async throws -> Set<String> {
+        let snapshot = try await db.collection("users")
+            .document(userId)
+            .collection("savedProfiles")
+            .getDocuments()
+        return Set(snapshot.documents.map { $0.documentID })
+    }
 
     func uploadProfilePhoto(_ data: Data, userId: String) async throws -> String
     {

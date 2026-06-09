@@ -80,6 +80,7 @@ struct ChatView: View {
         }
         .task {
             chatViewModel.observeConversations(for: currentUserID)
+            await chatViewModel.loadFavorites(for: currentUserID)
         }
         .onDisappear {
             chatViewModel.stopListeningToConversations()
