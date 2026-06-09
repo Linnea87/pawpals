@@ -48,6 +48,7 @@ final class ChatService: ChatRepository {
             "timestamp": Timestamp(date: message.timestamp),
             "isRead": false,
             "isDelivered": false,
+            "imageURL": message.imageURL as Any
         ]
         try await ref.setData(data)
 
