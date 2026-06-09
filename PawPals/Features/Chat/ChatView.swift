@@ -5,7 +5,8 @@ import SwiftUI
 struct ChatView: View {
     @Binding var selectedTab: Tab
     @Environment(ChatViewModel.self) private var chatViewModel
-    @State private var navigationPath = NavigationPath() /// Controls which conversation is currently pushed onto the navigation stack.
+    @State private var navigationPath = NavigationPath()
+    @State private var conversationViewModel = ConversationViewModel(conversationRepository: ConversationService())
     var currentUserID: String = ""
 
     
@@ -62,7 +63,7 @@ struct ChatView: View {
                     currentUserID: currentUserID,
                     otherUser: chatViewModel.otherUser(in: conversation, currentUserID: currentUserID) ?? .mock
                 )
-                .environment(chatViewModel.makeConversationViewModel())
+                .environment(conversationViewModel)
             }
             .safeAreaInset(edge: .bottom, spacing: Spacing.none) {
                 TabBarView(

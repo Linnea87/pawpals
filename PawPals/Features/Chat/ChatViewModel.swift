@@ -20,6 +20,7 @@ final class ChatViewModel {
     var errorMessage: String?
     var activeConversation: Conversation?
     var pendingConversationID: String? /// Set when the user taps a push notification for a new message.
+    var isActiveConversationNew: Bool = false
     var selectedFilter: ChatFilter = .all
 
     var filteredConversations: [Conversation] {
@@ -54,12 +55,28 @@ final class ChatViewModel {
         isLoading = true
         errorMessage = nil
         do {
-            let conversation = try await chatRepository.createOrFetchConversation(
+            if let existing = try await chatRepository.fetchConversationIfExists(
                 between: currentUserId,
                 and: user.id
-            )
-            activeConversation = conversation
-            participants[user.id] = user
+            ) {
+                
+                activeConversation = existing
+                participants[user.id] = user
+                isActiveConversationNew = false
+            } else {
+            
+                let conversationID = [currentUserId, user.id].sorted().joined(separator: "_")
+                let draft = Conversation(
+                    id: conversationID,
+                    participantIDs: [currentUserId, user.id],
+                    lastMessage: "",
+                    lastMessageTimestamp: Date(),
+                    unreadCount: 0
+                )
+                activeConversation = draft
+                participants[user.id] = user
+                isActiveConversationNew = true
+            }
         } catch {
             errorMessage = error.localizedDescription
         }
@@ -135,7 +152,15 @@ final class ChatViewModel {
         }
     }
     
-    func makeConversationViewModel() -> ConversationViewModel {
-        ConversationViewModel(chatRepository: chatRepository)
+    /// Creates the active conversation in Firestore.
+    /// Called by ConversationViewModel on the first message send for a new conversation.
+    func createActiveConversation() async throws {
+        guard let conversation = activeConversation else { return }
+        _ = try await chatRepository.createOrFetchConversation(
+            between: conversation.participantIDs[0],
+            and: conversation.participantIDs[1]
+        )
+        isActiveConversationNew = false
     }
+    
 }
