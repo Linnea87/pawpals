@@ -66,10 +66,10 @@ final class MeetService: MeetRepository {
         }
     }
     
-    func updateLocation(_ location: GeoPoint, userId: String) async throws {
+    func updateLocation(_ location: GeoPoint, userID: String) async throws {
         /// Store lat/long as top-level Double fields so they match the User model's - latitude and longitude properties when decoded by Firestore
         try await db.collection("users")
-            .document(userId)
+            .document(userID)
             .setData(
                 [
                     "latitude": location.latitude,
@@ -79,25 +79,25 @@ final class MeetService: MeetRepository {
             )
     }
     
-    func saveProfile(_ targetId: String, by userId: String) async throws {
+    func saveProfile(_ targetID: String, by userID: String) async throws {
         try await db.collection("users")
-            .document(userId)
+            .document(userID)
             .collection("savedProfiles")
-            .document(targetId)
+            .document(targetID)
             .setData(["savedAt": Date()])
     }
 
-    func unsaveProfile(_ targetId: String, by userId: String) async throws {
+    func unsaveProfile(_ targetID: String, by userID: String) async throws {
         try await db.collection("users")
-            .document(userId)
+            .document(userID)
             .collection("savedProfiles")
-            .document(targetId)
+            .document(targetID)
             .delete()
     }
 
-    func fetchSavedProfiles(for userId: String) async throws -> [User] {
+    func fetchSavedProfiles(for userID: String) async throws -> [User] {
              let snapshot = try await db.collection("users")
-                 .document(userId)
+                 .document(userID)
                  .collection("savedProfiles")
                  .getDocuments()
 
@@ -110,9 +110,9 @@ final class MeetService: MeetRepository {
              return users
          }
 
-    func fetchSavedProfileIds(for userId: String) async throws -> Set<String> {
+    func fetchSavedProfileIds(for userID: String) async throws -> Set<String> {
         let snapshot = try await db.collection("users")
-            .document(userId)
+            .document(userID)
             .collection("savedProfiles")
             .getDocuments()
         return Set(snapshot.documents.map { $0.documentID })

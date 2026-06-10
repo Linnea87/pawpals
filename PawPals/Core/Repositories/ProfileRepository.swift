@@ -10,7 +10,7 @@ protocol ProfileRepository {
      func saveDog(_ dog: Dog, userID: String) async throws
 
      /// Removes a dog from the user's dogs subcollection in Firestore.
-     func removeDog(dogId: String, userId: String) async throws
+     func removeDog(dogID: String, userID: String) async throws
 
      /// Saves the user's walk preferences to Firestore.
      func savePreferences(_ prefs: UserPreferences, userID: String) async throws
@@ -22,7 +22,7 @@ protocol ProfileRepository {
      func savePushNotificationToken(_ token: String, userID: String) async throws
 
      /// Deletes all Firestore data associated with a user account.
-     func deleteUserData(userId: String) async throws
+     func deleteUserData(userID: String) async throws
 
      /// Uploads a profile photo to Firebase Storage and returns the download URL.
      func uploadProfilePhoto(_ data: Data, userID: String) async throws -> String

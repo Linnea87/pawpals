@@ -43,8 +43,8 @@ final class ProfileService: ProfileRepository {
     }
     
     
-    func fetchUser(userId: String) async throws -> User {
-        let doc = try await db.collection("users").document(userId)
+    func fetchUser(userID: String) async throws -> User {
+        let doc = try await db.collection("users").document(userID)
             .getDocument()
         guard let data = doc.data() else { throw ProfileServiceError.notFound }
 
@@ -75,7 +75,7 @@ final class ProfileService: ProfileRepository {
     }
 
     
-    func savePreferences(_ prefs: UserPreferences, userId: String) async throws
+    func savePreferences(_ prefs: UserPreferences, userID: String) async throws
     {
         let data: [String: Any] = [
             "preferences": [
