@@ -50,9 +50,6 @@ final class ChatViewModel {
 
     private var stopConversationsListener: (() -> Void)? /// Holds the Firestore cleanup closure
 
-
-    private var stopObservingConversations: (() -> Void)?
-
     init(chatRepository: ChatRepository, profileRepository: ProfileRepository, meetRepository: MeetRepository) {
         self.chatRepository = chatRepository
         self.profileRepository = profileRepository
@@ -127,7 +124,7 @@ final class ChatViewModel {
     /// Each update also triggers a participant fetch so names and avatars stay current.
     func observeConversations(for userID: String) {
         currentUserID = userID
-        stopObservingConversations = chatRepository.observeConversations(for: userID) { [weak self] updated in
+        stopConversationsListener = chatRepository.observeConversations(for: userID) { [weak self] updated in
             guard let self else { return }
             self.conversations = updated
             Task { await self.loadParticipants(for: updated, currentUserID: userID) }

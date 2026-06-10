@@ -350,10 +350,10 @@ private struct MessageInputBar: View {
     .environment(
         AuthViewModel(
             repository: MockAuthRepository(),
-            userRepository: MockUserRepository()
+            userRepository: MockProfileRepository()
         )
     )
     .environment(
-        ProfileViewModel(userRepository: MockUserRepository(), user: .mock)
+        ProfileViewModel(profileRepository: MockProfileRepository(), user: .mock)
     )
 }
