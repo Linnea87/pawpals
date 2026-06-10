@@ -206,27 +206,33 @@ private struct MessageBubbleView: View {
                 .clipShape(RoundedRectangle(cornerRadius: Radius.medium))
 
         } else if let imageURL = message.imageURL,
-            let url = URL(string: imageURL)
-        {
-            AsyncImage(url: url) { phase in
-                switch phase {
-                case .empty:
-                    ProgressView()
-                        .frame(width: 200, height: 150)
-                case .success(let image):
-                    image
-                        .resizable()
-                        .scaledToFill()
-                        .frame(maxWidth: 200, maxHeight: 200)
-                        .clipShape(
-                            RoundedRectangle(cornerRadius: Radius.medium)
-                        )
-                case .failure:
-                    Image(systemName: "photo")
-                        .foregroundStyle(Theme.warmBrown)
-                        .frame(width: 200, height: 150)
-                @unknown default:
-                    EmptyView()
+                  let url = URL(string: imageURL) {
+            VStack(alignment: .leading, spacing: Spacing.xSmall) {
+                AsyncImage(url: url) { phase in
+                    switch phase {
+                    case .empty:
+                        ProgressView().frame(width: 200, height: 150)
+                    case .success(let image):
+                        image
+                            .resizable()
+                            .scaledToFill()
+                            .frame(maxWidth: 200, maxHeight: 200)
+                            .clipShape(RoundedRectangle(cornerRadius: Radius.medium))
+                    case .failure:
+                        Image(systemName: "photo")
+                            .foregroundStyle(Theme.warmBrown)
+                            .frame(width: 200, height: 150)
+                    @unknown default:
+                        EmptyView()
+                    }
+                }
+                if !message.text.isEmpty {
+                    Text(message.text)
+                        .padding(.horizontal, Spacing.medium)
+                        .padding(.vertical, Spacing.small)
+                        .background(isFromCurrentUser ? Theme.terracotta : Theme.offWhite)
+                        .foregroundStyle(isFromCurrentUser ? .white : Theme.darkBrown)
+                        .clipShape(RoundedRectangle(cornerRadius: Radius.medium))
                 }
             }
 
@@ -234,9 +240,7 @@ private struct MessageBubbleView: View {
             Text(message.text)
                 .padding(.horizontal, Spacing.medium)
                 .padding(.vertical, Spacing.small)
-                .background(
-                    isFromCurrentUser ? Theme.terracotta : Theme.offWhite
-                )
+                .background(isFromCurrentUser ? Theme.terracotta : Theme.offWhite)
                 .foregroundStyle(isFromCurrentUser ? .white : Theme.darkBrown)
                 .clipShape(RoundedRectangle(cornerRadius: Radius.medium))
         }
@@ -296,6 +300,7 @@ private struct MessageInputBar: View {
                         let image = UIImage(data: data)
                     {
                         onImagePick(image)
+                        selectedPhoto = nil
                     }
                 }
             }
