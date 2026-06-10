@@ -3,9 +3,14 @@ import SwiftUI
 
 struct ConversationView: View {
     @Environment(ConversationViewModel.self) private var conversationViewModel
+    @Environment(ChatViewModel.self) private var chatViewModel
+    @Environment(\.dismiss) private var dismiss
     let conversation: Conversation
     let currentUserID: String
     let otherUser: User
+    var isModal: Bool = false
+
+    var selectedTab: Binding<Tab> = .constant(.chat)
 
     @State private var selectedUser: User?
 
@@ -83,6 +88,7 @@ struct ConversationView: View {
                 }
             }
         }
+        .navigationBarBackButtonHidden(true)
         .toolbar(content: {
             ToolbarItem(placement: .principal) {
                 Button {
@@ -101,6 +107,18 @@ struct ConversationView: View {
                             .fontWeight(.semibold)
                             .foregroundStyle(Theme.darkBrown)
                     }
+                }
+            }
+            ToolbarItem(placement: .topBarTrailing) {
+                Button {
+                    if isModal {
+                        chatViewModel.activeConversation = nil
+                    } else {
+                        dismiss()
+                    }
+                } label: {
+                    Image(systemName: "xmark")
+                        .foregroundStyle(Theme.warmBrown)
                 }
             }
         })
@@ -202,30 +220,34 @@ private struct MessageBubbleView: View {
     private var bubbleContent: some View {
         if isUploadingImage {
             ProgressView()
-                .frame(width: 200, height: 150)
+                .frame(width: Size.imagePreview, height: Size.imagePlaceholder)
                 .background(
                     isFromCurrentUser
-                    ? Theme.terracotta.opacity(Opacity.xxSmall) : Theme.offWhite
+                        ? Theme.terracotta.opacity(Opacity.xxSmall)
+                        : Theme.offWhite
                 )
                 .clipShape(RoundedRectangle(cornerRadius: Radius.medium))
 
         } else if let imageURL = message.imageURL,
-                  let url = URL(string: imageURL) {
+            let url = URL(string: imageURL)
+        {
             VStack(alignment: .leading, spacing: Spacing.xSmall) {
                 AsyncImage(url: url) { phase in
                     switch phase {
                     case .empty:
-                        ProgressView().frame(width: 200, height: 150)
+                        ProgressView().frame(width: Size.imagePreview, height: Size.imagePlaceholder)
                     case .success(let image):
                         image
                             .resizable()
                             .scaledToFill()
-                            .frame(maxWidth: 200, maxHeight: 200)
-                            .clipShape(RoundedRectangle(cornerRadius: Radius.medium))
+                            .frame(maxWidth: Size.imagePreview, maxHeight: Size.imagePreview)
+                            .clipShape(
+                                RoundedRectangle(cornerRadius: Radius.medium)
+                            )
                     case .failure:
                         Image(systemName: "photo")
                             .foregroundStyle(Theme.warmBrown)
-                            .frame(width: 200, height: 150)
+                            .frame(width: Size.imagePreview, height: Size.imagePlaceholder)
                     @unknown default:
                         EmptyView()
                     }
@@ -234,9 +256,16 @@ private struct MessageBubbleView: View {
                     Text(message.text)
                         .padding(.horizontal, Spacing.medium)
                         .padding(.vertical, Spacing.small)
-                        .background(isFromCurrentUser ? Theme.terracotta : Theme.offWhite)
-                        .foregroundStyle(isFromCurrentUser ? .white : Theme.darkBrown)
-                        .clipShape(RoundedRectangle(cornerRadius: Radius.medium))
+                        .background(
+                            isFromCurrentUser
+                                ? Theme.terracotta : Theme.offWhite
+                        )
+                        .foregroundStyle(
+                            isFromCurrentUser ? .white : Theme.darkBrown
+                        )
+                        .clipShape(
+                            RoundedRectangle(cornerRadius: Radius.medium)
+                        )
                 }
             }
 
@@ -244,7 +273,9 @@ private struct MessageBubbleView: View {
             Text(message.text)
                 .padding(.horizontal, Spacing.medium)
                 .padding(.vertical, Spacing.small)
-                .background(isFromCurrentUser ? Theme.terracotta : Theme.offWhite)
+                .background(
+                    isFromCurrentUser ? Theme.terracotta : Theme.offWhite
+                )
                 .foregroundStyle(isFromCurrentUser ? .white : Theme.darkBrown)
                 .clipShape(RoundedRectangle(cornerRadius: Radius.medium))
         }
@@ -346,7 +377,15 @@ private struct MessageInputBar: View {
             otherUser: .mock
         )
     }
+
     .environment(conversationViewModel)
+    .environment(
+        ChatViewModel(
+            chatRepository: MockChatRepository(),
+            profileRepository: MockProfileRepository(),
+            meetRepository: MockMeetRepository()
+        )
+    )
     .environment(
         AuthViewModel(
             repository: MockAuthRepository(),
@@ -354,6 +393,9 @@ private struct MessageInputBar: View {
         )
     )
     .environment(
-        ProfileViewModel(profileRepository: MockProfileRepository(), user: .mock)
+        ProfileViewModel(
+            profileRepository: MockProfileRepository(),
+            user: .mock
+        )
     )
 }

@@ -12,7 +12,9 @@ struct ProfileView: View {
     @Environment(AuthViewModel.self) private var authViewModel
     @Environment(ProfileViewModel.self) private var profileViewModel
     @Environment(MeetViewModel.self) private var meetViewModel
-    @State private var conversationViewModel = ConversationViewModel(conversationRepository: ConversationService())
+    @State private var conversationViewModel = ConversationViewModel(
+        conversationRepository: ConversationService()
+    )
     @State private var selectedPhoto: PhotosPickerItem?
     @State private var showSidebar = false
     @State private var showEditProfile = false
@@ -115,7 +117,10 @@ struct ProfileView: View {
                                 .listRowBackground(Theme.offWhite.opacity(0.6))
                             }
                         } header: {
-                            SectionHeader(title: displayUser.dogs.count == 1 ? "profile.dog" : "profile.dogs")
+                            SectionHeader(
+                                title: displayUser.dogs.count == 1
+                                    ? "profile.dog" : "profile.dogs"
+                            )
                         }
                     }
 
@@ -142,7 +147,8 @@ struct ProfileView: View {
                                 .listRowBackground(Theme.offWhite.opacity(0.6))
                             }
                         } header: {
-                            SectionHeader(title: "profile.savedProfiles")                        }
+                            SectionHeader(title: "profile.savedProfiles")
+                        }
                     }
 
                     if !isOwner {
@@ -156,7 +162,8 @@ struct ProfileView: View {
                                 if chatViewModel.isActiveConversationNew {
                                     conversationViewModel.isNew = true
                                     conversationViewModel.onCreate = {
-                                        try await chatViewModel.createActiveConversation()
+                                        try await chatViewModel
+                                            .createActiveConversation()
                                     }
                                 }
                             }
@@ -300,7 +307,9 @@ struct ProfileView: View {
                     otherUser: chatViewModel.otherUser(
                         in: conversation,
                         currentUserID: authViewModel.currentUserID
-                    ) ?? .mock
+                    ) ?? .mock,
+                    isModal: true,
+                    selectedTab: $selectedTab
                 )
                 .environment(conversationViewModel)
             }
@@ -310,6 +319,14 @@ struct ProfileView: View {
                     chatViewModel.isActiveConversationNew = false
                     conversationViewModel.isNew = false
                     conversationViewModel.onCreate = nil
+                    if !isOwner {
+                        selectedTab = .chat
+                        dismiss()
+                        Task { @MainActor in
+                            try? await Task.sleep(for: .milliseconds(400))
+                            selectedTab = .chat
+                        }
+                    }
                 }
             }
             .alert(
@@ -355,7 +372,10 @@ struct ProfileView: View {
             )
         )
         .environment(
-            ProfileViewModel(profileRepository: MockProfileRepository(), user: .mock)
+            ProfileViewModel(
+                profileRepository: MockProfileRepository(),
+                user: .mock
+            )
         )
         .environment(MeetViewModel(locationViewModel: LocationViewModel()))
 }
@@ -382,7 +402,10 @@ struct ProfileView: View {
         )
     )
     .environment(
-        ProfileViewModel(profileRepository: MockProfileRepository(), user: .mock)
+        ProfileViewModel(
+            profileRepository: MockProfileRepository(),
+            user: .mock
+        )
     )
     .environment(MeetViewModel(locationViewModel: LocationViewModel()))
 }
