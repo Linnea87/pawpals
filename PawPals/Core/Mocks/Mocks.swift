@@ -117,34 +117,53 @@ struct MockAuthRepository: AuthRepository {
     func deleteAccount() async throws {}
 }
 
-// =========== MockUserRepository =============================
+// =========== MockProfileRepository =============================
+
 
 struct MockUserRepository: UserRepository {
     func updateProfile(_ user: User) async throws {}
-    func saveDog(_ dog: Dog, userID: String) async throws {}
-    func removeDog(dogID: String, userID: String) async throws {}
+    func saveDog(_ dog: Dog, userId: String) async throws {}
+    func removeDog(dogId: String, userId: String) async throws {}
     func fetchNearbyUsers(location: GeoPoint, radius: Double, excludingUserID: String) async throws -> [User] { [] }
-    func updateLocation(_ location: GeoPoint, userID: String) async throws {}
-    func savePreferences(_ prefs: UserPreferences, userID: String) async throws {}
-    func loadPreferences(userID: String) async throws -> UserPreferences {
+    func updateLocation(_ location: GeoPoint, userId: String) async throws {}
+    func savePreferences(_ prefs: UserPreferences, userId: String) async throws {}
+    func loadPreferences(userId: String) async throws -> UserPreferences {
         UserPreferences(walkTypes: [], dogSize: .medium, searchRadius: 10.0)
     }
     func savePushNotificationToken(_ token: String, userID: String) async throws {}
-    func deleteUserData(userID: String) async throws {}
-    func saveProfile(_ targetID: String, by userID: String) async throws {}
-    func unsaveProfile(_ targetID: String, by userID: String) async throws {}
-    func fetchSavedProfiles(for userID: String) async throws -> [User] { [] }
-    func uploadProfilePhoto(_ data: Data, userID: String) async throws -> String { "" }
-    func fetchUser(userID: String) async throws -> User { .mock }
+    func deleteUserData(userId: String) async throws {}
+    func saveProfile(_ targetId: String, by userId: String) async throws {}
+    func unsaveProfile(_ targetId: String, by userId: String) async throws {}
+    func fetchSavedProfiles(for userId: String) async throws -> [User] { [] }
+    func uploadProfilePhoto(_ data: Data, userId: String) async throws -> String { "" }
+    func fetchUser(userId: String) async throws -> User { .mock }
 }
-
 
 // =========== MockChatRepository =============================
 
-
 struct MockChatRepository: ChatRepository {
-    func sendMessage(_ message: Message, to conversationID: String) async throws {}
+    func observeConversations(
+        for userID: String,
+        onUpdate: @escaping ([Conversation]) -> Void
+    ) -> (() -> Void) { return {} }
 
+    func createOrFetchConversation(between userId1: String, and userId2: String) async throws -> Conversation {
+        Conversation(
+            id: "mock-conv",
+            participantIDs: [userId1, userId2],
+            lastMessage: "",
+            lastMessageTimestamp: Date()
+        )
+    }
+    
+    func fetchConversationIfExists(between userID1: String, and userID2: String) async throws -> Conversation? {
+        return nil
+    }
+}
+
+// =========== MockConversationRepository =============================
+
+struct MockConversationRepository: ConversationRepository {
     func observeMessages(
         conversationID: String,
         onUpdate: @escaping ([Message]) -> Void
@@ -193,23 +212,9 @@ struct MockChatRepository: ChatRepository {
         return {}
     }
 
+    func sendMessage(_ message: Message, to conversationID: String) async throws {}
     func markAsRead(conversationID: String, userID: String) async throws {}
     func markAsDelivered(conversationID: String, userID: String) async throws {}
-
-    func observeConversations(
-        for userID: String,
-        onUpdate: @escaping ([Conversation]) -> Void
-    ) -> (() -> Void) { return {} }
-
-    func createOrFetchConversation(between userId1: String, and userId2: String) async throws -> Conversation {
-        Conversation(
-            id: "mock-conv",
-            participantIDs: [userId1, userId2],
-            lastMessage: "",
-            lastMessageTimestamp: Date()
-        )
-    }
-
     func uploadImage(_ image: UIImage, conversationID: String) async throws -> URL {
         URL(string: "https://mock-image-url.com/image.jpg")!
     }

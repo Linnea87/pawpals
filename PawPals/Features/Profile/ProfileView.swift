@@ -12,7 +12,7 @@ struct ProfileView: View {
     @Environment(AuthViewModel.self) private var authViewModel
     @Environment(ProfileViewModel.self) private var profileViewModel
     @Environment(MeetViewModel.self) private var meetViewModel
-
+    @State private var conversationViewModel = ConversationViewModel(conversationRepository: ConversationService())
     @State private var selectedPhoto: PhotosPickerItem?
     @State private var showSidebar = false
     @State private var showEditProfile = false
@@ -118,9 +118,9 @@ struct ProfileView: View {
                             SectionHeader(title: displayUser.dogs.count == 1 ? "profile.dog" : "profile.dogs")                        }
                     }
 
-                    if isOwner && !profileViewModel.savedUsers.isEmpty {
+                    if isOwner && !meetViewModel.savedUsers.isEmpty {
                         Section {
-                            ForEach(profileViewModel.savedUsers) { savedUser in
+                            ForEach(meetViewModel.savedUsers) { savedUser in
                                 HStack(spacing: Spacing.medium) {
                                     AvatarView(
                                         photoURL: savedUser.photoURL,
@@ -151,6 +151,13 @@ struct ProfileView: View {
                                     with: user,
                                     currentUserID: authViewModel.currentUserID
                                 )
+                                /// If the conversation is new, configure ConversationViewModel for lazy creation.
+                                if chatViewModel.isActiveConversationNew {
+                                    conversationViewModel.isNew = true
+                                    conversationViewModel.onCreate = {
+                                        try await chatViewModel.createActiveConversation()
+                                    }
+                                }
                             }
                         } label: {
                             Text("profile.start.chat")
@@ -174,7 +181,7 @@ struct ProfileView: View {
                 .task {
                     if isOwner {
                         await profileViewModel.loadPreferences()
-                        await profileViewModel.loadSavedProfiles()
+                        await meetViewModel.loadSavedProfiles()
                     }
                 }
                 .task(id: selectedPhoto) {
@@ -294,6 +301,15 @@ struct ProfileView: View {
                         currentUserID: authViewModel.currentUserID
                     ) ?? .mock
                 )
+                .environment(conversationViewModel)
+            }
+            .onChange(of: chatViewModel.activeConversation) { _, newValue in
+                /// User navigated back without sending — clean up the draft state.
+                if newValue == nil {
+                    chatViewModel.isActiveConversationNew = false
+                    conversationViewModel.isNew = false
+                    conversationViewModel.onCreate = nil
+                }
             }
             .alert(
                 "profile.deleteAccount.title",
@@ -327,17 +343,18 @@ struct ProfileView: View {
         .environment(
             ChatViewModel(
                 chatRepository: MockChatRepository(),
-                userRepository: MockUserRepository()
+                profileRepository: MockProfileRepository(),
+                meetRepository: MockMeetRepository()
             )
         )
         .environment(
             AuthViewModel(
                 repository: MockAuthRepository(),
-                userRepository: MockUserRepository()
+                userRepository: MockProfileRepository()
             )
         )
         .environment(
-            ProfileViewModel(userRepository: MockUserRepository(), user: .mock)
+            ProfileViewModel(profileRepository: MockProfileRepository(), user: .mock)
         )
         .environment(MeetViewModel(locationService: LocationService()))
 }
@@ -353,17 +370,18 @@ struct ProfileView: View {
     .environment(
         ChatViewModel(
             chatRepository: MockChatRepository(),
-            userRepository: MockUserRepository()
+            profileRepository: MockProfileRepository(),
+            meetRepository: MockMeetRepository()
         )
     )
     .environment(
         AuthViewModel(
             repository: MockAuthRepository(),
-            userRepository: MockUserRepository()
+            userRepository: MockProfileRepository()
         )
     )
     .environment(
-        ProfileViewModel(userRepository: MockUserRepository(), user: .mock)
+        ProfileViewModel(profileRepository: MockProfileRepository(), user: .mock)
     )
     .environment(MeetViewModel(locationService: LocationService()))
 }

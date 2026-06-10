@@ -1,20 +1,19 @@
 import Foundation
 import UIKit
 
-@MainActor
 @Observable
 final class ProfileViewModel {
     
-    private let userRepository: UserRepository
+    private let profileRepository: ProfileRepository
+    
     var user: User
     var isLoading = false
     var errorMessage: String?
-    var savedUsers: [User] = []
     
-    init(userRepository: UserRepository, user: User) {
-        self.userRepository = userRepository
-        self.user = user
-    }
+    init(profileRepository: ProfileRepository, user: User) {
+         self.profileRepository = profileRepository
+         self.user = user
+     }
     
     func saveOwnerInfo(name: String, photoURL: String?) async {
         isLoading = true
@@ -22,7 +21,7 @@ final class ProfileViewModel {
         user.name = name
         user.photoURL = photoURL
         do {
-            try await userRepository.updateProfile(user)
+            try await profileRepository.updateProfile(user)
         } catch {
             errorMessage = error.localizedDescription
         }
@@ -37,8 +36,8 @@ final class ProfileViewModel {
         user.city = city
         user.preferences.walkTypes = walkTypes
         do {
-            try await userRepository.updateProfile(user)
-            try await userRepository.savePreferences(user.preferences, userID: user.id)
+            try await profileRepository.updateProfile(user)
+            try await profileRepository.savePreferences(user.preferences, userId: user.id)
         } catch {
             errorMessage = error.localizedDescription
         }
@@ -49,7 +48,7 @@ final class ProfileViewModel {
         isLoading = true
         errorMessage = nil
         do {
-            try await userRepository.saveDog(dog, userID: user.id)
+            try await profileRepository.saveDog(dog, userId: user.id)
             user.dogs.append(dog)
         } catch {
             errorMessage = error.localizedDescription
@@ -61,8 +60,8 @@ final class ProfileViewModel {
         isLoading = true
         errorMessage = nil
         do {
-            try await userRepository.removeDog(dogID: dogID, userID: user.id)
-            user.dogs.removeAll { $0.id == dogID }
+            try await profileRepository.removeDog(dogId: dogId, userId: user.id)
+            user.dogs.removeAll { $0.id == dogId }
         } catch {
             errorMessage = error.localizedDescription
         }
@@ -90,9 +89,9 @@ final class ProfileViewModel {
         }
         user.preferences.walkTypes = walkTypes
         do {
-            try await userRepository.updateProfile(user)
-            try await userRepository.saveDog(dog, userID: user.id)
-            try await userRepository.savePreferences(user.preferences, userID: user.id)
+            try await profileRepository.updateProfile(user)
+            try await profileRepository.saveDog(dog, userId: user.id)
+            try await profileRepository.savePreferences(user.preferences, userId: user.id)
         } catch {
             errorMessage = error.localizedDescription
         }
@@ -103,7 +102,7 @@ final class ProfileViewModel {
         isLoading = true
         errorMessage = nil
         do {
-            user.preferences = try await userRepository.loadPreferences(userID: user.id)
+            user.preferences = try await profileRepository.loadPreferences(userId: user.id)
         } catch {
             errorMessage = error.localizedDescription
         }
@@ -114,19 +113,11 @@ final class ProfileViewModel {
         isLoading = true
         errorMessage = nil
         do {
-            try await userRepository.savePreferences(user.preferences, userID: user.id)
+            try await profileRepository.savePreferences(user.preferences, userId: user.id)
         } catch {
             errorMessage = error.localizedDescription
         }
         isLoading = false
-    }
-    
-    func loadSavedProfiles() async {
-        do {
-            savedUsers = try await userRepository.fetchSavedProfiles(for: user.id)
-        } catch {
-            errorMessage = error.localizedDescription
-        }
     }
     
     func uploadProfilePhoto(_ data: Data) async {
@@ -134,11 +125,13 @@ final class ProfileViewModel {
         errorMessage = nil
         defer { isLoading = false }
         do {
-            guard let uiImage = UIImage(data: data),
-                  let jpegData = uiImage.jpegData(compressionQuality: 0.8) else { return }
-            let url = try await userRepository.uploadProfilePhoto(jpegData, userID: user.id)
+            let jpegData = await MainActor.run {
+                UIImage(data: data)?.jpegData(compressionQuality: 0.8)
+            }
+            guard let jpegData else { return }
+            let url = try await profileRepository.uploadProfilePhoto(jpegData, userId: user.id)
             user.photoURL = url
-            try await userRepository.updateProfile(user)
+            try await profileRepository.updateProfile(user)
         } catch {
             errorMessage = error.localizedDescription
         }
@@ -148,8 +141,8 @@ final class ProfileViewModel {
         isLoading = true
         errorMessage = nil
         do {
-            user = try await userRepository.fetchUser(userID: userID)
-            user.preferences = try await userRepository.loadPreferences(userID: userID)
+            user = try await profileRepository.fetchUser(userId: userId)
+            user.preferences = try await profileRepository.loadPreferences(userId: userId)
         } catch {
             errorMessage = error.localizedDescription
         }

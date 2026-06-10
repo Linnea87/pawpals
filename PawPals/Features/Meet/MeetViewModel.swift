@@ -16,16 +16,17 @@ final class MeetViewModel {
     var locationStatus: CLAuthorizationStatus = .notDetermined
     var currentUserLocation: CLLocationCoordinate2D?
     var searchRadius: Double = 5.0
-    var savedUserIDs: Set<String> = []
+    var savedUserIds: Set<String> = []
+    var savedUsers: [User] = []
 
-    private let userRepository: UserRepository
+    private let meetRepository: MeetRepository
     private let locationService: LocationService
 
     init(
-        userRepository: UserRepository = UserService(),
+        meetRepository: MeetRepository = MeetService(),
         locationService: LocationService
     ) {
-        self.userRepository = userRepository
+        self.meetRepository = meetRepository
         self.locationService = locationService
     }
 
@@ -46,7 +47,7 @@ final class MeetViewModel {
                 longitude: location.coordinate.longitude
             )
             /// Persist the user's current location to Firestore so others can find them/
-            try await userRepository.updateLocation(geoPoint, userID: userID)
+            try await meetRepository.updateLocation(geoPoint, userId: userID)
             /// Now we have a location, fetch users nearby
             await loadNearbyUsers()
 
@@ -70,7 +71,7 @@ final class MeetViewModel {
                 latitude: currentLocation.latitude,
                 longitude: currentLocation.longitude
             )
-            allNearbyUsers = try await userRepository.fetchNearbyUsers(
+            allNearbyUsers = try await meetRepository.fetchNearbyUsers(
                 location: geoPoint,
                 radius: searchRadius,
                 excludingUserID: Auth.auth().currentUser?.uid ?? ""
@@ -84,8 +85,9 @@ final class MeetViewModel {
     func loadSavedProfiles() async {
         guard let userID = Auth.auth().currentUser?.uid else { return }
         do {
-            let users = try await userRepository.fetchSavedProfiles(for: userID)
-            savedUserIDs = Set(users.map { $0.id })
+            let users = try await meetRepository.fetchSavedProfiles(for: userId)
+            savedUsers = users
+            savedUserIds = Set(users.map { $0.id })
         } catch {
             errorMessage = error.localizedDescription
         }
@@ -94,12 +96,12 @@ final class MeetViewModel {
     func toggleSave(targetID: String) async {
         guard let userID = Auth.auth().currentUser?.uid else { return }
         do {
-            if savedUserIDs.contains(targetID) {
-                try await userRepository.unsaveProfile(targetID, by: userID)
-                savedUserIDs.remove(targetID)
+            if savedUserIds.contains(targetId) {
+                try await meetRepository.unsaveProfile(targetId, by: userId)
+                savedUserIds.remove(targetId)
             } else {
-                try await userRepository.saveProfile(targetID, by: userID)
-                savedUserIDs.insert(targetID)
+                try await meetRepository.saveProfile(targetId, by: userId)
+                savedUserIds.insert(targetId)
             }
         } catch {
             errorMessage = error.localizedDescription
