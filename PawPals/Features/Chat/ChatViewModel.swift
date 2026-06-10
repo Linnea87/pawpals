@@ -162,7 +162,7 @@ final class ChatViewModel {
     
     func loadFavorites(for userID: String) async {
         do {
-            savedUserIDs = try await meetRepository.fetchSavedProfileIds(for: userID)
+            savedUserIDs = try await meetRepository.fetchSavedProfileIDs(for: userID)
         } catch {
             errorMessage = error.localizedDescription
         }

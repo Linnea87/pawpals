@@ -12,4 +12,7 @@ protocol ChatRepository {
 
     /// Returns the existing conversation without creating one — nil =  no conversation yet.
     func fetchConversationIfExists(between userID1: String, and userID2: String) async throws -> Conversation?
+    
+    /// Fetches the IDs of all users the current user already has a conversation with.
+    func fetchConnectedUserIDs(for userID: String) async throws -> Set<String>
 }

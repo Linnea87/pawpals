@@ -55,4 +55,15 @@ final class ChatService: ChatRepository {
         /// Caller stores this and calls it on view disappear to detach the listener.
         return { listener.remove() }
     }
+    
+    func fetchConnectedUserIDs(for userID: String) async throws -> Set<String> {
+        let snapshot = try await db.collection("conversations")
+            .whereField("participantIDs", arrayContains: userID)
+            .getDocuments()
+        let partnerIDs = snapshot.documents.compactMap { doc -> String? in
+            let ids = doc.data()["participantIDs"] as? [String] ?? []
+            return ids.first { $0 != userID }
+        }
+        return Set(partnerIDs)
+    }
 }

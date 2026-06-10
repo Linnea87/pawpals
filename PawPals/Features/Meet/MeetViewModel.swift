@@ -17,17 +17,22 @@ final class MeetViewModel {
     var searchRadius: Double = 5.0
     var savedUserIDs: Set<String> = []
     var savedUsers: [User] = []
+    
+    var connectedUserIDs: Set<String> = []
 
 
     private let meetRepository: MeetRepository
     private let locationViewModel: LocationViewModel
+    private let chatRepository: ChatRepository
 
     init(
         meetRepository: MeetRepository = MeetService(),
-        locationViewModel: LocationViewModel
+        locationViewModel: LocationViewModel,
+        chatRepository: ChatRepository = ChatService()
     ) {
         self.meetRepository = meetRepository
         self.locationViewModel = locationViewModel
+        self.chatRepository = chatRepository
     }
 
     func loadWithLocation() async {
@@ -71,6 +76,11 @@ final class MeetViewModel {
                 radius: searchRadius,
                 excludingUserID: Auth.auth().currentUser?.uid ?? ""
             )
+            let partnerIDs = try await chatRepository.fetchConnectedUserIDs(for: Auth.auth().currentUser?.uid ?? "")
+
+            connectedUserIDs = partnerIDs
+
+            allNearbyUsers = allNearbyUsers.filter { !partnerIDs.contains($0.id) }
 
         } catch {
             errorMessage = error.localizedDescription
