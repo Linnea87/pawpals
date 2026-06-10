@@ -5,6 +5,7 @@ struct FilterSheetView: View {
     @Environment(MeetViewModel.self) private var viewModel
     @Environment(AuthViewModel.self) private var authVM
     @Environment(FilterViewModel.self) private var filterViewModel
+    @Environment(LocationViewModel.self) private var locationViewModel
     @Environment(\.dismiss) private var dismiss
 
     var body: some View {
@@ -128,7 +129,7 @@ struct FilterSheetView: View {
 
     @ViewBuilder
     private var mapSection: some View {
-        if let center = viewModel.currentUserLocation {
+        if let center = locationViewModel.currentUserLocation {
             /// radius-only filter — walk type and size prefs do NOT affect the map
             let usersInRadius = viewModel.allNearbyUsers.filter {
                 ($0.distance ?? 0) <= filterViewModel.searchRadius
@@ -196,12 +197,13 @@ struct FilterSheetView: View {
 }
 
 #Preview {
-    let vm = MeetViewModel(userRepository: MockUserRepository(), locationService: LocationService())
-    vm.currentUserLocation = CLLocationCoordinate2D(latitude: 59.3293, longitude: 18.0686)
-    vm.allNearbyUsers = User.mockUsers
-
-    return FilterSheetView()
-        .environment(vm)
-        .environment(FilterViewModel())
-        .environment(AuthViewModel(repository: AuthService(), userRepository: UserService()))
+    let locationVM = LocationViewModel()
+        locationVM.currentUserLocation = CLLocationCoordinate2D(latitude: 59.3293, longitude: 18.0686)
+        let vm = MeetViewModel(userRepository: MockUserRepository(), locationViewModel: locationVM)
+        vm.allNearbyUsers = User.mockUsers
+        return FilterSheetView()
+            .environment(vm)
+            .environment(locationVM)
+            .environment(FilterViewModel())
+            .environment(AuthViewModel(repository: AuthService(), userRepository: UserService()))
 }
