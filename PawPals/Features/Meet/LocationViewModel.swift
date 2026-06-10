@@ -47,17 +47,24 @@ final class LocationViewModel {
     }
     
     private func resolveAndSaveCity(from location: CLLocation, userID: String) async {
-            do {
+        do {
+            let city: String?
+
+            if #available(iOS 26, *) {
                 guard let request = MKReverseGeocodingRequest(location: location) else { return }
                 let mapItems = try await request.mapItems
-
-                guard let city = mapItems.first?.addressRepresentations?.cityName else { return }
-
-                try await profileRepository.updateCity(city, userID: userID)
-                resolvedCity = city
-            } catch {
-
+                city = mapItems.first?.addressRepresentations?.cityName
+            } else {
+                let placemarks = try await CLGeocoder().reverseGeocodeLocation(location)
+                city = placemarks.first?.locality
             }
+
+            guard let city else { return }
+            try await profileRepository.updateCity(city, userID: userID)
+            resolvedCity = city
+        } catch {
+
         }
+    }
 
 }
