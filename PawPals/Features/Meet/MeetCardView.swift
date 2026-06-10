@@ -40,9 +40,10 @@ struct MeetCardView: View {
                 Spacer()
             }
         }
+        .frame(maxWidth: .infinity, alignment: .leading)
         .padding(Spacing.large)
         .background(Theme.offWhite)
-        .clipShape(RoundedRectangle(cornerRadius: 20))
+        .clipShape(RoundedRectangle(cornerRadius: Radius.large))
     }
 }
 
