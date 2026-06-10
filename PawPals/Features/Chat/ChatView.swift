@@ -5,7 +5,8 @@ import SwiftUI
 struct ChatView: View {
     @Binding var selectedTab: Tab
     @Environment(ChatViewModel.self) private var chatViewModel
-    @State private var navigationPath = NavigationPath() /// Controls which conversation is currently pushed onto the navigation stack.
+    @State private var navigationPath = NavigationPath()
+    @State private var conversationViewModel = ConversationViewModel(conversationRepository: ConversationService())
     var currentUserID: String = ""
 
     
@@ -62,6 +63,7 @@ struct ChatView: View {
                     currentUserID: currentUserID,
                     otherUser: chatViewModel.otherUser(in: conversation, currentUserID: currentUserID) ?? .mock
                 )
+                .environment(conversationViewModel)
             }
             .safeAreaInset(edge: .bottom, spacing: Spacing.none) {
                 TabBarView(
@@ -83,7 +85,7 @@ struct ChatView: View {
             await chatViewModel.loadFavorites(for: currentUserID)
         }
         .onDisappear {
-            chatViewModel.stopListeningToConversations()
+            chatViewModel.stopObservingConversations()
         }
         /// Handles the case where the notification tap arrives while the app is already open.
         .onChange(of: chatViewModel.pendingConversationID) { _, _ in

@@ -12,7 +12,7 @@ struct ProfileView: View {
     @Environment(AuthViewModel.self) private var authViewModel
     @Environment(ProfileViewModel.self) private var profileViewModel
     @Environment(MeetViewModel.self) private var meetViewModel
-
+    @State private var conversationViewModel = ConversationViewModel(conversationRepository: ConversationService())
     @State private var selectedPhoto: PhotosPickerItem?
     @State private var showSidebar = false
     @State private var showEditProfile = false
@@ -151,6 +151,13 @@ struct ProfileView: View {
                                     with: user,
                                     currentUserId: authViewModel.currentUserId
                                 )
+                                /// If the conversation is new, configure ConversationViewModel for lazy creation.
+                                if chatViewModel.isActiveConversationNew {
+                                    conversationViewModel.isNew = true
+                                    conversationViewModel.onCreate = {
+                                        try await chatViewModel.createActiveConversation()
+                                    }
+                                }
                             }
                         } label: {
                             Text("profile.start.chat")
@@ -294,6 +301,15 @@ struct ProfileView: View {
                         currentUserID: authViewModel.currentUserId
                     ) ?? .mock
                 )
+                .environment(conversationViewModel)
+            }
+            .onChange(of: chatViewModel.activeConversation) { _, newValue in
+                /// User navigated back without sending — clean up the draft state.
+                if newValue == nil {
+                    chatViewModel.isActiveConversationNew = false
+                    conversationViewModel.isNew = false
+                    conversationViewModel.onCreate = nil
+                }
             }
             .alert(
                 "profile.deleteAccount.title",

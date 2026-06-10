@@ -2,7 +2,7 @@ import PhotosUI
 import SwiftUI
 
 struct ConversationView: View {
-    @Environment(ChatViewModel.self) private var chatViewModel
+    @Environment(ConversationViewModel.self) private var conversationViewModel
     let conversation: Conversation
     let currentUserID: String
     let otherUser: User
@@ -10,14 +10,14 @@ struct ConversationView: View {
     @State private var selectedUser: User?
 
     var body: some View {
-        @Bindable var chatViewModel = chatViewModel
+        @Bindable var conversationVM = conversationViewModel
 
         ZStack {
             Theme.appBackground
                 .ignoresSafeArea()
 
             VStack(spacing: Spacing.none) {
-                if chatViewModel.isLoading {
+                if conversationVM.isLoading {
                     Spacer()
                     ProgressView()
                         .frame(maxWidth: .infinity)
@@ -28,7 +28,7 @@ struct ConversationView: View {
                             LazyVStack(spacing: Spacing.small) {
                                 DateSeparatorView(date: Date())
 
-                                ForEach(chatViewModel.messages) { message in
+                                ForEach(conversationVM.messages) { message in
                                     MessageBubbleView(
                                         message: message,
                                         isFromCurrentUser: message.senderID
@@ -38,7 +38,7 @@ struct ConversationView: View {
                                 }
                                 // TODO [PP-028]: Remove temporary uploading placeholder message
                                 // when real message with imageURL arrives from Firestore observer
-                                if chatViewModel.isUploadingImage {
+                                if conversationVM.isUploadingImage {
                                     MessageBubbleView(
                                         message: Message(
                                             id: "uploading",
@@ -54,8 +54,8 @@ struct ConversationView: View {
                             }
                             .padding(Spacing.medium)
                         }
-                        .onChange(of: chatViewModel.messages.count) { _, _ in
-                            guard let last = chatViewModel.messages.last else {
+                        .onChange(of: conversationVM.messages.count) { _, _ in
+                            guard let last = conversationVM.messages.last else {
                                 return
                             }
                             withAnimation {
@@ -65,16 +65,16 @@ struct ConversationView: View {
                     }
                 }
 
-                MessageInputBar(text: $chatViewModel.messageText) {
+                MessageInputBar(text: $conversationVM.messageText) {
                     Task {
-                        await chatViewModel.sendMessage(
+                        await conversationVM.sendMessage(
                             in: conversation,
                             senderID: currentUserID
                         )
                     }
                 } onImagePick: { image in
                     Task {
-                        await chatViewModel.sendImage(
+                        await conversationVM.sendImage(
                             image,
                             in: conversation,
                             senderID: currentUserID
@@ -89,8 +89,12 @@ struct ConversationView: View {
                     selectedUser = otherUser
                 } label: {
                     VStack(spacing: Spacing.xxSmall) {
-                        AvatarView(photoURL: otherUser.photoURL, size: IconSize.messageAvatar, iconSize:
-                        IconSize.avatarIcon)
+                        AvatarView(
+                            photoURL: otherUser.photoURL,
+                            size: IconSize.messageAvatar,
+                            iconSize:
+                                IconSize.avatarIcon
+                        )
 
                         Text(otherUser.name)
                             .font(.headline)
@@ -111,32 +115,32 @@ struct ConversationView: View {
         }
         .toolbarVisibility(.hidden, for: .tabBar)
         .onAppear {
-            chatViewModel.observeMessages(
+            conversationViewModel.observeMessages(
                 conversationID: conversation.id,
                 currentUserID: currentUserID
             )
             Task {
-                await chatViewModel.markAsRead(
+                await conversationViewModel.markAsRead(
                     conversationID: conversation.id,
                     userID: currentUserID
                 )
             }
         }
         .onDisappear {
-            chatViewModel.stopListening()
+            conversationViewModel.stopObservingMessages()
         }
         .alert(
             String(localized: "common.error"),
             isPresented: Binding(
-                get: { chatViewModel.errorMessage != nil },
-                set: { if !$0 { chatViewModel.errorMessage = nil } }
+                get: { conversationVM.errorMessage != nil },
+                set: { if !$0 { conversationVM.errorMessage = nil } }
             )
         ) {
             Button(String(localized: "common.ok")) {
-                chatViewModel.errorMessage = nil
+                conversationVM.errorMessage = nil
             }
         } message: {
-            Text(chatViewModel.errorMessage ?? "")
+            Text(conversationVM.errorMessage ?? "")
         }
     }
 }
@@ -201,7 +205,7 @@ private struct MessageBubbleView: View {
                 .frame(width: 200, height: 150)
                 .background(
                     isFromCurrentUser
-                        ? Theme.terracotta.opacity(0.3) : Theme.offWhite
+                    ? Theme.terracotta.opacity(Opacity.xxSmall) : Theme.offWhite
                 )
                 .clipShape(RoundedRectangle(cornerRadius: Radius.medium))
 
@@ -326,7 +330,9 @@ private struct MessageInputBar: View {
 }
 
 #Preview {
-    let viewModel = ChatViewModel(chatRepository: MockChatRepository(), profileRepository: MockProfileRepository(), meetRepository: MockMeetRepository())
+    let conversationViewModel = ConversationViewModel(
+        conversationRepository: MockConversationRepository()
+    )
     let conversation = Conversation(
         id: "conv1",
         participantIDs: ["user1", "user2"],
@@ -340,7 +346,14 @@ private struct MessageInputBar: View {
             otherUser: .mock
         )
     }
-    .environment(viewModel)
-    .environment(AuthViewModel(repository: MockAuthRepository(), userRepository: MockProfileRepository()))
-    .environment(ProfileViewModel(profileRepository: MockProfileRepository(), user: .mock))
+    .environment(conversationViewModel)
+    .environment(
+        AuthViewModel(
+            repository: MockAuthRepository(),
+            userRepository: MockProfileRepository()
+        )
+    )
+    .environment(
+        ProfileViewModel(profileRepository: MockProfileRepository(), user: .mock)
+    )
 }
