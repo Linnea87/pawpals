@@ -71,7 +71,6 @@ struct ChatView: View {
                     chatUnreadCount: chatViewModel.totalUnread
                 )
             }
-            .navigationTitle(Text("chat.title"))
             .alert(
                 "common.error",
                 isPresented: .constant(chatViewModel.errorMessage != nil)
@@ -83,6 +82,7 @@ struct ChatView: View {
         }
         .task {
             chatViewModel.observeConversations(for: currentUserID)
+            await chatViewModel.loadFavorites(for: currentUserID)
         }
         .onDisappear {
             chatViewModel.stopObservingConversations()
@@ -100,22 +100,11 @@ struct ChatView: View {
     private var filterTabs: some View {
         HStack(spacing: Spacing.small) {
             ForEach(ChatFilter.allCases, id: \.self) { filter in
-                Button {
+                FilterChip(
+                    title: NSLocalizedString(filter.label, comment: ""),
+                    isSelected: chatViewModel.selectedFilter == filter
+                ) {
                     chatViewModel.selectedFilter = filter
-                } label: {
-                    Text(LocalizedStringKey(filter.label))
-                        .font(.subheadline)
-                        .fontWeight(.medium)
-                        .foregroundStyle(
-                            chatViewModel.selectedFilter == filter ? .white : Theme.darkBrown
-                        )
-                        .padding(.horizontal, Spacing.large)
-                        .padding(.vertical, Spacing.small)
-                        .background(
-                            chatViewModel.selectedFilter == filter
-                                ? Theme.sageGreen : Theme.offWhite
-                        )
-                        .clipShape(Capsule())
                 }
             }
         }
@@ -137,7 +126,7 @@ struct ChatView: View {
 }
 
 private func makePreviewChatViewModel() -> ChatViewModel {
-    let viewModel = ChatViewModel(chatRepository: MockChatRepository(), userRepository: MockUserRepository())
+    let viewModel = ChatViewModel(chatRepository: MockChatRepository(), profileRepository: MockProfileRepository(), meetRepository: MockMeetRepository())
     viewModel.conversations = [
         Conversation(
             id: "1",

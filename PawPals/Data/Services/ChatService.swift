@@ -26,7 +26,7 @@ final class ChatService: ChatRepository {
         try ref.setData(from: conversation)
         return conversation
     }
-    
+
     func fetchConversationIfExists(between userID1: String, and userID2: String) async throws -> Conversation? {
         let conversationID = [userID1, userID2].sorted().joined(separator: "_")
         let snapshot = try await db.collection("conversations").document(conversationID).getDocument()

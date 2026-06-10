@@ -17,15 +17,16 @@ final class MeetViewModel {
     var currentUserLocation: CLLocationCoordinate2D?
     var searchRadius: Double = 5.0
     var savedUserIds: Set<String> = []
+    var savedUsers: [User] = []
 
-    private let userRepository: UserRepository
+    private let meetRepository: MeetRepository
     private let locationService: LocationService
 
     init(
-        userRepository: UserRepository = UserService(),
+        meetRepository: MeetRepository = MeetService(),
         locationService: LocationService
     ) {
-        self.userRepository = userRepository
+        self.meetRepository = meetRepository
         self.locationService = locationService
     }
 
@@ -46,7 +47,7 @@ final class MeetViewModel {
                 longitude: location.coordinate.longitude
             )
             /// Persist the user's current location to Firestore so others can find them/
-            try await userRepository.updateLocation(geoPoint, userId: userID)
+            try await meetRepository.updateLocation(geoPoint, userId: userID)
             /// Now we have a location, fetch users nearby
             await loadNearbyUsers()
 
@@ -70,87 +71,22 @@ final class MeetViewModel {
                 latitude: currentLocation.latitude,
                 longitude: currentLocation.longitude
             )
-            allNearbyUsers = try await userRepository.fetchNearbyUsers(
+            allNearbyUsers = try await meetRepository.fetchNearbyUsers(
                 location: geoPoint,
                 radius: searchRadius,
                 excludingUserID: Auth.auth().currentUser?.uid ?? ""
             )
-            applyFilters()
 
         } catch {
             errorMessage = error.localizedDescription
         }
     }
 
-    func setRadius(_ km: Double, userId: String) {
-        searchRadius = km
-        applyFilters()
-        Task {
-            try? await userRepository.savePreferences(
-                UserPreferences(
-                    walkTypes: [],
-                    dogSize: .medium,
-                    searchRadius: km
-                ),
-                userId: userId
-            )
-        }
-    }
-
-    func toggleFilter(_ filter: String) {
-        if activeFilters.contains(filter) {
-            activeFilters.remove(filter)
-        } else {
-            activeFilters.insert(filter)
-        }
-        applyFilters()
-    }
-
-    func clearFilters() {
-        activeFilters.removeAll()
-        applyFilters()
-    }
-
-    func toggleSizeFilter(_ size: String) {
-        if activeSizeFilters.contains(size) {
-            activeSizeFilters.remove(size)
-        } else {
-            activeSizeFilters.insert(size)
-        }
-        applyFilters()
-    }
-
-    func clearSizeFilters() {
-        activeSizeFilters.removeAll()
-        applyFilters()
-    }
-
-    private func applyFilters() {
-        var result = allNearbyUsers
-
-        if !activeFilters.isEmpty {
-            result = result.filter { user in
-                let userWalkTypes = Set(
-                    user.preferences.walkTypes.map { $0.rawValue }
-                )
-                return !activeFilters.isDisjoint(with: userWalkTypes)
-            }
-        }
-
-        if !activeSizeFilters.isEmpty {
-            result = result.filter { user in
-                guard let size = user.dogs.first?.size else { return false }
-                return activeSizeFilters.contains(size.rawValue)
-            }
-        }
-
-        filteredUsers = result
-    }
-
     func loadSavedProfiles() async {
         guard let userId = Auth.auth().currentUser?.uid else { return }
         do {
-            let users = try await userRepository.fetchSavedProfiles(for: userId)
+            let users = try await meetRepository.fetchSavedProfiles(for: userId)
+            savedUsers = users
             savedUserIds = Set(users.map { $0.id })
         } catch {
             errorMessage = error.localizedDescription
@@ -161,10 +97,10 @@ final class MeetViewModel {
         guard let userId = Auth.auth().currentUser?.uid else { return }
         do {
             if savedUserIds.contains(targetId) {
-                try await userRepository.unsaveProfile(targetId, by: userId)
+                try await meetRepository.unsaveProfile(targetId, by: userId)
                 savedUserIds.remove(targetId)
             } else {
-                try await userRepository.saveProfile(targetId, by: userId)
+                try await meetRepository.saveProfile(targetId, by: userId)
                 savedUserIds.insert(targetId)
             }
         } catch {

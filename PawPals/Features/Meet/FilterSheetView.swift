@@ -4,6 +4,7 @@ import SwiftUI
 struct FilterSheetView: View {
     @Environment(MeetViewModel.self) private var viewModel
     @Environment(AuthViewModel.self) private var authVM
+    @Environment(FilterViewModel.self) private var filterViewModel
     @Environment(\.dismiss) private var dismiss
 
     var body: some View {
@@ -21,15 +22,16 @@ struct FilterSheetView: View {
 
                         ScrollView(.horizontal, showsIndicators: false) {
                             HStack(spacing: Spacing.small) {
-                                FilterChip(title: "All", isSelected: viewModel.activeFilters.isEmpty) {
-                                    viewModel.clearFilters()
+                                FilterChip(title: "All", isSelected: filterViewModel.activeFilters.isEmpty) {
+                                    filterViewModel.clearFilters(userId: authVM.currentUserId)
                                 }
                                 ForEach(WalkType.allCases) { walkType in
                                     FilterChip(
                                         title: walkType.rawValue,
-                                        isSelected: viewModel.activeFilters.contains(walkType.rawValue)
+                                        isSelected: filterViewModel.activeFilters.contains(walkType.rawValue)
                                     ) {
-                                        viewModel.toggleFilter(walkType.rawValue)
+                                        filterViewModel.toggleFilter(walkType.rawValue, userId: authVM.currentUserId)
+
                                     }
                                 }
                             }
@@ -43,22 +45,22 @@ struct FilterSheetView: View {
 
                         ScrollView(.horizontal, showsIndicators: false) {
                             HStack(spacing: Spacing.small) {
-                                FilterChip(title: "All sizes", isSelected: viewModel.activeSizeFilters.isEmpty) {
-                                    viewModel.clearSizeFilters()
+                                FilterChip(title: "All sizes", isSelected: filterViewModel.activeSizeFilters.isEmpty) {
+                                    filterViewModel.clearSizeFilters(userId: authVM.currentUserId)
                                 }
                                 ForEach(DogSize.allCases, id: \.self) { size in
                                     FilterChip(
                                         title: size.rawValue.capitalized,
-                                        isSelected: viewModel.activeSizeFilters.contains(size.rawValue)
+                                        isSelected: filterViewModel.activeSizeFilters.contains(size.rawValue)
                                     ) {
-                                        viewModel.toggleSizeFilter(size.rawValue)
+                                        filterViewModel.toggleSizeFilter(size.rawValue, userId: authVM.currentUserId)
                                     }
                                 }
                             }
                         }
                     }
                     .padding(Spacing.medium)
-                    .background(Theme.offWhite.opacity(0.6))
+                    .background(Theme.offWhite.opacity(Opacity.xSmall))
                     .clipShape(RoundedRectangle(cornerRadius: Radius.medium))
 
                     VStack(alignment: .leading, spacing: Spacing.medium) {
@@ -70,16 +72,15 @@ struct FilterSheetView: View {
                                 .fontWeight(.semibold)
                                 .foregroundStyle(Theme.darkBrown)
 
-                            Text("\(Int(viewModel.searchRadius)) km")
+                            Text("\(Int(filterViewModel.searchRadius)) km")
                                 .font(.title2)
                                 .fontWeight(.bold)
                                 .foregroundStyle(Theme.terracotta)
 
                             Slider(
                                 value: Binding(
-                                    get: { viewModel.searchRadius },
-                                    set: {
-                                        viewModel.setRadius(
+                                    get: { filterViewModel.searchRadius },
+                                    set: { filterViewModel.setRadius(
                                             $0,
                                             userId: authVM.currentUserId
                                         )
@@ -108,14 +109,12 @@ struct FilterSheetView: View {
                         mapSection
                     }
                     .padding(Spacing.medium)
-                    .background(Theme.offWhite.opacity(0.6))
+                    .background(Theme.offWhite.opacity(Opacity.xSmall))
                     .clipShape(RoundedRectangle(cornerRadius: Radius.medium))
                     .frame(maxHeight: .infinity)
                 }
                 .padding(Spacing.medium)
             }
-            .navigationTitle("common.filter")
-            .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
                     Button("common.done") {
@@ -132,15 +131,15 @@ struct FilterSheetView: View {
         if let center = viewModel.currentUserLocation {
             /// radius-only filter — walk type and size prefs do NOT affect the map
             let usersInRadius = viewModel.allNearbyUsers.filter {
-                ($0.distance ?? 0) <= viewModel.searchRadius
+                ($0.distance ?? 0) <= filterViewModel.searchRadius
             }
 
             Map(
                 initialPosition: .region(
                     MKCoordinateRegion(
                         center: center,
-                        latitudinalMeters: viewModel.searchRadius * 1000 * 2,
-                        longitudinalMeters: viewModel.searchRadius * 1000 * 2
+                        latitudinalMeters: filterViewModel.searchRadius * 1000 * 2,
+                        longitudinalMeters: filterViewModel.searchRadius * 1000 * 2
                     )
                 )
             ) {
@@ -194,32 +193,15 @@ struct FilterSheetView: View {
                 .shadow(radius: Radius.xxSmall)
         }
     }
-    
-    private struct FilterChip: View {
-        let title: String
-        let isSelected: Bool
-        let action: () -> Void
-
-        var body: some View {
-            Button(action: action) {
-                Text(title)
-                    .font(.footnote)
-                    .padding(.horizontal, Spacing.medium)
-                    .padding(.vertical, Spacing.medium)
-                    .background(isSelected ? Theme.sageGreen : Theme.offWhite)
-                    .foregroundStyle(isSelected ? Theme.offWhite : Theme.darkBrown)
-                    .clipShape(Capsule())
-            }
-        }
-    }
 }
 
 #Preview {
-    let vm = MeetViewModel(userRepository: MockUserRepository(), locationService: LocationService())
+    let vm = MeetViewModel(meetRepository: MockMeetRepository(), locationService: LocationService())
     vm.currentUserLocation = CLLocationCoordinate2D(latitude: 59.3293, longitude: 18.0686)
     vm.allNearbyUsers = User.mockUsers
 
     return FilterSheetView()
         .environment(vm)
-        .environment(AuthViewModel(repository: AuthService(), userRepository: UserService()))
+        .environment(FilterViewModel())
+        .environment(AuthViewModel(repository: AuthService(), userRepository: ProfileService()))
 }

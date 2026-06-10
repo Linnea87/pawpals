@@ -27,13 +27,8 @@ struct MeetCardView: View {
                     .padding(Spacing.xSmall)
                 
                 if let walkType = user.preferences.walkTypes.first {
-                    Text(walkType.rawValue)
+                    WalkTypeTag(walkType: walkType)
                         .font(.caption2)
-                        .padding(.horizontal, Spacing.small)
-                        .padding(.vertical, Spacing.xSmall)
-                        .background(Theme.terracotta)
-                        .foregroundStyle(Theme.offWhite)
-                        .clipShape(Capsule())
                 }
             }
             
@@ -45,9 +40,10 @@ struct MeetCardView: View {
                 Spacer()
             }
         }
+        .frame(maxWidth: .infinity, alignment: .leading)
         .padding(Spacing.large)
         .background(Theme.offWhite)
-        .clipShape(RoundedRectangle(cornerRadius: 20))
+        .clipShape(RoundedRectangle(cornerRadius: Radius.large))
     }
 }
 

@@ -89,13 +89,7 @@ struct ProfileView: View {
                                 HStack(spacing: Spacing.small) {
                                     ForEach(displayUser.preferences.walkTypes) {
                                         walkType in
-                                        Text(walkType.rawValue)
-                                            .font(.caption)
-                                            .padding(.horizontal, Spacing.small)
-                                            .padding(.vertical, Spacing.xSmall)
-                                            .background(Theme.terracotta)
-                                            .foregroundStyle(Theme.offWhite)
-                                            .clipShape(Capsule())
+                                        WalkTypeTag(walkType: walkType)
                                     }
                                 }
                             }
@@ -124,9 +118,9 @@ struct ProfileView: View {
                             SectionHeader(title: displayUser.dogs.count == 1 ? "profile.dog" : "profile.dogs")                        }
                     }
 
-                    if isOwner && !profileViewModel.savedUsers.isEmpty {
+                    if isOwner && !meetViewModel.savedUsers.isEmpty {
                         Section {
-                            ForEach(profileViewModel.savedUsers) { savedUser in
+                            ForEach(meetViewModel.savedUsers) { savedUser in
                                 HStack(spacing: Spacing.medium) {
                                     AvatarView(
                                         photoURL: savedUser.photoURL,
@@ -187,7 +181,7 @@ struct ProfileView: View {
                 .task {
                     if isOwner {
                         await profileViewModel.loadPreferences()
-                        await profileViewModel.loadSavedProfiles()
+                        await meetViewModel.loadSavedProfiles()
                     }
                 }
                 .task(id: selectedPhoto) {
@@ -349,17 +343,18 @@ struct ProfileView: View {
         .environment(
             ChatViewModel(
                 chatRepository: MockChatRepository(),
-                userRepository: MockUserRepository()
+                profileRepository: MockProfileRepository(),
+                meetRepository: MockMeetRepository()
             )
         )
         .environment(
             AuthViewModel(
                 repository: MockAuthRepository(),
-                userRepository: MockUserRepository()
+                userRepository: MockProfileRepository()
             )
         )
         .environment(
-            ProfileViewModel(userRepository: MockUserRepository(), user: .mock)
+            ProfileViewModel(profileRepository: MockProfileRepository(), user: .mock)
         )
         .environment(MeetViewModel(locationService: LocationService()))
 }
@@ -375,17 +370,18 @@ struct ProfileView: View {
     .environment(
         ChatViewModel(
             chatRepository: MockChatRepository(),
-            userRepository: MockUserRepository()
+            profileRepository: MockProfileRepository(),
+            meetRepository: MockMeetRepository()
         )
     )
     .environment(
         AuthViewModel(
             repository: MockAuthRepository(),
-            userRepository: MockUserRepository()
+            userRepository: MockProfileRepository()
         )
     )
     .environment(
-        ProfileViewModel(userRepository: MockUserRepository(), user: .mock)
+        ProfileViewModel(profileRepository: MockProfileRepository(), user: .mock)
     )
     .environment(MeetViewModel(locationService: LocationService()))
 }

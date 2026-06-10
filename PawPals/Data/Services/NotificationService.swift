@@ -11,9 +11,9 @@ final class NotificationService: NSObject {
     var pendingConversationID: String?
     var pushNotificationToken: String?
 
-    private let userRepository: UserRepository
+    private let userRepository: ProfileRepository
 
-    init(userRepository: UserRepository) {
+    init(userRepository: ProfileRepository) {
         self.userRepository = userRepository
         super.init()
         UNUserNotificationCenter.current().delegate = self

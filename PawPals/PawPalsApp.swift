@@ -10,6 +10,7 @@ struct PawPalsApp: App {
     @State private var notificationService: NotificationService
     @State private var locationService: LocationService
     @State private var profileViewModel: ProfileViewModel
+    @State private var filterViewModel: FilterViewModel
 
 
     init() {
@@ -21,10 +22,11 @@ struct PawPalsApp: App {
         let locationService = LocationService()
         _locationService = State(initialValue: locationService)
         _meetViewModel = State(initialValue: MeetViewModel(locationService: locationService))
-        _authViewModel = State(initialValue: AuthViewModel(repository: AuthService(), userRepository: UserService()))
-        _chatViewModel = State(initialValue: ChatViewModel(chatRepository: ChatService(), userRepository: UserService()))
-        _notificationService = State(initialValue: NotificationService(userRepository: UserService()))
-        _profileViewModel = State(initialValue: ProfileViewModel(userRepository: UserService(), user: .mock))
+        _authViewModel = State(initialValue: AuthViewModel(repository: AuthService(), userRepository: ProfileService()))
+        _chatViewModel = State(initialValue: ChatViewModel(chatRepository: ChatService(), profileRepository: ProfileService(), meetRepository: MeetService()))
+        _notificationService = State(initialValue: NotificationService(userRepository: ProfileService()))
+        _profileViewModel = State(initialValue: ProfileViewModel(profileRepository: ProfileService(), user: .mock))
+        _filterViewModel = State(initialValue: FilterViewModel())
     }
 
     var body: some Scene {
@@ -32,6 +34,7 @@ struct PawPalsApp: App {
             AppNavigationView()
                 .environment(authViewModel)
                 .environment(meetViewModel)
+                .environment(filterViewModel)
                 .environment(chatViewModel)
                 .environment(notificationService)
                 .environment(locationService)
