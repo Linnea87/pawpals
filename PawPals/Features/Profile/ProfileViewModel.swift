@@ -28,12 +28,11 @@ final class ProfileViewModel {
         isLoading = false
     }
     
-    func saveProfileInfo(name: String, bio: String, city: String, walkTypes: [WalkType]) async {
+    func saveProfileInfo(name: String, bio: String, walkTypes: [WalkType]) async {
         isLoading = true
         errorMessage = nil
         user.name = name
         user.bio = bio
-        user.city = city
         user.preferences.walkTypes = walkTypes
         do {
             try await profileRepository.updateProfile(user)
