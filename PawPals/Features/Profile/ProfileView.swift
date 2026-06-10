@@ -83,7 +83,7 @@ struct ProfileView: View {
                     else { return }
                     await profileViewModel.uploadProfilePhoto(data)
                 }
-                .safeAreaInset(edge: .bottom, spacing: 0) {
+                .safeAreaInset(edge: .bottom, spacing: Spacing.none) {
                     if isOwner {
                         TabBarView(selectedTab: $selectedTab)
                     }
