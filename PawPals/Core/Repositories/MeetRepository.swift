@@ -17,6 +17,9 @@ protocol MeetRepository {
     
     /// Fetches all profiles saved by a user.
     func fetchSavedProfiles(for userId: String) async throws -> [User]
+
+    /// Fetches the IDs of all profiles saved by a user.
+    func fetchSavedProfileIds(for userId: String) async throws -> Set<String>
 }
 
 

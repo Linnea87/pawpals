@@ -80,6 +80,7 @@ struct ChatView: View {
         }
         .task {
             chatViewModel.observeConversations(for: currentUserID)
+            await chatViewModel.loadFavorites(for: currentUserID)
         }
         .onDisappear {
             chatViewModel.stopListeningToConversations()
@@ -123,7 +124,7 @@ struct ChatView: View {
 }
 
 private func makePreviewChatViewModel() -> ChatViewModel {
-    let viewModel = ChatViewModel(chatRepository: MockChatRepository(), userRepository: MockProfileRepository())
+    let viewModel = ChatViewModel(chatRepository: MockChatRepository(), profileRepository: MockProfileRepository(), meetRepository: MockMeetRepository())
     viewModel.conversations = [
         Conversation(
             id: "1",

@@ -110,6 +110,11 @@ final class MeetService: MeetRepository {
              return users
          }
 
-
-
+    func fetchSavedProfileIds(for userId: String) async throws -> Set<String> {
+        let snapshot = try await db.collection("users")
+            .document(userId)
+            .collection("savedProfiles")
+            .getDocuments()
+        return Set(snapshot.documents.map { $0.documentID })
+    }
 }

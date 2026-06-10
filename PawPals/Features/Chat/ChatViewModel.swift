@@ -24,12 +24,16 @@ final class ChatViewModel {
     var pendingConversationID: String? /// Set when the user taps a push notification for a new message.
     var isUploadingImage: Bool = false
     var selectedFilter: ChatFilter = .all
+    var savedUserIds: Set<String> = []
+    private(set) var currentUserID: String = ""
 
     var filteredConversations: [Conversation] {
         switch selectedFilter {
         case .all: return conversations
         case .unread: return conversations.filter { $0.unreadCount > 0 }
-        case .favorite: return []
+        case .favorite: return conversations.filter { conversation in
+            conversation.participantIDs.contains { $0 != currentUserID && savedUserIds.contains($0) }
+        }
         }
     }
 
@@ -41,7 +45,8 @@ final class ChatViewModel {
     }
 
     private let chatRepository: ChatRepository
-    private let userRepository: ProfileRepository
+    private let profileRepository: ProfileRepository
+    private let meetRepository: MeetRepository
 
 
     private var stopObserving: (() -> Void)?
@@ -49,9 +54,10 @@ final class ChatViewModel {
 
     private var stopObservingConversations: (() -> Void)?
 
-    init(chatRepository: ChatRepository, userRepository: ProfileRepository) {
+    init(chatRepository: ChatRepository, profileRepository: ProfileRepository, meetRepository: MeetRepository) {
         self.chatRepository = chatRepository
-        self.userRepository = userRepository
+        self.profileRepository = profileRepository
+        self.meetRepository = meetRepository
     }
 
     /// Creates or fetches a conversation with another user and navigates to it.
@@ -174,6 +180,7 @@ final class ChatViewModel {
     /// Starts a real-time Firestore listener for the full conversations list.
     /// Each update also triggers a participant fetch so names and avatars stay current.
     func observeConversations(for userID: String) {
+        currentUserID = userID
         stopObservingConversations = chatRepository.observeConversations(for: userID) { [weak self] updated in
             guard let self else { return }
             self.conversations = updated
@@ -228,7 +235,7 @@ final class ChatViewModel {
         await withTaskGroup(of: (String, User)?.self) { group in
             for id in otherIDs {
                 group.addTask {
-                    guard let user = try? await self.userRepository.fetchUser(userId: id)
+                    guard let user = try? await self.profileRepository.fetchUser(userId: id)
                     else { return nil }
                     return (id, user)
                 }
@@ -238,6 +245,14 @@ final class ChatViewModel {
                     participants[id] = user
                 }
             }
+        }
+    }
+    
+    func loadFavorites(for userId: String) async {
+        do {
+            savedUserIds = try await meetRepository.fetchSavedProfileIds(for: userId)
+        } catch {
+            errorMessage = error.localizedDescription
         }
     }
 }

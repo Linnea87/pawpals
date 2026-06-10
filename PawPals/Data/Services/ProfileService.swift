@@ -147,7 +147,6 @@ final class ProfileService: ProfileRepository {
         }
     }
 
-    
     func uploadProfilePhoto(_ data: Data, userId: String) async throws -> String
     {
         let ref = Storage.storage().reference().child(

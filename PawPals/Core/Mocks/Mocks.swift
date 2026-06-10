@@ -119,6 +119,7 @@ struct MockAuthRepository: AuthRepository {
 
 // =========== MockProfileRepository =============================
 
+
   struct MockProfileRepository: ProfileRepository {
       func updateProfile(_ user: User) async throws {}
       func saveDog(_ dog: Dog, userId: String) async throws {}
@@ -133,6 +134,7 @@ struct MockAuthRepository: AuthRepository {
       func uploadProfilePhoto(_ data: Data, userId: String) async throws -> String { "" }
   }
 
+
   // =========== MockMeetRepository =============================
 
   struct MockMeetRepository: MeetRepository {
@@ -142,6 +144,7 @@ struct MockAuthRepository: AuthRepository {
       func saveProfile(_ targetId: String, by userId: String) async throws {}
       func unsaveProfile(_ targetId: String, by userId: String) async throws {}
       func fetchSavedProfiles(for userId: String) async throws -> [User] { [] }
+      func fetchSavedProfileIds(for userId: String) async throws -> Set<String> { [] }
   }
 
 // =========== MockChatRepository =============================

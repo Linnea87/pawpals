@@ -327,7 +327,8 @@ struct ProfileView: View {
         .environment(
             ChatViewModel(
                 chatRepository: MockChatRepository(),
-                userRepository: MockProfileRepository()
+                profileRepository: MockProfileRepository(),
+                meetRepository: MockMeetRepository()
             )
         )
         .environment(
@@ -353,7 +354,8 @@ struct ProfileView: View {
     .environment(
         ChatViewModel(
             chatRepository: MockChatRepository(),
-            userRepository: MockProfileRepository()
+            profileRepository: MockProfileRepository(),
+            meetRepository: MockMeetRepository()
         )
     )
     .environment(

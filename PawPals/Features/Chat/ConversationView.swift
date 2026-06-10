@@ -321,7 +321,7 @@ private struct MessageInputBar: View {
 }
 
 #Preview {
-    let viewModel = ChatViewModel(chatRepository: MockChatRepository(), userRepository: MockProfileRepository())
+    let viewModel = ChatViewModel(chatRepository: MockChatRepository(), profileRepository: MockProfileRepository(), meetRepository: MockMeetRepository())
     let conversation = Conversation(
         id: "conv1",
         participantIDs: ["user1", "user2"],
