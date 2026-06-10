@@ -356,7 +356,7 @@ struct ProfileView: View {
         .environment(
             ProfileViewModel(profileRepository: MockProfileRepository(), user: .mock)
         )
-        .environment(MeetViewModel(locationService: LocationService()))
+        .environment(MeetViewModel(locationViewModel: LocationViewModel()))
 }
 
 #Preview("Visitor") {
@@ -383,5 +383,5 @@ struct ProfileView: View {
     .environment(
         ProfileViewModel(profileRepository: MockProfileRepository(), user: .mock)
     )
-    .environment(MeetViewModel(locationService: LocationService()))
+    .environment(MeetViewModel(locationViewModel: LocationViewModel()))
 }

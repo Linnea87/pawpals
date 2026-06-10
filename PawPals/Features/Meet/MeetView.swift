@@ -5,6 +5,7 @@ struct MeetView: View {
     @Binding var selectedTab: Tab
     @Environment(MeetViewModel.self) private var viewModel
     @Environment(FilterViewModel.self) private var filterViewModel
+    @Environment(LocationViewModel.self) private var locationViewModel
     @State private var showFilterSheet = false
     
     var body: some View {
@@ -22,7 +23,7 @@ struct MeetView: View {
                         .padding(.top, Spacing.large)
                         .padding(.bottom, Spacing.medium)
                     
-                    if vm.isLocating {
+                    if locationViewModel.isLocating {
                         Spacer()
                         VStack(spacing: Spacing.small) {
                             ProgressView()
@@ -34,7 +35,7 @@ struct MeetView: View {
                         Spacer()
                         
                     } else if
-                        vm.locationStatus == .denied || vm.locationStatus == .restricted {
+                        locationViewModel.locationStatus == .denied || locationViewModel.locationStatus == .restricted {
                         Spacer()
                         VStack(spacing: Spacing.medium) {
                             Image(systemName: "location.slash")
@@ -122,16 +123,20 @@ struct MeetView: View {
 }
 
 #Preview("Default") {
+    let locationVM = LocationViewModel()
     MeetView(selectedTab: .constant(.meet))
-        .environment(MeetViewModel(locationService: LocationService()))
+        .environment(MeetViewModel(locationViewModel: locationVM))
+        .environment(FilterViewModel())
+        .environment(locationVM)
 }
 
 #Preview("Active filters") {
-    let vm = MeetViewModel(locationService: LocationService())
+    let locationVM = LocationViewModel()
     let filterVM = FilterViewModel()
     filterVM.activeFilters = ["Evening walk", "City walk"]
     filterVM.activeSizeFilters = ["medium"]
     return MeetView(selectedTab: .constant(.meet))
-        .environment(vm)
+        .environment(MeetViewModel(locationViewModel: locationVM))
         .environment(filterVM)
+        .environment(locationVM)
 }

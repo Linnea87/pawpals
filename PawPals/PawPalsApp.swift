@@ -8,7 +8,7 @@ struct PawPalsApp: App {
     @State private var meetViewModel: MeetViewModel
     @State private var chatViewModel: ChatViewModel
     @State private var notificationService: NotificationService
-    @State private var locationService: LocationService
+    @State private var locationViewModel: LocationViewModel
     @State private var profileViewModel: ProfileViewModel
     @State private var filterViewModel: FilterViewModel
 
@@ -19,12 +19,13 @@ struct PawPalsApp: App {
         if let clientID = FirebaseApp.app()?.options.clientID {
             GIDSignIn.sharedInstance.configuration = GIDConfiguration(clientID: clientID)
         }
-        let locationService = LocationService()
-        _locationService = State(initialValue: locationService)
-        _meetViewModel = State(initialValue: MeetViewModel(locationService: locationService))
-        _authViewModel = State(initialValue: AuthViewModel(repository: AuthService(), userRepository: ProfileService()))
+
+        let locationViewModel = LocationViewModel()
+        _locationViewModel = State(initialValue: locationViewModel)
+        _meetViewModel = State(initialValue: MeetViewModel(locationViewModel: locationViewModel))
+        _authViewModel = State(initialValue: AuthViewModel(repository: AuthService(), profileRepository: ProfileService()))
         _chatViewModel = State(initialValue: ChatViewModel(chatRepository: ChatService(), profileRepository: ProfileService(), meetRepository: MeetService()))
-        _notificationService = State(initialValue: NotificationService(userRepository: ProfileService()))
+        _notificationService = State(initialValue: NotificationService(profileRepository: ProfileService()))
         _profileViewModel = State(initialValue: ProfileViewModel(profileRepository: ProfileService(), user: .mock))
         _filterViewModel = State(initialValue: FilterViewModel())
     }
@@ -37,7 +38,7 @@ struct PawPalsApp: App {
                 .environment(filterViewModel)
                 .environment(chatViewModel)
                 .environment(notificationService)
-                .environment(locationService)
+                .environment(locationViewModel)
                 .environment(profileViewModel)
                 .onChange(of: authViewModel.currentUser?.id) { _, _ in
                      if let user = authViewModel.currentUser {
