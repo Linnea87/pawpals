@@ -22,7 +22,7 @@ final class ChatViewModel {
     var pendingConversationID: String? /// Set when the user taps a push notification for a new message.
     var isActiveConversationNew: Bool = false /// True when activeConversation is a local draft not yet saved to Firestore.
     var selectedFilter: ChatFilter = .all
-    var savedUserIds: Set<String> = []
+    var savedUserIDs: Set<String> = []
     private(set) var currentUserID: String = ""
 
     var filteredConversations: [Conversation] {
@@ -30,7 +30,7 @@ final class ChatViewModel {
         case .all: return conversations
         case .unread: return conversations.filter { $0.unreadCount > 0 }
         case .favorite: return conversations.filter { conversation in
-            conversation.participantIDs.contains { $0 != currentUserID && savedUserIds.contains($0) }
+            conversation.participantIDs.contains { $0 != currentUserID && savedUserIDs.contains($0) }
         }
         }
     }
@@ -58,24 +58,24 @@ final class ChatViewModel {
 
     /// Navigates to an existing conversation or creates a local draft if none exists yet.
     /// Nothing is written to Firestore until the first message is sent.
-    func startConversation(with user: User, currentUserId: String) async {
+    func startConversation(with user: User, currentUserID: String) async {
         isLoading = true
         errorMessage = nil
         do {
             if let existing = try await chatRepository.fetchConversationIfExists(
-                between: currentUserId,
+                between: currentUserID,
                 and: user.id
             ) {
-                
+
                 activeConversation = existing
                 participants[user.id] = user
                 isActiveConversationNew = false
             } else {
                 /// Build a local draft with the deterministic ID — no Firestore write yet.
-                let conversationID = [currentUserId, user.id].sorted().joined(separator: "_")
+                let conversationID = [currentUserID, user.id].sorted().joined(separator: "_")
                 let draft = Conversation(
                     id: conversationID,
-                    participantIDs: [currentUserId, user.id],
+                    participantIDs: [currentUserID, user.id],
                     lastMessage: "",
                     lastMessageTimestamp: Date(),
                     unreadCount: 0
@@ -147,7 +147,7 @@ final class ChatViewModel {
         await withTaskGroup(of: (String, User)?.self) { group in
             for id in otherIDs {
                 group.addTask {
-                    guard let user = try? await self.profileRepository.fetchUser(userId: id)
+                    guard let user = try? await self.profileRepository.fetchUser(userID: id)
                     else { return nil }
                     return (id, user)
                 }
@@ -160,9 +160,9 @@ final class ChatViewModel {
         }
     }
     
-    func loadFavorites(for userId: String) async {
+    func loadFavorites(for userID: String) async {
         do {
-            savedUserIds = try await meetRepository.fetchSavedProfileIds(for: userId)
+            savedUserIDs = try await meetRepository.fetchSavedProfileIds(for: userID)
         } catch {
             errorMessage = error.localizedDescription
         }

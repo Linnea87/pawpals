@@ -103,7 +103,7 @@ final class MeetService: MeetRepository {
 
              var users: [User] = []
              for doc in snapshot.documents {
-                 if let user = try? await profileRepository.fetchUser(userId: doc.documentID) {
+                 if let user = try? await profileRepository.fetchUser(userID: doc.documentID) {
                      users.append(user)
                  }
              }

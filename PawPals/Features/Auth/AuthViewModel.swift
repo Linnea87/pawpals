@@ -10,11 +10,11 @@ final class AuthViewModel {
     var activeOption: AuthOption = .signIn
 
     private let repository: AuthRepository
-    private let userRepository: ProfileRepository
+    private let profileRepository: ProfileRepository
 
-    init(repository: AuthRepository, userRepository: ProfileRepository) {
+    init(repository: AuthRepository, profileRepository: ProfileRepository) {
         self.repository = repository
-        self.userRepository = userRepository
+        self.profileRepository = profileRepository
     }
 
     func signUp(name: String, email: String, password: String) async {
@@ -109,7 +109,7 @@ final class AuthViewModel {
         defer { isLoading = false }
         guard let userID = currentUser?.id else { return }
         do {
-            try await userRepository.deleteUserData(userID: userID)
+            try await profileRepository.deleteUserData(userID: userID)
             try await repository.deleteAccount()
             currentUser = nil
         } catch let error as AuthError {

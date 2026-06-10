@@ -11,10 +11,10 @@ final class NotificationService: NSObject {
     var pendingConversationID: String?
     var pushNotificationToken: String?
 
-    private let userRepository: ProfileRepository
+    private let profileRepository: ProfileRepository
 
-    init(userRepository: ProfileRepository) {
-        self.userRepository = userRepository
+    init(profileRepository: ProfileRepository) {
+        self.profileRepository = profileRepository
         super.init()
         UNUserNotificationCenter.current().delegate = self
         Messaging.messaging().delegate = self
@@ -37,7 +37,7 @@ final class NotificationService: NSObject {
     /// Saves the push notification token to Firestore via the repository.
     func savePushNotificationToken(_ token: String, for userID: String) async {
         do {
-            try await userRepository.savePushNotificationToken(
+            try await profileRepository.savePushNotificationToken(
                 token,
                 userID: userID
             )

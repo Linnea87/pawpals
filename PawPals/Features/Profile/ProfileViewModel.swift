@@ -37,7 +37,7 @@ final class ProfileViewModel {
         user.preferences.walkTypes = walkTypes
         do {
             try await profileRepository.updateProfile(user)
-            try await profileRepository.savePreferences(user.preferences, userId: user.id)
+            try await profileRepository.savePreferences(user.preferences, userID: user.id)
         } catch {
             errorMessage = error.localizedDescription
         }
@@ -48,7 +48,7 @@ final class ProfileViewModel {
         isLoading = true
         errorMessage = nil
         do {
-            try await profileRepository.saveDog(dog, userId: user.id)
+            try await profileRepository.saveDog(dog, userID: user.id)
             user.dogs.append(dog)
         } catch {
             errorMessage = error.localizedDescription
@@ -60,8 +60,8 @@ final class ProfileViewModel {
         isLoading = true
         errorMessage = nil
         do {
-            try await profileRepository.removeDog(dogId: dogId, userId: user.id)
-            user.dogs.removeAll { $0.id == dogId }
+            try await profileRepository.removeDog(dogID: dogID, userID: user.id)
+            user.dogs.removeAll { $0.id == dogID }
         } catch {
             errorMessage = error.localizedDescription
         }
@@ -90,8 +90,8 @@ final class ProfileViewModel {
         user.preferences.walkTypes = walkTypes
         do {
             try await profileRepository.updateProfile(user)
-            try await profileRepository.saveDog(dog, userId: user.id)
-            try await profileRepository.savePreferences(user.preferences, userId: user.id)
+            try await profileRepository.saveDog(dog, userID: user.id)
+            try await profileRepository.savePreferences(user.preferences, userID: user.id)
         } catch {
             errorMessage = error.localizedDescription
         }
@@ -102,7 +102,7 @@ final class ProfileViewModel {
         isLoading = true
         errorMessage = nil
         do {
-            user.preferences = try await profileRepository.loadPreferences(userId: user.id)
+            user.preferences = try await profileRepository.loadPreferences(userID: user.id)
         } catch {
             errorMessage = error.localizedDescription
         }
@@ -113,7 +113,7 @@ final class ProfileViewModel {
         isLoading = true
         errorMessage = nil
         do {
-            try await profileRepository.savePreferences(user.preferences, userId: user.id)
+            try await profileRepository.savePreferences(user.preferences, userID: user.id)
         } catch {
             errorMessage = error.localizedDescription
         }
@@ -129,7 +129,7 @@ final class ProfileViewModel {
                 UIImage(data: data)?.jpegData(compressionQuality: 0.8)
             }
             guard let jpegData else { return }
-            let url = try await profileRepository.uploadProfilePhoto(jpegData, userId: user.id)
+            let url = try await profileRepository.uploadProfilePhoto(jpegData, userID: user.id)
             user.photoURL = url
             try await profileRepository.updateProfile(user)
         } catch {
@@ -141,8 +141,8 @@ final class ProfileViewModel {
         isLoading = true
         errorMessage = nil
         do {
-            user = try await profileRepository.fetchUser(userId: userId)
-            user.preferences = try await profileRepository.loadPreferences(userId: userId)
+            user = try await profileRepository.fetchUser(userID: userID)
+            user.preferences = try await profileRepository.loadPreferences(userID: userID)
         } catch {
             errorMessage = error.localizedDescription
         }

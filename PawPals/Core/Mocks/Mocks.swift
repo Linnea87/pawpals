@@ -119,25 +119,32 @@ struct MockAuthRepository: AuthRepository {
 
 // =========== MockProfileRepository =============================
 
+  struct MockProfileRepository: ProfileRepository {
+      func updateProfile(_ user: User) async throws {}
+      func saveDog(_ dog: Dog, userID: String) async throws {}
+      func removeDog(dogID: String, userID: String) async throws {}
+      func fetchUser(userID: String) async throws -> User { .mock }
+      func savePreferences(_ prefs: UserPreferences, userID: String) async throws {}
+      func loadPreferences(userID: String) async throws -> UserPreferences {
+          UserPreferences(walkTypes: [], dogSize: .medium, searchRadius: 10.0)
+      }
+      func savePushNotificationToken(_ token: String, userID: String) async throws {}
+      func deleteUserData(userID: String) async throws {}
+      func uploadProfilePhoto(_ data: Data, userID: String) async throws -> String { "" }
+  }
 
-struct MockUserRepository: UserRepository {
-    func updateProfile(_ user: User) async throws {}
-    func saveDog(_ dog: Dog, userId: String) async throws {}
-    func removeDog(dogId: String, userId: String) async throws {}
-    func fetchNearbyUsers(location: GeoPoint, radius: Double, excludingUserID: String) async throws -> [User] { [] }
-    func updateLocation(_ location: GeoPoint, userId: String) async throws {}
-    func savePreferences(_ prefs: UserPreferences, userId: String) async throws {}
-    func loadPreferences(userId: String) async throws -> UserPreferences {
-        UserPreferences(walkTypes: [], dogSize: .medium, searchRadius: 10.0)
-    }
-    func savePushNotificationToken(_ token: String, userID: String) async throws {}
-    func deleteUserData(userId: String) async throws {}
-    func saveProfile(_ targetId: String, by userId: String) async throws {}
-    func unsaveProfile(_ targetId: String, by userId: String) async throws {}
-    func fetchSavedProfiles(for userId: String) async throws -> [User] { [] }
-    func uploadProfilePhoto(_ data: Data, userId: String) async throws -> String { "" }
-    func fetchUser(userId: String) async throws -> User { .mock }
-}
+  // =========== MockMeetRepository =============================
+
+  struct MockMeetRepository: MeetRepository {
+      func fetchNearbyUsers(location: GeoPoint, radius: Double, excludingUserID: String) async
+  throws -> [User] { [] }
+      func updateLocation(_ location: GeoPoint, userID: String) async throws {}
+      func saveProfile(_ targetID: String, by userID: String) async throws {}
+      func unsaveProfile(_ targetID: String, by userID: String) async throws {}
+      func fetchSavedProfiles(for userID: String) async throws -> [User] { [] }
+      func fetchSavedProfileIds(for userID: String) async throws -> Set<String> { [] }
+  }
+
 
 // =========== MockChatRepository =============================
 
@@ -147,10 +154,10 @@ struct MockChatRepository: ChatRepository {
         onUpdate: @escaping ([Conversation]) -> Void
     ) -> (() -> Void) { return {} }
 
-    func createOrFetchConversation(between userId1: String, and userId2: String) async throws -> Conversation {
+    func createOrFetchConversation(between userID1: String, and userID2: String) async throws -> Conversation {
         Conversation(
             id: "mock-conv",
-            participantIDs: [userId1, userId2],
+            participantIDs: [userID1, userID2],
             lastMessage: "",
             lastMessageTimestamp: Date()
         )

@@ -207,11 +207,11 @@ struct AddProfileSheet: View {
             .environment(
                 AuthViewModel(
                     repository: MockAuthRepository(),
-                    userRepository:MockProfileRepository()
+                    profileRepository: MockProfileRepository()
                 )
             )
     }
-    
+
     #Preview("Edit") {
         NavigationStack { AddProfileSheet(user: .mock) }
             .environment(
@@ -223,7 +223,7 @@ struct AddProfileSheet: View {
             .environment(
                 AuthViewModel(
                     repository: MockAuthRepository(),
-                    userRepository: MockProfileRepository()
+                    profileRepository: MockProfileRepository()
                 )
             )
     }

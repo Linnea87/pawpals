@@ -90,7 +90,7 @@ final class ConversationViewModel {
             conversation.participantIDs.first { $0 != senderID } ?? ""
 
         do {
-            let url = try await chatRepository.uploadImage(image, conversationID: conversation.id)
+            let url = try await conversationRepository.uploadImage(image, conversationID: conversation.id)
 
             let message = Message(
                 id: UUID().uuidString,

@@ -115,7 +115,8 @@ struct ProfileView: View {
                                 .listRowBackground(Theme.offWhite.opacity(0.6))
                             }
                         } header: {
-                            SectionHeader(title: displayUser.dogs.count == 1 ? "profile.dog" : "profile.dogs")                        }
+                            SectionHeader(title: displayUser.dogs.count == 1 ? "profile.dog" : "profile.dogs")
+                        }
                     }
 
                     if isOwner && !meetViewModel.savedUsers.isEmpty {
@@ -350,7 +351,7 @@ struct ProfileView: View {
         .environment(
             AuthViewModel(
                 repository: MockAuthRepository(),
-                userRepository: MockProfileRepository()
+                profileRepository: MockProfileRepository()
             )
         )
         .environment(
@@ -377,7 +378,7 @@ struct ProfileView: View {
     .environment(
         AuthViewModel(
             repository: MockAuthRepository(),
-            userRepository: MockProfileRepository()
+            profileRepository: MockProfileRepository()
         )
     )
     .environment(

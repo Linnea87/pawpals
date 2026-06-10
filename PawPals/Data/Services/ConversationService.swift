@@ -91,7 +91,7 @@ final class ConversationService: ConversationRepository {
         try await batch.commit()
     }
 
-    func uploadImage(_ image: UIImage, conversationId: String) async throws -> URL {
+    func uploadImage(_ image: UIImage, conversationID: String) async throws -> URL {
         guard let imageData = image.jpegData(compressionQuality: 0.7) else {
             throw URLError(.badServerResponse)
         }
@@ -101,7 +101,7 @@ final class ConversationService: ConversationRepository {
 
         let storageRef = Storage.storage()
             .reference()
-            .child("conversations/\(conversationId)/\(UUID().uuidString).jpg")
+            .child("conversations/\(conversationID)/\(UUID().uuidString).jpg")
 
         _ = try await storageRef.putDataAsync(imageData)
         return try await storageRef.downloadURL()
