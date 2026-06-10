@@ -56,7 +56,7 @@ final class ProfileViewModel {
         isLoading = false
     }
     
-    func removeDog(_ dogId: String) async {
+    func removeDog(_ dogID: String) async {
         isLoading = true
         errorMessage = nil
         do {
@@ -137,7 +137,7 @@ final class ProfileViewModel {
         }
     }
 
-    func loadUser(userId: String) async {
+    func loadUser(userID: String) async {
         isLoading = true
         errorMessage = nil
         do {

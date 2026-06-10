@@ -17,5 +17,5 @@ protocol ConversationRepository {
     /// Marks all undelivered messages as delivered — triggers the second checkmark.
     func markAsDelivered(conversationID: String, userID: String) async throws
 
-    func uploadImage(_ image: UIImage, conversationId: String) async throws -> URL
+    func uploadImage(_ image: UIImage, conversationID: String) async throws -> URL
 }

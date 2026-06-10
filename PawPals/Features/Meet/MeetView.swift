@@ -83,7 +83,7 @@ struct MeetView: View {
                         ScrollView {
                             LazyVStack(spacing: Spacing.medium) {
                                 ForEach(filterViewModel.applyFilters(to: vm.allNearbyUsers)) { user in
-                                    MeetCardView(user: user, isSaved: vm.savedUserIds.contains(user.id))
+                                    MeetCardView(user: user, isSaved: vm.savedUserIDs.contains(user.id))
                                         .onTapGesture { vm.selectedUser = user }
                                 }
                             }

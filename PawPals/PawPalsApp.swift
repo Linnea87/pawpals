@@ -42,7 +42,7 @@ struct PawPalsApp: App {
                 .onChange(of: authViewModel.currentUser?.id) { _, _ in
                      if let user = authViewModel.currentUser {
                          profileViewModel.user = user
-                         Task { await profileViewModel.loadUser(userId: user.id) }
+                         Task { await profileViewModel.loadUser(userID: user.id) }
                      } else {
                          profileViewModel.user = .mock
                      }

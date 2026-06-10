@@ -83,7 +83,7 @@ final class MeetViewModel {
     }
 
     func loadSavedProfiles() async {
-        guard let userId = Auth.auth().currentUser?.uid else { return }
+        guard let userID = Auth.auth().currentUser?.uid else { return }
         do {
             let users = try await meetRepository.fetchSavedProfiles(for: userId)
             savedUsers = users
@@ -93,8 +93,8 @@ final class MeetViewModel {
         }
     }
 
-    func toggleSave(targetId: String) async {
-        guard let userId = Auth.auth().currentUser?.uid else { return }
+    func toggleSave(targetID: String) async {
+        guard let userID = Auth.auth().currentUser?.uid else { return }
         do {
             if savedUserIds.contains(targetId) {
                 try await meetRepository.unsaveProfile(targetId, by: userId)

@@ -26,30 +26,30 @@ final class ProfileService: ProfileRepository {
         )
     }
 
-    func saveDog(_ dog: Dog, userId: String) async throws {
+    func saveDog(_ dog: Dog, userID: String) async throws {
         try db.collection("users")
-            .document(userId)
+            .document(userID)
             .collection("dogs")
             .document(dog.id)
             .setData(from: dog)
     }
 
-    func removeDog(dogId: String, userId: String) async throws {
+    func removeDog(dogID: String, userID: String) async throws {
         try await db.collection("users")
-            .document(userId)
+            .document(userID)
             .collection("dogs")
-            .document(dogId)
+            .document(dogID)
             .delete()
     }
     
     
-    func fetchUser(userId: String) async throws -> User {
-        let doc = try await db.collection("users").document(userId)
+    func fetchUser(userID: String) async throws -> User {
+        let doc = try await db.collection("users").document(userID)
             .getDocument()
         guard let data = doc.data() else { throw ProfileServiceError.notFound }
 
         let dogsSnapshot = try await db.collection("users")
-            .document(userId)
+            .document(userID)
             .collection("dogs")
             .getDocuments()
         let dogs = dogsSnapshot.documents.compactMap {
@@ -57,7 +57,7 @@ final class ProfileService: ProfileRepository {
         }
 
         return User(
-            id: userId,
+            id: userID,
             name: data["name"] as? String ?? "",
             photoURL: data["photoURL"] as? String,
             bio: data["bio"] as? String ?? "",
@@ -75,7 +75,7 @@ final class ProfileService: ProfileRepository {
     }
 
     
-    func savePreferences(_ prefs: UserPreferences, userId: String) async throws
+    func savePreferences(_ prefs: UserPreferences, userID: String) async throws
     {
         let data: [String: Any] = [
             "preferences": [
@@ -84,14 +84,14 @@ final class ProfileService: ProfileRepository {
                 "searchRadius": prefs.searchRadius,
             ]
         ]
-        try await db.collection("users").document(userId).setData(
+        try await db.collection("users").document(userID).setData(
             data,
             merge: true
         )
     }
 
-    func loadPreferences(userId: String) async throws -> UserPreferences {
-        let doc = try await db.collection("users").document(userId)
+    func loadPreferences(userID: String) async throws -> UserPreferences {
+        let doc = try await db.collection("users").document(userID)
             .getDocument()
         guard let data = doc.data(),
             let prefsData = data["preferences"] as? [String: Any]
@@ -122,18 +122,18 @@ final class ProfileService: ProfileRepository {
             .setData(["pushNotificationToken": token], merge: true)
     }
 
-    func deleteUserData(userId: String) async throws {
+    func deleteUserData(userID: String) async throws {
         let batch = db.batch()
-        let dogsSnapshot = try await db.collection("users").document(userId)
+        let dogsSnapshot = try await db.collection("users").document(userID)
             .collection("dogs").getDocuments()
         for doc in dogsSnapshot.documents {
             batch.deleteDocument(doc.reference)
         }
-        batch.deleteDocument(db.collection("users").document(userId))
+        batch.deleteDocument(db.collection("users").document(userID))
         try await batch.commit()
 
         let conversationsSnapshot = try await db.collection("conversations")
-            .whereField("participantIDs", arrayContains: userId)
+            .whereField("participantIDs", arrayContains: userID)
             .getDocuments()
         for conversationDoc in conversationsSnapshot.documents {
             let messagesSnapshot = try await conversationDoc.reference
@@ -147,10 +147,10 @@ final class ProfileService: ProfileRepository {
         }
     }
 
-    func uploadProfilePhoto(_ data: Data, userId: String) async throws -> String
+    func uploadProfilePhoto(_ data: Data, userID: String) async throws -> String
     {
         let ref = Storage.storage().reference().child(
-            "profile_photos/\(userId).jpg"
+            "profile_photos/\(userID).jpg"
         )
         let metadata = StorageMetadata()
         metadata.contentType = "image/jpeg"
