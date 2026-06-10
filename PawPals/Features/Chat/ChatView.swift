@@ -123,7 +123,7 @@ struct ChatView: View {
 }
 
 private func makePreviewChatViewModel() -> ChatViewModel {
-    let viewModel = ChatViewModel(chatRepository: MockChatRepository(), userRepository: MockUserRepository())
+    let viewModel = ChatViewModel(chatRepository: MockChatRepository(), userRepository: MockProfileRepository())
     viewModel.conversations = [
         Conversation(
             id: "1",

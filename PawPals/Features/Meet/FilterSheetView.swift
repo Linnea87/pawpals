@@ -196,12 +196,12 @@ struct FilterSheetView: View {
 }
 
 #Preview {
-    let vm = MeetViewModel(userRepository: MockUserRepository(), locationService: LocationService())
+    let vm = MeetViewModel(meetRepository: MockMeetRepository(), locationService: LocationService())
     vm.currentUserLocation = CLLocationCoordinate2D(latitude: 59.3293, longitude: 18.0686)
     vm.allNearbyUsers = User.mockUsers
 
     return FilterSheetView()
         .environment(vm)
         .environment(FilterViewModel())
-        .environment(AuthViewModel(repository: AuthService(), userRepository: UserService()))
+        .environment(AuthViewModel(repository: AuthService(), userRepository: ProfileService()))
 }
