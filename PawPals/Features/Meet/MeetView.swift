@@ -110,7 +110,7 @@ struct MeetView: View {
             }
             
             .sheet(item: $vm.selectedUser) { user in
-                ProfileView(user: user, isOwner: false, selectedTab: $selectedTab)
+                ProfileView(user: user, isOwner: false, cameFromMeet: true, selectedTab: $selectedTab)
                     .environment(viewModel)
             }
             .sheet(isPresented: $showFilterSheet) {

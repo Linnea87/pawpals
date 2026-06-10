@@ -1,4 +1,5 @@
 import Foundation
+import SwiftUI
 
 /// Available in all builds — referenced as a nil-fallback in production views.
 extension User {
@@ -227,6 +228,34 @@ struct MockConversationRepository: ConversationRepository {
     func markAsDelivered(conversationID: String, userID: String) async throws {}
     func uploadImage(_ image: UIImage, conversationID: String) async throws -> URL {
         URL(string: "https://mock-image-url.com/image.jpg")!
+    }
+}
+
+// =========== Preview Environments =============================
+
+extension View {
+    func profilePreviewEnvironments() -> some View {
+        self
+            .environment(
+                ChatViewModel(
+                    chatRepository: MockChatRepository(),
+                    profileRepository: MockProfileRepository(),
+                    meetRepository: MockMeetRepository()
+                )
+            )
+            .environment(
+                AuthViewModel(
+                    repository: MockAuthRepository(),
+                    profileRepository: MockProfileRepository()
+                )
+            )
+            .environment(
+                ProfileViewModel(
+                    profileRepository: MockProfileRepository(),
+                    user: .mock
+                )
+            )
+            .environment(MeetViewModel(locationViewModel: LocationViewModel()))
     }
 }
 #endif

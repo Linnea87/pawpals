@@ -127,6 +127,7 @@ struct ConversationView: View {
                 ProfileView(
                     user: user,
                     isOwner: false,
+                    cameFromMeet: false,
                     selectedTab: .constant(.chat)
                 )
             }
