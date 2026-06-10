@@ -11,16 +11,14 @@ final class MeetViewModel {
     var activeFilters: Set<String> = []
     var activeSizeFilters: Set<String> = []
     var isLoading = false
-    
+
     var errorMessage: String? = nil
-   
-    
+
     var searchRadius: Double = 5.0
     var savedUserIds: Set<String> = []
 
     private let userRepository: UserRepository
     private let locationViewModel: LocationViewModel
-    
 
     init(
         userRepository: UserRepository = UserService(),
@@ -34,15 +32,11 @@ final class MeetViewModel {
         guard let userID = Auth.auth().currentUser?.uid else { return }
 
         do {
-            try await locationViewModel.startLocating()
-            
-            guard let currentLocation = locationViewModel.currentUserLocation else {
-                return
-            }
+            let coordinate = try await locationViewModel.startLocating()
             /// Convert CLLocation to GeoPoint — the repository layer speaks GeoPoint, not CLLocation
             let geoPoint = GeoPoint(
-                latitude: currentLocation.latitude,
-                longitude: currentLocation.longitude
+                latitude: coordinate.latitude,
+                longitude: coordinate.longitude
             )
             /// Persist the user's current location to Firestore so others can find them/
             try await userRepository.updateLocation(geoPoint, userId: userID)
@@ -57,13 +51,15 @@ final class MeetViewModel {
     }
 
     func loadNearbyUsers() async {
-        guard let currentLocation = locationViewModel.currentUserLocation else { return }
+        guard let currentLocation = locationViewModel.currentUserLocation else {
+            return
+        }
         isLoading = true
         errorMessage = nil
         defer { isLoading = false }
 
         do {
-            
+
             let geoPoint = GeoPoint(
                 latitude: currentLocation.latitude,
                 longitude: currentLocation.longitude

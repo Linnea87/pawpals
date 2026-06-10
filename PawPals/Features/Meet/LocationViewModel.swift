@@ -12,7 +12,7 @@ final class LocationViewModel {
         self.locationService = locationService
     }
 
-    func startLocating() async throws {
+    func startLocating() async throws -> CLLocationCoordinate2D {
         isLocating = true
         defer { isLocating = false }
 
@@ -23,7 +23,7 @@ final class LocationViewModel {
 
             currentUserLocation = location.coordinate
             locationStatus = .authorizedWhenInUse
-
+            return location.coordinate
         } catch LocationError.permissionDenied {
             /// User denied location access — update status so the View can show the correct UI
             locationStatus = .denied
