@@ -11,39 +11,38 @@ final class MeetViewModel {
     var activeFilters: Set<String> = []
     var activeSizeFilters: Set<String> = []
     var isLoading = false
-    var isLocating = false
+    
     var errorMessage: String? = nil
-    var locationStatus: CLAuthorizationStatus = .notDetermined
-    var currentUserLocation: CLLocationCoordinate2D?
+   
+    
     var searchRadius: Double = 5.0
     var savedUserIds: Set<String> = []
 
     private let userRepository: UserRepository
-    private let locationService: LocationService
+    private let locationViewModel: LocationViewModel
+    
 
     init(
         userRepository: UserRepository = UserService(),
-        locationService: LocationService
+        locationViewModel: LocationViewModel
     ) {
         self.userRepository = userRepository
-        self.locationService = locationService
+        self.locationViewModel = locationViewModel
     }
 
     func loadWithLocation() async {
         guard let userID = Auth.auth().currentUser?.uid else { return }
-        isLocating = true
-        defer { isLocating = false }
 
         do {
-            /// Request a single real GPS location using the modern iOS 17 AsyncSequence API
-            let location = try await locationService.requestLocationOnce()
-            currentUserLocation = location.coordinate
-            locationStatus = .authorizedWhenInUse
-
+            try await locationViewModel.startLocating()
+            
+            guard let currentLocation = locationViewModel.currentUserLocation else {
+                return
+            }
             /// Convert CLLocation to GeoPoint — the repository layer speaks GeoPoint, not CLLocation
             let geoPoint = GeoPoint(
-                latitude: location.coordinate.latitude,
-                longitude: location.coordinate.longitude
+                latitude: currentLocation.latitude,
+                longitude: currentLocation.longitude
             )
             /// Persist the user's current location to Firestore so others can find them/
             try await userRepository.updateLocation(geoPoint, userId: userID)
@@ -51,15 +50,14 @@ final class MeetViewModel {
             await loadNearbyUsers()
 
         } catch LocationError.permissionDenied {
-            /// User denied location access — update status so the View can show the correct UI
-            locationStatus = .denied
+            // locationViewModel already set locationStatus = .denied; MeetView shows the settings message
         } catch {
             errorMessage = error.localizedDescription
         }
     }
 
     func loadNearbyUsers() async {
-        guard let currentLocation = currentUserLocation else { return }
+        guard let currentLocation = locationViewModel.currentUserLocation else { return }
         isLoading = true
         errorMessage = nil
         defer { isLoading = false }
