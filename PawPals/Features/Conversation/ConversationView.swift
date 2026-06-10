@@ -99,7 +99,7 @@ struct ConversationView: View {
                             photoURL: otherUser.photoURL,
                             size: IconSize.messageAvatar,
                             iconSize:
-                                IconSize.avatarIcon
+                                IconSize.avatarIconSmall
                         )
 
                         Text(otherUser.name)

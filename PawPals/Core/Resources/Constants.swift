@@ -34,6 +34,7 @@ enum FontSize {
 }
 
 enum IconSize {
+    static let avatarIconSmall: CGFloat = 16
     static let tabBarIcon: CGFloat = 22
     static let avatarIcon: CGFloat = 30
     static let messageAvatar: CGFloat = 32
