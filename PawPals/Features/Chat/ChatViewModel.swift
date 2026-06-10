@@ -28,7 +28,9 @@ final class ChatViewModel {
     var filteredConversations: [Conversation] {
         switch selectedFilter {
         case .all: return conversations
-        case .unread: return conversations.filter { $0.unreadCount > 0 }
+        case .unread: return conversations.filter {
+                $0.unreadCounts[currentUserID, default: 0] > 0
+            }
         case .favorite: return conversations.filter { conversation in
             conversation.participantIDs.contains { $0 != currentUserID && savedUserIDs.contains($0) }
         }
@@ -40,7 +42,7 @@ final class ChatViewModel {
 
     /// Sum of unread counts across all conversations — drives the tab bar badge.
     var totalUnread: Int {
-        conversations.reduce(0) { $0 + $1.unreadCount }
+        conversations.reduce(0) { $0 + ($1.unreadCounts[currentUserID] ?? 0) }
     }
 
     private let chatRepository: ChatRepository
@@ -77,8 +79,7 @@ final class ChatViewModel {
                     id: conversationID,
                     participantIDs: [currentUserID, user.id],
                     lastMessage: "",
-                    lastMessageTimestamp: Date(),
-                    unreadCount: 0
+                    lastMessageTimestamp: Date()
                 )
                 activeConversation = draft
                 participants[user.id] = user

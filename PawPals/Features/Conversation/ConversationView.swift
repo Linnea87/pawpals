@@ -139,6 +139,7 @@ struct ConversationView: View {
                 currentUserID: currentUserID
             )
             Task {
+                guard !conversationViewModel.isNew else { return }
                 await conversationViewModel.markAsRead(
                     conversationID: conversation.id,
                     userID: currentUserID

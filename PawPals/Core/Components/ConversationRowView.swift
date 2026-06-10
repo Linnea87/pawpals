@@ -6,6 +6,7 @@ struct ConversationRowView: View {
     let conversation: Conversation
     let timestampText: String
     let otherUser: User?
+    let unreadCount: Int
 
     var body: some View {
         HStack(spacing: Spacing.medium) {
@@ -29,8 +30,8 @@ struct ConversationRowView: View {
                     .font(.caption)
                     .foregroundStyle(Theme.warmBrown)
                 
-                if conversation.unreadCount > 0 {
-                    Text("\(conversation.unreadCount)")
+                if unreadCount > 0 {
+                    Text("\(unreadCount)")
                         .font(.caption)
                         .fontWeight(.semibold)
                         .foregroundStyle(.white)
@@ -50,8 +51,7 @@ struct ConversationRowView: View {
         participantIDs: ["Anna", "Patrik"],
         lastMessage: "Hey, want to go for a walk?",
         lastMessageTimestamp: Date(),
-        unreadCount: 2
+        unreadCounts: ["Patrik": 2]
     )
-    ConversationRowView(conversation: mockConversation, timestampText: "Today", otherUser: nil)
-        .padding()
+    ConversationRowView(conversation: mockConversation, timestampText: "Today", otherUser: nil, unreadCount: 2)
 }

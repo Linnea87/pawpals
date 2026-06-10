@@ -20,8 +20,7 @@ final class ChatService: ChatRepository {
             id: conversationID,
             participantIDs: [userID1, userID2],
             lastMessage: "",
-            lastMessageTimestamp: Date(),
-            unreadCount: 0
+            lastMessageTimestamp: Date()
         )
         try ref.setData(from: conversation)
         return conversation
