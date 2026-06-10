@@ -99,7 +99,7 @@ struct ConversationView: View {
                             photoURL: otherUser.photoURL,
                             size: IconSize.messageAvatar,
                             iconSize:
-                                IconSize.avatarIcon
+                                IconSize.avatarIconSmall
                         )
 
                         Text(otherUser.name)
@@ -127,6 +127,7 @@ struct ConversationView: View {
                 ProfileView(
                     user: user,
                     isOwner: false,
+                    cameFromMeet: false,
                     selectedTab: .constant(.chat)
                 )
             }

@@ -15,7 +15,7 @@ struct AppNavigationView: View {
                 switch selectedTab {
                 case .profile:
                     if let user = authVM.currentUser {
-                        ProfileView(user: user, isOwner: true, selectedTab: $selectedTab)
+                        ProfileView(user: user, isOwner: true, cameFromMeet: false, selectedTab: $selectedTab)
                     }
                 case .chat:
                     ChatView(
