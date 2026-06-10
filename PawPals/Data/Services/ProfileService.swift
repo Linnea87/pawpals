@@ -158,4 +158,11 @@ final class ProfileService: ProfileRepository {
         let url = try await ref.downloadURL()
         return url.absoluteString
     }
+    
+    func updateCity(_ city: String, userID: String) async throws {
+        try await db.collection("users").document(userID).setData(
+            ["city": city],
+            merge: true
+        )
+    }
 }

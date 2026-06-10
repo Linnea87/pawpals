@@ -29,4 +29,6 @@ protocol ProfileRepository {
 
      /// Fetches a single user's data from Firestore by ID.
      func fetchUser(userID: String) async throws -> User
+    
+    func updateCity(_ city: String, userID: String) async throws 
 }
