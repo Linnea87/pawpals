@@ -19,7 +19,7 @@ protocol MeetRepository {
     func fetchSavedProfiles(for userID: String) async throws -> [User]
 
     /// Fetches the IDs of all profiles saved by a user.
-    func fetchSavedProfileIds(for userID: String) async throws -> Set<String>
+    func fetchSavedProfileIDs(for userID: String) async throws -> Set<String>
 }
 
 

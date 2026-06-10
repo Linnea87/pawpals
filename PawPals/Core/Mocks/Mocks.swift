@@ -142,7 +142,7 @@ struct MockAuthRepository: AuthRepository {
       func saveProfile(_ targetID: String, by userID: String) async throws {}
       func unsaveProfile(_ targetID: String, by userID: String) async throws {}
       func fetchSavedProfiles(for userID: String) async throws -> [User] { [] }
-      func fetchSavedProfileIds(for userID: String) async throws -> Set<String> { [] }
+      func fetchSavedProfileIDs(for userID: String) async throws -> Set<String> { [] }
   }
 
 
@@ -166,6 +166,8 @@ struct MockChatRepository: ChatRepository {
     func fetchConversationIfExists(between userID1: String, and userID2: String) async throws -> Conversation? {
         return nil
     }
+    
+    func fetchConnectedUserIDs(for userID: String) async throws -> Set<String> { [] }
 }
 
 // =========== MockConversationRepository =============================
