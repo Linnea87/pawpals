@@ -20,7 +20,7 @@ struct SavedProfilesSection: View {
                                 .foregroundStyle(Theme.warmBrown)
                         }
                     }
-                    .listRowBackground(Theme.offWhite.opacity(0.6))
+                    .listRowBackground(Theme.offWhite.opacity(Opacity.xSmall))
                 }
             } header: {
                 SectionHeader(title: "profile.savedProfiles")

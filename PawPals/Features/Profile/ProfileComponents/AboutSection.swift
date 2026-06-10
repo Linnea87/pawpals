@@ -8,7 +8,7 @@ struct AboutSection: View {
             Text(user.bio)
                 .font(.callout)
                 .foregroundStyle(Theme.darkBrown)
-                .listRowBackground(Theme.offWhite.opacity(0.6))
+                .listRowBackground(Theme.offWhite.opacity(Opacity.xSmall))
 
             if !user.preferences.walkTypes.isEmpty {
                 ScrollView(.horizontal, showsIndicators: false) {
@@ -18,7 +18,7 @@ struct AboutSection: View {
                         }
                     }
                 }
-                .listRowBackground(Theme.offWhite.opacity(0.6))
+                .listRowBackground(Theme.offWhite.opacity(Opacity.xSmall))
             }
         } header: {
             SectionHeader(title: "profile.aboutUs")
