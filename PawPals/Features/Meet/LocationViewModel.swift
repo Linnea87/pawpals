@@ -6,11 +6,11 @@ final class LocationViewModel {
     var currentUserLocation: CLLocationCoordinate2D?
     var isLocating = false
 
-    private let locationService: LocationService
+    private let locationRepository: LocationRepository
 
-    init(locationService: LocationService = LocationService()) {
-        self.locationService = locationService
-    }
+        init(locationRepository: LocationRepository = LocationService()) {
+            self.locationRepository = locationRepository
+        }
 
     func startLocating() async throws -> CLLocationCoordinate2D {
         isLocating = true
@@ -19,7 +19,7 @@ final class LocationViewModel {
         do {
 
             /// Request a single real GPS location using the modern iOS 17 AsyncSequence API
-            let location = try await locationService.requestLocationOnce()
+            let location = try await locationRepository.requestLocationOnce()
 
             currentUserLocation = location.coordinate
             locationStatus = .authorizedWhenInUse

@@ -2,7 +2,7 @@ import CoreLocation
 import Observation
 
 @Observable
-final class LocationService {
+final class LocationService: LocationRepository {
 
     var currentLocation: CLLocation?
         var authorizationStatus: CLAuthorizationStatus = .notDetermined
