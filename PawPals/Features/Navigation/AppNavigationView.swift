@@ -5,6 +5,8 @@ struct AppNavigationView: View {
     @Environment(AuthViewModel.self) private var authVM
     @Environment(ChatViewModel.self) private var chatViewModel
     @Environment(NotificationService.self) private var notificationService
+    @Environment(LocationViewModel.self) private var locationViewModel
+    @Environment(ProfileViewModel.self) private var profileViewModel
     @State private var selectedTab: Tab = .meet
 
     var body: some View {
@@ -29,16 +31,20 @@ struct AppNavigationView: View {
                 }
             }
         }
-        // Fires when the user taps a push notification.
-        // Passes the conversationID to ChatViewModel and switches to the chat tab.
+        
+        .onChange(of: locationViewModel.resolvedCity) { _, city in
+            if let city {
+                profileViewModel.user.city = city
+            }
+        }
         .onChange(of: notificationService.pendingConversationID) { _, conversationID in
             guard let conversationID else { return }
             chatViewModel.pendingConversationID = conversationID
             selectedTab = .chat
             notificationService.pendingConversationID = nil
         }
-        // Fires once after the user signs in.
-        // Requests notification permission and saves the token to Firestore.
+        /// Fires once after the user signs in.
+        /// Requests notification permission and saves the token to Firestore.
         .onChange(of: authVM.isAuthenticated) { _, isAuthenticated in
             guard isAuthenticated else { return }
             Task {

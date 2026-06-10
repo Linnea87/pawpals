@@ -131,6 +131,7 @@ struct MockAuthRepository: AuthRepository {
       func savePushNotificationToken(_ token: String, userID: String) async throws {}
       func deleteUserData(userID: String) async throws {}
       func uploadProfilePhoto(_ data: Data, userID: String) async throws -> String { "" }
+      func updateCity(_ city: String, userID: String) async throws {}
   }
 
   // =========== MockMeetRepository =============================
