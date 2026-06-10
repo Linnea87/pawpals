@@ -15,7 +15,7 @@ final class MeetViewModel {
     var errorMessage: String? = nil
 
     var searchRadius: Double = 5.0
-    var savedUserIds: Set<String> = []
+    var savedUserIDs: Set<String> = []
     var savedUsers: [User] = []
 
 
@@ -41,7 +41,7 @@ final class MeetViewModel {
                 longitude: coordinate.longitude
             )
             /// Persist the user's current location to Firestore so others can find them/
-            try await meetRepository.updateLocation(geoPoint, userId: userID)
+            try await meetRepository.updateLocation(geoPoint, userID: userID)
             /// Now we have a location, fetch users nearby
             await loadNearbyUsers()
 
@@ -80,9 +80,9 @@ final class MeetViewModel {
     func loadSavedProfiles() async {
         guard let userID = Auth.auth().currentUser?.uid else { return }
         do {
-            let users = try await meetRepository.fetchSavedProfiles(for: userId)
+            let users = try await meetRepository.fetchSavedProfiles(for: userID)
             savedUsers = users
-            savedUserIds = Set(users.map { $0.id })
+            savedUserIDs = Set(users.map { $0.id })
         } catch {
             errorMessage = error.localizedDescription
         }
@@ -91,12 +91,12 @@ final class MeetViewModel {
     func toggleSave(targetID: String) async {
         guard let userID = Auth.auth().currentUser?.uid else { return }
         do {
-            if savedUserIds.contains(targetId) {
-                try await meetRepository.unsaveProfile(targetId, by: userId)
-                savedUserIds.remove(targetId)
+            if savedUserIDs.contains(targetID) {
+                try await meetRepository.unsaveProfile(targetID, by: userID)
+                savedUserIDs.remove(targetID)
             } else {
-                try await meetRepository.saveProfile(targetId, by: userId)
-                savedUserIds.insert(targetId)
+                try await meetRepository.saveProfile(targetID, by: userID)
+                savedUserIDs.insert(targetID)
             }
         } catch {
             errorMessage = error.localizedDescription
