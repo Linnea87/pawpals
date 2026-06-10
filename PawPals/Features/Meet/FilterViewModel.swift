@@ -12,53 +12,53 @@ final class FilterViewModel {
         self.filterRepository = filterRepository
     }
 
-    func loadPreferences(userId: String) async {
-        guard let prefs = try? await filterRepository.fetchFilterPreferences(userId: userId) else { return }
+    func loadPreferences(userID: String) async {
+        guard let prefs = try? await filterRepository.fetchFilterPreferences(userID: userID) else { return }
         searchRadius = prefs.searchRadius
         activeFilters = prefs.activeFilters
         activeSizeFilters = prefs.activeSizeFilters
     }
 
-    func savePreferences(userId: String) {
+    func savePreferences(userID: String) {
         let prefs = FilterPreferences(
             searchRadius: searchRadius,
             activeFilters: activeFilters,
             activeSizeFilters: activeSizeFilters
         )
-        Task { try? await filterRepository.saveFilterPreferences(prefs, userId: userId) }
+        Task { try? await filterRepository.saveFilterPreferences(prefs, userID: userID) }
     }
 
-    func toggleFilter(_ filter: String, userId: String) {
+    func toggleFilter(_ filter: String, userID: String) {
         if activeFilters.contains(filter) {
             activeFilters.remove(filter)
         } else {
             activeFilters.insert(filter)
         }
-        savePreferences(userId: userId)
+        savePreferences(userID: userID)
     }
 
-    func clearFilters(userId: String) {
+    func clearFilters(userID: String) {
         activeFilters.removeAll()
-        savePreferences(userId: userId)
+        savePreferences(userID: userID)
     }
 
-    func toggleSizeFilter(_ size: String, userId: String) {
+    func toggleSizeFilter(_ size: String, userID: String) {
         if activeSizeFilters.contains(size) {
             activeSizeFilters.remove(size)
         } else {
             activeSizeFilters.insert(size)
         }
-        savePreferences(userId: userId)
+        savePreferences(userID: userID)
     }
 
-    func clearSizeFilters(userId: String) {
+    func clearSizeFilters(userID: String) {
         activeSizeFilters.removeAll()
-        savePreferences(userId: userId)
+        savePreferences(userID: userID)
     }
 
-    func setRadius(_ km: Double, userId: String) {
+    func setRadius(_ km: Double, userID: String) {
         searchRadius = km
-        savePreferences(userId: userId)
+        savePreferences(userID: userID)
     }
 
     func applyFilters(to users: [User]) -> [User] {

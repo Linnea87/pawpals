@@ -16,114 +16,80 @@ enum ChatFilter: CaseIterable {
 @Observable
 final class ChatViewModel {
     var conversations: [Conversation] = []
-    var messages: [Message] = []
-    var messageText: String = ""
     var isLoading: Bool = false
     var errorMessage: String?
     var activeConversation: Conversation?
     var pendingConversationID: String? /// Set when the user taps a push notification for a new message.
-    var isUploadingImage: Bool = false
+    var isActiveConversationNew: Bool = false /// True when activeConversation is a local draft not yet saved to Firestore.
     var selectedFilter: ChatFilter = .all
+    var savedUserIds: Set<String> = []
+    private(set) var currentUserID: String = ""
 
     var filteredConversations: [Conversation] {
         switch selectedFilter {
         case .all: return conversations
         case .unread: return conversations.filter { $0.unreadCount > 0 }
-        case .favorite: return []
+        case .favorite: return conversations.filter { conversation in
+            conversation.participantIDs.contains { $0 != currentUserID && savedUserIds.contains($0) }
+        }
         }
     }
 
     /// Cache of resolved User objects keyed by their Firestore user ID.
     var participants: [String: User] = [:]
 
+    /// Sum of unread counts across all conversations — drives the tab bar badge.
     var totalUnread: Int {
         conversations.reduce(0) { $0 + $1.unreadCount }
     }
 
     private let chatRepository: ChatRepository
-    private let userRepository: UserRepository
+    private let profileRepository: ProfileRepository
+    private let meetRepository: MeetRepository
 
 
-    private var stopObserving: (() -> Void)?
+    private var stopConversationsListener: (() -> Void)? /// Holds the Firestore cleanup closure
 
-
-    private var stopObservingConversations: (() -> Void)?
-
-    init(chatRepository: ChatRepository, userRepository: UserRepository) {
+    init(chatRepository: ChatRepository, profileRepository: ProfileRepository, meetRepository: MeetRepository) {
         self.chatRepository = chatRepository
-        self.userRepository = userRepository
+        self.profileRepository = profileRepository
+        self.meetRepository = meetRepository
     }
 
-    /// Creates or fetches a conversation with another user and navigates to it.
-    /// Also stores the other user in the participants cache immediately so the conversation header shows the correct name and photo.
+    /// Navigates to an existing conversation or creates a local draft if none exists yet.
+    /// Nothing is written to Firestore until the first message is sent.
     func startConversation(with user: User, currentUserId: String) async {
         isLoading = true
         errorMessage = nil
         do {
-            let conversation = try await chatRepository.createOrFetchConversation(
+            if let existing = try await chatRepository.fetchConversationIfExists(
                 between: currentUserId,
                 and: user.id
-            )
-            activeConversation = conversation
-            participants[user.id] = user
+            ) {
+                
+                activeConversation = existing
+                participants[user.id] = user
+                isActiveConversationNew = false
+            } else {
+                /// Build a local draft with the deterministic ID — no Firestore write yet.
+                let conversationID = [currentUserId, user.id].sorted().joined(separator: "_")
+                let draft = Conversation(
+                    id: conversationID,
+                    participantIDs: [currentUserId, user.id],
+                    lastMessage: "",
+                    lastMessageTimestamp: Date(),
+                    unreadCount: 0
+                )
+                activeConversation = draft
+                participants[user.id] = user
+                isActiveConversationNew = true
+            }
         } catch {
             errorMessage = error.localizedDescription
         }
         isLoading = false
     }
 
-    func markAsDelivered(conversationID: String, userID: String) async {
-        do {
-            try await chatRepository.markAsDelivered(
-                conversationID: conversationID,
-                userID: userID
-            )
-        } catch {
-            errorMessage = error.localizedDescription
-        }
-    }
-
-    /// Optimistically resets the unread badge in the local array before writing to Firestore.
-    /// If the Firestore write fails, the previous count is restored so the UI stays accurate.
-    func markAsRead(conversationID: String, userID: String) async {
-        guard let index = conversations.firstIndex(where: { $0.id == conversationID })
-        else { return }
-
-        let previous = conversations[index].unreadCount
-        conversations[index].unreadCount = 0
-
-        do {
-            try await chatRepository.markAsRead(
-                conversationID: conversationID,
-                userID: userID
-            )
-        } catch {
-            conversations[index].unreadCount = previous
-            errorMessage = error.localizedDescription
-        }
-    }
-
-    func sendMessage(in conversation: Conversation, senderID: String) async {
-        let receiverID = conversation.participantIDs.first { $0 != senderID } ?? ""
-        let trimmedMessage = messageText.trimmingCharacters(in: .whitespaces)
-        guard !trimmedMessage.isEmpty else { return }
-
-        let message = Message(
-            id: UUID().uuidString,
-            senderID: senderID,
-            receiverID: receiverID,
-            text: trimmedMessage,
-            timestamp: Date()
-        )
-
-        messageText = ""
-
-        do {
-            try await chatRepository.sendMessage(message, to: conversation.id)
-        } catch {
-            errorMessage = error.localizedDescription
-        }
-    }
 
     /// Looks up the other participant in the local participants cache.
     /// Returns nil if the user hasn't been fetched yet — callers fall back to .mock.
@@ -152,75 +118,28 @@ final class ChatViewModel {
         return formatter.string(from: date)
     }
 
-    /// Starts the Firestore listener for messages in a single conversation.
-    func observeMessages(conversationID: String, currentUserID: String) {
-        messages = []
-        isLoading = true
-        stopObserving = chatRepository.observeMessages(
-            conversationID: conversationID
-        ) { [weak self] updatedMessages in
-            guard let self else { return }
-            self.messages = updatedMessages
-            self.isLoading = false
-            Task {
-                await self.markAsDelivered(
-                    conversationID: conversationID,
-                    userID: currentUserID
-                )
-            }
-        }
-    }
+    
 
     /// Starts a real-time Firestore listener for the full conversations list.
     /// Each update also triggers a participant fetch so names and avatars stay current.
     func observeConversations(for userID: String) {
-        stopObservingConversations = chatRepository.observeConversations(for: userID) { [weak self] updated in
+        currentUserID = userID
+        stopConversationsListener = chatRepository.observeConversations(for: userID) { [weak self] updated in
             guard let self else { return }
             self.conversations = updated
-            Task { await self.fetchParticipants(for: updated, currentUserID: userID) }
+            Task { await self.loadParticipants(for: updated, currentUserID: userID) }
         }
     }
 
     /// Removes the conversations Firestore listener.
-    func stopListeningToConversations() {
-        stopObservingConversations?()
-        stopObservingConversations = nil
+    func stopObservingConversations() {
+        stopConversationsListener?()
+        stopConversationsListener = nil
     }
 
-    /// Removes the messages Firestore listener.
-    func stopListening() {
-        stopObserving?()
-        stopObserving = nil
-    }
-
-    func sendImage(_ image: UIImage, in conversation: Conversation, senderID: String) async {
-        isUploadingImage = true
-        errorMessage = nil
-
-        let receiverID = conversation.participantIDs.first { $0 != senderID } ?? ""
-
-        do {
-            let url = try await chatRepository.uploadImage(image, conversationId: conversation.id)
-
-            let message = Message(
-                id: UUID().uuidString,
-                senderID: senderID,
-                receiverID: receiverID,
-                text: "",
-                imageURL: url.absoluteString,
-                timestamp: Date()
-            )
-
-            try await chatRepository.sendMessage(message, to: conversation.id)
-        } catch {
-            errorMessage = error.localizedDescription
-        }
-
-        isUploadingImage = false
-    }
 
     /// Fetches Firestore user documents for all participants we don't have cached yet.
-    private func fetchParticipants(for conversations: [Conversation], currentUserID: String) async {
+    private func loadParticipants(for conversations: [Conversation], currentUserID: String) async {
         let otherIDs = Set(
             conversations.flatMap { $0.participantIDs.filter { $0 != currentUserID } }
         ).filter { participants[$0] == nil }
@@ -228,7 +147,7 @@ final class ChatViewModel {
         await withTaskGroup(of: (String, User)?.self) { group in
             for id in otherIDs {
                 group.addTask {
-                    guard let user = try? await self.userRepository.fetchUser(userId: id)
+                    guard let user = try? await self.profileRepository.fetchUser(userId: id)
                     else { return nil }
                     return (id, user)
                 }
@@ -240,4 +159,24 @@ final class ChatViewModel {
             }
         }
     }
+    
+    func loadFavorites(for userId: String) async {
+        do {
+            savedUserIds = try await meetRepository.fetchSavedProfileIds(for: userId)
+        } catch {
+            errorMessage = error.localizedDescription
+        }
+    }
+    
+    /// Creates the active conversation in Firestore.
+    /// Called by ConversationViewModel on the first message send for a new conversation.
+    func createActiveConversation() async throws {
+        guard let conversation = activeConversation else { return }
+        _ = try await chatRepository.createOrFetchConversation(
+            between: conversation.participantIDs[0],
+            and: conversation.participantIDs[1]
+        )
+        isActiveConversationNew = false
+    }
+    
 }

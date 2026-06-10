@@ -5,7 +5,8 @@ import SwiftUI
 struct ChatView: View {
     @Binding var selectedTab: Tab
     @Environment(ChatViewModel.self) private var chatViewModel
-    @State private var navigationPath = NavigationPath() /// Controls which conversation is currently pushed onto the navigation stack.
+    @State private var navigationPath = NavigationPath()
+    @State private var conversationViewModel = ConversationViewModel(conversationRepository: ConversationService())
     var currentUserID: String = ""
 
     
@@ -62,6 +63,7 @@ struct ChatView: View {
                     currentUserID: currentUserID,
                     otherUser: chatViewModel.otherUser(in: conversation, currentUserID: currentUserID) ?? .mock
                 )
+                .environment(conversationViewModel)
             }
             .safeAreaInset(edge: .bottom, spacing: Spacing.none) {
                 TabBarView(
@@ -80,9 +82,10 @@ struct ChatView: View {
         }
         .task {
             chatViewModel.observeConversations(for: currentUserID)
+            await chatViewModel.loadFavorites(for: currentUserID)
         }
         .onDisappear {
-            chatViewModel.stopListeningToConversations()
+            chatViewModel.stopObservingConversations()
         }
         /// Handles the case where the notification tap arrives while the app is already open.
         .onChange(of: chatViewModel.pendingConversationID) { _, _ in
@@ -97,22 +100,11 @@ struct ChatView: View {
     private var filterTabs: some View {
         HStack(spacing: Spacing.small) {
             ForEach(ChatFilter.allCases, id: \.self) { filter in
-                Button {
+                FilterChip(
+                    title: NSLocalizedString(filter.label, comment: ""),
+                    isSelected: chatViewModel.selectedFilter == filter
+                ) {
                     chatViewModel.selectedFilter = filter
-                } label: {
-                    Text(LocalizedStringKey(filter.label))
-                        .font(.subheadline)
-                        .fontWeight(.medium)
-                        .foregroundStyle(
-                            chatViewModel.selectedFilter == filter ? .white : Theme.darkBrown
-                        )
-                        .padding(.horizontal, Spacing.large)
-                        .padding(.vertical, Spacing.small)
-                        .background(
-                            chatViewModel.selectedFilter == filter
-                                ? Theme.sageGreen : Theme.offWhite
-                        )
-                        .clipShape(Capsule())
                 }
             }
         }
@@ -134,7 +126,7 @@ struct ChatView: View {
 }
 
 private func makePreviewChatViewModel() -> ChatViewModel {
-    let viewModel = ChatViewModel(chatRepository: MockChatRepository(), userRepository: MockUserRepository())
+    let viewModel = ChatViewModel(chatRepository: MockChatRepository(), profileRepository: MockProfileRepository(), meetRepository: MockMeetRepository())
     viewModel.conversations = [
         Conversation(
             id: "1",

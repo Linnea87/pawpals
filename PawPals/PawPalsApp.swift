@@ -19,13 +19,14 @@ struct PawPalsApp: App {
         if let clientID = FirebaseApp.app()?.options.clientID {
             GIDSignIn.sharedInstance.configuration = GIDConfiguration(clientID: clientID)
         }
+
         let locationViewModel = LocationViewModel()
         _locationViewModel = State(initialValue: locationViewModel)
         _meetViewModel = State(initialValue: MeetViewModel(locationViewModel: locationViewModel))
-        _authViewModel = State(initialValue: AuthViewModel(repository: AuthService(), userRepository: UserService()))
-        _chatViewModel = State(initialValue: ChatViewModel(chatRepository: ChatService(), userRepository: UserService()))
-        _notificationService = State(initialValue: NotificationService(userRepository: UserService()))
-        _profileViewModel = State(initialValue: ProfileViewModel(userRepository: UserService(), user: .mock))
+        _authViewModel = State(initialValue: AuthViewModel(repository: AuthService(), profileRepository: ProfileService()))
+        _chatViewModel = State(initialValue: ChatViewModel(chatRepository: ChatService(), profileRepository: ProfileService(), meetRepository: MeetService()))
+        _notificationService = State(initialValue: NotificationService(profileRepository: ProfileService()))
+        _profileViewModel = State(initialValue: ProfileViewModel(profileRepository: ProfileService(), user: .mock))
         _filterViewModel = State(initialValue: FilterViewModel())
     }
 
@@ -42,7 +43,7 @@ struct PawPalsApp: App {
                 .onChange(of: authViewModel.currentUser?.id) { _, _ in
                      if let user = authViewModel.currentUser {
                          profileViewModel.user = user
-                         Task { await profileViewModel.loadUser(userId: user.id) }
+                         Task { await profileViewModel.loadUser(userID: user.id) }
                      } else {
                          profileViewModel.user = .mock
                      }

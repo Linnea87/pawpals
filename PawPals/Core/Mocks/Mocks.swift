@@ -117,7 +117,8 @@ struct MockAuthRepository: AuthRepository {
     func deleteAccount() async throws {}
 }
 
-// =========== MockUserRepository =============================
+// =========== MockProfileRepository =============================
+
 
 struct MockUserRepository: UserRepository {
     func updateProfile(_ user: User) async throws {}
@@ -138,13 +139,31 @@ struct MockUserRepository: UserRepository {
     func fetchUser(userId: String) async throws -> User { .mock }
 }
 
-
 // =========== MockChatRepository =============================
 
-
 struct MockChatRepository: ChatRepository {
-    func sendMessage(_ message: Message, to conversationID: String) async throws {}
+    func observeConversations(
+        for userID: String,
+        onUpdate: @escaping ([Conversation]) -> Void
+    ) -> (() -> Void) { return {} }
 
+    func createOrFetchConversation(between userId1: String, and userId2: String) async throws -> Conversation {
+        Conversation(
+            id: "mock-conv",
+            participantIDs: [userId1, userId2],
+            lastMessage: "",
+            lastMessageTimestamp: Date()
+        )
+    }
+    
+    func fetchConversationIfExists(between userID1: String, and userID2: String) async throws -> Conversation? {
+        return nil
+    }
+}
+
+// =========== MockConversationRepository =============================
+
+struct MockConversationRepository: ConversationRepository {
     func observeMessages(
         conversationID: String,
         onUpdate: @escaping ([Message]) -> Void
@@ -193,24 +212,10 @@ struct MockChatRepository: ChatRepository {
         return {}
     }
 
+    func sendMessage(_ message: Message, to conversationID: String) async throws {}
     func markAsRead(conversationID: String, userID: String) async throws {}
     func markAsDelivered(conversationID: String, userID: String) async throws {}
-
-    func observeConversations(
-        for userID: String,
-        onUpdate: @escaping ([Conversation]) -> Void
-    ) -> (() -> Void) { return {} }
-
-    func createOrFetchConversation(between userId1: String, and userId2: String) async throws -> Conversation {
-        Conversation(
-            id: "mock-conv",
-            participantIDs: [userId1, userId2],
-            lastMessage: "",
-            lastMessageTimestamp: Date()
-        )
-    }
-
-    func uploadImage(_ image: UIImage, conversationId: String) async throws -> URL {
+    func uploadImage(_ image: UIImage, conversationID: String) async throws -> URL {
         URL(string: "https://mock-image-url.com/image.jpg")!
     }
 }

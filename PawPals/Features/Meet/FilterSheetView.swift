@@ -24,14 +24,14 @@ struct FilterSheetView: View {
                         ScrollView(.horizontal, showsIndicators: false) {
                             HStack(spacing: Spacing.small) {
                                 FilterChip(title: "All", isSelected: filterViewModel.activeFilters.isEmpty) {
-                                    filterViewModel.clearFilters(userId: authVM.currentUserId)
+                                    filterViewModel.clearFilters(userID: authVM.currentUserID)
                                 }
                                 ForEach(WalkType.allCases) { walkType in
                                     FilterChip(
                                         title: walkType.rawValue,
                                         isSelected: filterViewModel.activeFilters.contains(walkType.rawValue)
                                     ) {
-                                        filterViewModel.toggleFilter(walkType.rawValue, userId: authVM.currentUserId)
+                                        filterViewModel.toggleFilter(walkType.rawValue, userID: authVM.currentUserID)
 
                                     }
                                 }
@@ -47,21 +47,21 @@ struct FilterSheetView: View {
                         ScrollView(.horizontal, showsIndicators: false) {
                             HStack(spacing: Spacing.small) {
                                 FilterChip(title: "All sizes", isSelected: filterViewModel.activeSizeFilters.isEmpty) {
-                                    filterViewModel.clearSizeFilters(userId: authVM.currentUserId)
+                                    filterViewModel.clearSizeFilters(userID: authVM.currentUserID)
                                 }
                                 ForEach(DogSize.allCases, id: \.self) { size in
                                     FilterChip(
                                         title: size.rawValue.capitalized,
                                         isSelected: filterViewModel.activeSizeFilters.contains(size.rawValue)
                                     ) {
-                                        filterViewModel.toggleSizeFilter(size.rawValue, userId: authVM.currentUserId)
+                                        filterViewModel.toggleSizeFilter(size.rawValue, userID: authVM.currentUserID)
                                     }
                                 }
                             }
                         }
                     }
                     .padding(Spacing.medium)
-                    .background(Theme.offWhite.opacity(0.6))
+                    .background(Theme.offWhite.opacity(Opacity.xSmall))
                     .clipShape(RoundedRectangle(cornerRadius: Radius.medium))
 
                     VStack(alignment: .leading, spacing: Spacing.medium) {
@@ -83,7 +83,7 @@ struct FilterSheetView: View {
                                     get: { filterViewModel.searchRadius },
                                     set: { filterViewModel.setRadius(
                                             $0,
-                                            userId: authVM.currentUserId
+                                            userID: authVM.currentUserID
                                         )
                                     }
                                 ),
@@ -110,7 +110,7 @@ struct FilterSheetView: View {
                         mapSection
                     }
                     .padding(Spacing.medium)
-                    .background(Theme.offWhite.opacity(0.6))
+                    .background(Theme.offWhite.opacity(Opacity.xSmall))
                     .clipShape(RoundedRectangle(cornerRadius: Radius.medium))
                     .frame(maxHeight: .infinity)
                 }
@@ -179,7 +179,7 @@ struct FilterSheetView: View {
             Spacer()
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .background(Theme.offWhite.opacity(Opacity.xSmal))
+        .background(Theme.offWhite.opacity(Opacity.xSmall))
         .clipShape(RoundedRectangle(cornerRadius: Radius.medium))
     }
     
@@ -197,13 +197,15 @@ struct FilterSheetView: View {
 }
 
 #Preview {
-    let locationVM = LocationViewModel()
-        locationVM.currentUserLocation = CLLocationCoordinate2D(latitude: 59.3293, longitude: 18.0686)
-        let vm = MeetViewModel(userRepository: MockUserRepository(), locationViewModel: locationVM)
-        vm.allNearbyUsers = User.mockUsers
-        return FilterSheetView()
-            .environment(vm)
-            .environment(locationVM)
-            .environment(FilterViewModel())
-            .environment(AuthViewModel(repository: AuthService(), userRepository: UserService()))
+  let locationVM = LocationViewModel()
+      locationVM.currentUserLocation = CLLocationCoordinate2D(latitude: 59.3293, longitude: 18.0686)
+    let vm = MeetViewModel(meetRepository: MockMeetRepository(), locationService: LocationService())
+    vm.currentUserLocation = CLLocationCoordinate2D(latitude: 59.3293, longitude: 18.0686)
+    vm.allNearbyUsers = User.mockUsers
+
+    return FilterSheetView()
+        .environment(vm)
+        .environment(locationVM)
+        .environment(FilterViewModel())
+        .environment(AuthViewModel(repository: AuthService(), userRepository: ProfileService()))
 }

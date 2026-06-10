@@ -18,7 +18,7 @@ struct AppNavigationView: View {
                 case .chat:
                     ChatView(
                         selectedTab: $selectedTab,
-                        currentUserID: authVM.currentUserId
+                        currentUserID: authVM.currentUserID
                     )
                 case .meet:
                     MeetView(selectedTab: $selectedTab)
@@ -46,7 +46,7 @@ struct AppNavigationView: View {
                 if let token = notificationService.pushNotificationToken {
                     await notificationService.savePushNotificationToken(
                         token,
-                        for: authVM.currentUserId
+                        for: authVM.currentUserID
                     )
                 }
             }
