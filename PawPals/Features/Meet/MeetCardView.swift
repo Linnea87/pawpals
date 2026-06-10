@@ -41,9 +41,7 @@ struct MeetCardView: View {
             }
         }
         .frame(maxWidth: .infinity, alignment: .leading)
-        .padding(Spacing.large)
-        .background(Theme.offWhite)
-        .clipShape(RoundedRectangle(cornerRadius: Radius.large))
+        .cardStyle()
     }
 }
 

@@ -35,8 +35,7 @@ struct ChatView: View {
                                 ConversationRowView(
                                     conversation: conversation,
                                     timestampText: chatViewModel.formattedTimeStamp(for: conversation),
-                                    otherUserName: chatViewModel.otherUser(in: conversation, currentUserID: currentUserID)?.name ?? String(localized: "common.unknown"),
-                                    otherUserPhotoURL: chatViewModel.otherUser(in: conversation, currentUserID: currentUserID)?.photoURL
+                                    otherUser: chatViewModel.otherUser(in: conversation, currentUserID: currentUserID)
                                 )
                             }
                             .buttonStyle(.plain)
