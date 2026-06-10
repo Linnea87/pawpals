@@ -106,7 +106,7 @@ struct SignInView: View {
         .environment(
             AuthViewModel(
                 repository: MockAuthRepository(),
-                userRepository: MockUserRepository()
+                userRepository: MockProfileRepository()
             )
         )
 }

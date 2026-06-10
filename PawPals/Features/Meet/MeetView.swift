@@ -28,7 +28,7 @@ struct MeetView: View {
                             ProgressView()
                             Text("Finding your location...")
                                 .font(.footnote)
-                                .foregroundStyle(Theme.warmBrown.opacity(0.6))
+                                .foregroundStyle(Theme.warmBrown.opacity(Opacity.xSmall))
                         }
                         .frame(maxWidth: .infinity)
                         Spacer()
@@ -45,7 +45,7 @@ struct MeetView: View {
                                 .foregroundStyle(Theme.warmBrown)
                             Text("PawPals needs your location to find nearby dogs.")
                                 .font(.footnote)
-                                .foregroundStyle(Theme.darkBrown.opacity(0.6))
+                                .foregroundStyle(Theme.darkBrown.opacity(Opacity.xSmall))
                                 .multilineTextAlignment(.center)
                                 .padding(.horizontal, Spacing.large)
                             Button("Open Settings") {
@@ -76,7 +76,7 @@ struct MeetView: View {
                     } else if filterViewModel.applyFilters(to: vm.allNearbyUsers).isEmpty {
                         Spacer()
                         Text("No matches nearby")
-                            .foregroundStyle(Theme.darkBrown.opacity(0.5))
+                            .foregroundStyle(Theme.darkBrown.opacity(Opacity.xSmall))
                             .frame(maxWidth: .infinity)
                         Spacer()
                     } else {
@@ -87,12 +87,12 @@ struct MeetView: View {
                                         .onTapGesture { vm.selectedUser = user }
                                 }
                             }
-                            .padding(.horizontal, Spacing.large)
+                            .padding(.horizontal, Spacing.xLarge)
                         }
                     }
                 }
             }
-            .safeAreaInset(edge: .bottom, spacing: 0) {
+            .safeAreaInset(edge: .bottom, spacing: Spacing.none) {
                 TabBarView(selectedTab: $selectedTab)
             }
             

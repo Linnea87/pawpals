@@ -733,9 +733,6 @@
         }
       }
     },
-    "profile.walk_preferences" : {
-
-    },
     "profile.walkPreferences" : {
       "extractionState" : "manual",
       "localizations" : {

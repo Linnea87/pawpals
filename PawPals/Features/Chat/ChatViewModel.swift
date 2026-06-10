@@ -45,7 +45,8 @@ final class ChatViewModel {
     }
 
     private let chatRepository: ChatRepository
-    private let userRepository: UserRepository
+    private let profileRepository: ProfileRepository
+    private let meetRepository: MeetRepository
 
 
     private var stopObserving: (() -> Void)?
@@ -53,9 +54,10 @@ final class ChatViewModel {
 
     private var stopObservingConversations: (() -> Void)?
 
-    init(chatRepository: ChatRepository, userRepository: UserRepository) {
+    init(chatRepository: ChatRepository, profileRepository: ProfileRepository, meetRepository: MeetRepository) {
         self.chatRepository = chatRepository
-        self.userRepository = userRepository
+        self.profileRepository = profileRepository
+        self.meetRepository = meetRepository
     }
 
     /// Creates or fetches a conversation with another user and navigates to it.
@@ -233,7 +235,7 @@ final class ChatViewModel {
         await withTaskGroup(of: (String, User)?.self) { group in
             for id in otherIDs {
                 group.addTask {
-                    guard let user = try? await self.userRepository.fetchUser(userId: id)
+                    guard let user = try? await self.profileRepository.fetchUser(userId: id)
                     else { return nil }
                     return (id, user)
                 }
@@ -248,7 +250,7 @@ final class ChatViewModel {
     
     func loadFavorites(for userId: String) async {
         do {
-            savedUserIds = try await userRepository.fetchSavedProfileIds(for: userId)
+            savedUserIds = try await meetRepository.fetchSavedProfileIds(for: userId)
         } catch {
             errorMessage = error.localizedDescription
         }

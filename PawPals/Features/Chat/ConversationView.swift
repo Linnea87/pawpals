@@ -321,7 +321,7 @@ private struct MessageInputBar: View {
 }
 
 #Preview {
-    let viewModel = ChatViewModel(chatRepository: MockChatRepository(), userRepository: MockUserRepository())
+    let viewModel = ChatViewModel(chatRepository: MockChatRepository(), profileRepository: MockProfileRepository(), meetRepository: MockMeetRepository())
     let conversation = Conversation(
         id: "conv1",
         participantIDs: ["user1", "user2"],
@@ -336,6 +336,6 @@ private struct MessageInputBar: View {
         )
     }
     .environment(viewModel)
-    .environment(AuthViewModel(repository: MockAuthRepository(), userRepository: MockUserRepository()))
-    .environment(ProfileViewModel(userRepository: MockUserRepository(), user: .mock))
+    .environment(AuthViewModel(repository: MockAuthRepository(), userRepository: MockProfileRepository()))
+    .environment(ProfileViewModel(profileRepository: MockProfileRepository(), user: .mock))
 }
