@@ -35,7 +35,8 @@ struct ChatView: View {
                                 ConversationRowView(
                                     conversation: conversation,
                                     timestampText: chatViewModel.formattedTimeStamp(for: conversation),
-                                    otherUser: chatViewModel.otherUser(in: conversation, currentUserID: currentUserID)
+                                    otherUser: chatViewModel.otherUser(in: conversation, currentUserID: currentUserID),
+                                    unreadCount: conversation.unreadCounts[currentUserID, default: 0]
                                 )
                             }
                             .buttonStyle(.plain)
@@ -132,14 +133,14 @@ private func makePreviewChatViewModel() -> ChatViewModel {
             participantIDs: ["Anna", "Patrik"],
             lastMessage: "Hey, want to go for a walk?",
             lastMessageTimestamp: Date(),
-            unreadCount: 3
+            unreadCounts: ["Patrik": 3]
         ),
         Conversation(
             id: "2",
             participantIDs: ["Sara", "Patrik"],
             lastMessage: "My dog loved meeting yours!",
             lastMessageTimestamp: Date().addingTimeInterval(-3600),
-            unreadCount: 1
+            unreadCounts: ["Patrik": 1]
         ),
         Conversation(
             id: "3",

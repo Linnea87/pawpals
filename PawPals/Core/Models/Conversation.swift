@@ -5,5 +5,5 @@ struct Conversation: Identifiable, Codable, Hashable {
     var participantIDs: [String]
     var lastMessage: String
     var lastMessageTimestamp: Date
-    var unreadCount: Int = 0
+    var unreadCounts: [String: Int] = [:]
 }
