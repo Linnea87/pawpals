@@ -39,7 +39,7 @@ final class MeetViewModel {
         guard let userID = Auth.auth().currentUser?.uid else { return }
 
         do {
-            let coordinate = try await locationViewModel.startLocating()
+            let coordinate = try await locationViewModel.startLocating(userID: userID)
             /// Convert CLLocation to GeoPoint — the repository layer speaks GeoPoint, not CLLocation
             let geoPoint = GeoPoint(
                 latitude: coordinate.latitude,
@@ -51,7 +51,7 @@ final class MeetViewModel {
             await loadNearbyUsers()
 
         } catch LocationError.permissionDenied {
-            // locationViewModel already set locationStatus = .denied; MeetView shows the settings message
+            // locationViewModel already set locationStatus = .denied
         } catch {
             errorMessage = error.localizedDescription
         }
