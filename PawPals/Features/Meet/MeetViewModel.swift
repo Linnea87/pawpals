@@ -20,16 +20,20 @@ final class MeetViewModel {
     private let meetRepository: MeetRepository
     private let locationViewModel: LocationViewModel
     private let chatRepository: ChatRepository
+    private let profileRepository: ProfileRepository
     private var radiusDebounce: Task<Void, Never>?
 
     init(
         meetRepository: MeetRepository = MeetService(),
         locationViewModel: LocationViewModel,
-        chatRepository: ChatRepository = ChatService()
+        chatRepository: ChatRepository = ChatService(),
+        profileRepository: ProfileRepository = ProfileService()
     ) {
         self.meetRepository = meetRepository
         self.locationViewModel = locationViewModel
         self.chatRepository = chatRepository
+        self.profileRepository = profileRepository
+
     }
 
     func loadWithLocation(currentUserID: String, radius: Double) async {
@@ -53,11 +57,11 @@ final class MeetViewModel {
             errorMessage = error.localizedDescription
         }
     }
-    
+
     func radiusChanged(to radius: Double, currentUserID: String) {
-        
+
         radiusDebounce?.cancel()
-        
+
         radiusDebounce = Task {
             try? await Task.sleep(for: .seconds(0.6))
             guard !Task.isCancelled else { return }
@@ -89,6 +93,14 @@ final class MeetViewModel {
                 !partnerIDs.contains($0.id)
             }
 
+        } catch {
+            errorMessage = error.localizedDescription
+        }
+    }
+
+    func fetchFullUser(userID: String) async {
+        do {
+            selectedUser = try await profileRepository.fetchUser(userID: userID)
         } catch {
             errorMessage = error.localizedDescription
         }

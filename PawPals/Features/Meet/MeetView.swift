@@ -107,7 +107,13 @@ struct MeetView: View {
                                             user.id
                                         )
                                     )
-                                    .onTapGesture { meetVM.selectedUser = user }
+                                    .onTapGesture {
+                                        Task {
+                                            await meetVM.fetchFullUser(
+                                                userID: user.id
+                                            )
+                                        }
+                                    }
                                 }
                             }
                             .padding(.horizontal, Spacing.xLarge)

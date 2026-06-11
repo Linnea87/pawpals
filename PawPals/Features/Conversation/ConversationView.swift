@@ -46,8 +46,7 @@ struct ConversationView: View {
                                         .id(message.id)
                                     }
                                 }
-                                // TODO [PP-028]: Remove temporary uploading placeholder message
-                                // when real message with imageURL arrives from Firestore observer
+
                                 if conversationVM.isUploadingImage {
                                     MessageBubbleView(
                                         message: Message(
