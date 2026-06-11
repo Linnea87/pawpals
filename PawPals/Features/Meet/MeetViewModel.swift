@@ -12,7 +12,6 @@ final class MeetViewModel {
 
     var errorMessage: String? = nil
 
-    var searchRadius: Double = 5.0
     var savedUserIDs: Set<String> = []
     var savedUsers: [User] = []
 
@@ -21,6 +20,7 @@ final class MeetViewModel {
     private let meetRepository: MeetRepository
     private let locationViewModel: LocationViewModel
     private let chatRepository: ChatRepository
+    private var radiusDebounce: Task<Void, Never>?
 
     init(
         meetRepository: MeetRepository = MeetService(),
@@ -32,7 +32,7 @@ final class MeetViewModel {
         self.chatRepository = chatRepository
     }
 
-    func loadWithLocation(currentUserID: String) async {
+    func loadWithLocation(currentUserID: String, radius: Double) async {
         guard !currentUserID.isEmpty else { return }
 
         do {
@@ -45,7 +45,7 @@ final class MeetViewModel {
                 userID: currentUserID
             )
 
-            await loadNearbyUsers(currentUserID: currentUserID)
+            await loadNearbyUsers(currentUserID: currentUserID, radius: radius)
 
         } catch LocationError.permissionDenied {
             /// locationViewModel already set locationStatus = .denied
@@ -53,8 +53,18 @@ final class MeetViewModel {
             errorMessage = error.localizedDescription
         }
     }
-
-    func loadNearbyUsers(currentUserID: String) async {
+    
+    func radiusChanged(to radius: Double, currentUserID: String) {
+        
+        radiusDebounce?.cancel()
+        
+        radiusDebounce = Task {
+            try? await Task.sleep(for: .seconds(0.6))
+            guard !Task.isCancelled else { return }
+            await loadNearbyUsers(currentUserID: currentUserID, radius: radius)
+        }
+    }
+    func loadNearbyUsers(currentUserID: String, radius: Double) async {
         guard let currentLocation = locationViewModel.currentUserLocation else {
             return
         }
@@ -66,7 +76,7 @@ final class MeetViewModel {
 
             allNearbyUsers = try await meetRepository.fetchNearbyUsers(
                 location: currentLocation,
-                radius: searchRadius,
+                radius: radius,
                 excludingUserID: currentUserID
             )
             let partnerIDs = try await chatRepository.fetchConnectedUserIDs(
