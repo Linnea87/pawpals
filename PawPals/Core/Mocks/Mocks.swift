@@ -172,6 +172,61 @@ struct MockChatRepository: ChatRepository {
     func fetchConnectedUserIDs(for userID: String) async throws -> Set<String> { [] }
 }
 
+// =========== ChatViewModel Preview =============================
+
+extension ChatViewModel {
+    /// Preview ViewModel pre-loaded with three sample conversations and their participants.
+    /// Relocated here from ChatView.swift (PP-085).
+    static var preview: ChatViewModel {
+        let viewModel = ChatViewModel(
+            chatRepository: MockChatRepository(),
+            profileRepository: MockProfileRepository(),
+            meetRepository: MockMeetRepository()
+        )
+        viewModel.conversations = [
+            Conversation(
+                id: "1",
+                participantIDs: ["Anna", "Patrik"],
+                lastMessage: "Hey, want to go for a walk?",
+                lastMessageTimestamp: Date(),
+                unreadCounts: ["Patrik": 3]
+            ),
+            Conversation(
+                id: "2",
+                participantIDs: ["Sara", "Patrik"],
+                lastMessage: "My dog loved meeting yours!",
+                lastMessageTimestamp: Date().addingTimeInterval(-3600),
+                unreadCounts: ["Patrik": 1]
+            ),
+            Conversation(
+                id: "3",
+                participantIDs: ["Johan", "Patrik"],
+                lastMessage: "See you at the park!",
+                lastMessageTimestamp: Date().addingTimeInterval(-7200)
+            ),
+        ]
+  
+        viewModel.participants = [
+            "Anna": previewParticipant(named: "Anna"),
+            "Sara": previewParticipant(named: "Sara"),
+            "Johan": previewParticipant(named: "Johan"),
+        ]
+        return viewModel
+    }
+
+  
+    private static func previewParticipant(named name: String) -> User {
+        User(
+            id: name,
+            name: name,
+            bio: "",
+            city: "Stockholm",
+            dogs: [],
+            preferences: UserPreferences(walkTypes: [], dogSize: .medium, searchRadius: 10)
+        )
+    }
+}
+
 // =========== MockConversationRepository =============================
 
 struct MockConversationRepository: ConversationRepository {
