@@ -1,15 +1,13 @@
 import SwiftUI
 
-
-
 struct ChatView: View {
     @Binding var selectedTab: Tab
     @Environment(ChatViewModel.self) private var chatViewModel
     @State private var navigationPath = NavigationPath()
-    @State private var conversationViewModel = ConversationViewModel(conversationRepository: ConversationService())
+    @State private var conversationViewModel = ConversationViewModel(
+        conversationRepository: ConversationService()
+    )
     var currentUserID: String = ""
-
-    
 
     var body: some View {
         NavigationStack(path: $navigationPath) {
@@ -30,13 +28,23 @@ struct ChatView: View {
                         )
                         .frame(maxWidth: .infinity, maxHeight: .infinity)
                     } else {
-                        List(chatViewModel.filteredConversations) { conversation in
+                        List(chatViewModel.filteredConversations) {
+                            conversation in
                             NavigationLink(value: conversation) {
                                 ConversationRowView(
                                     conversation: conversation,
-                                    timestampText: chatViewModel.formattedTimeStamp(for: conversation),
-                                    otherUser: chatViewModel.otherUser(in: conversation, currentUserID: currentUserID),
-                                    unreadCount: conversation.unreadCounts[currentUserID, default: 0]
+                                    timestampText:
+                                        chatViewModel.formattedTimeStamp(
+                                            for: conversation
+                                        ),
+                                    otherUser: chatViewModel.otherUser(
+                                        in: conversation,
+                                        currentUserID: currentUserID
+                                    ),
+                                    unreadCount: conversation.unreadCounts[
+                                        currentUserID,
+                                        default: 0
+                                    ]
                                 )
                             }
                             .buttonStyle(.plain)
@@ -61,7 +69,10 @@ struct ChatView: View {
                 ConversationView(
                     conversation: conversation,
                     currentUserID: currentUserID,
-                    otherUser: chatViewModel.otherUser(in: conversation, currentUserID: currentUserID) ?? .mock
+                    otherUser: chatViewModel.otherUser(
+                        in: conversation,
+                        currentUserID: currentUserID
+                    ) ?? .mock
                 )
                 .environment(conversationViewModel)
             }
@@ -73,9 +84,14 @@ struct ChatView: View {
             }
             .alert(
                 "common.error",
-                isPresented: .constant(chatViewModel.errorMessage != nil)
+                isPresented: Binding(
+                    get: { chatViewModel.errorMessage != nil },
+                    set: { if !$0 { chatViewModel.errorMessage = nil } }
+                )
             ) {
-                Button("common.ok") {}
+                Button("common.ok") {
+                    chatViewModel.errorMessage = nil
+                }
             } message: {
                 Text(chatViewModel.errorMessage ?? "")
             }
@@ -126,7 +142,11 @@ struct ChatView: View {
 }
 
 private func makePreviewChatViewModel() -> ChatViewModel {
-    let viewModel = ChatViewModel(chatRepository: MockChatRepository(), profileRepository: MockProfileRepository(), meetRepository: MockMeetRepository())
+    let viewModel = ChatViewModel(
+        chatRepository: MockChatRepository(),
+        profileRepository: MockProfileRepository(),
+        meetRepository: MockMeetRepository()
+    )
     viewModel.conversations = [
         Conversation(
             id: "1",
@@ -147,7 +167,7 @@ private func makePreviewChatViewModel() -> ChatViewModel {
             participantIDs: ["Johan", "Patrik"],
             lastMessage: "See you at the park!",
             lastMessageTimestamp: Date().addingTimeInterval(-7200)
-        )
+        ),
     ]
     return viewModel
 }

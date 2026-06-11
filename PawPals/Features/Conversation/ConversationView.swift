@@ -31,15 +31,20 @@ struct ConversationView: View {
                     ScrollViewReader { proxy in
                         ScrollView {
                             LazyVStack(spacing: Spacing.small) {
-                                DateSeparatorView(date: Date())
+                                ForEach(
+                                    conversationVM.messageGroups,
+                                    id: \.date
+                                ) { group in
+                                    DateSeparatorView(date: group.date)
 
-                                ForEach(conversationVM.messages) { message in
-                                    MessageBubbleView(
-                                        message: message,
-                                        isFromCurrentUser: message.senderID
-                                            == currentUserID
-                                    )
-                                    .id(message.id)
+                                    ForEach(group.messages) { message in
+                                        MessageBubbleView(
+                                            message: message,
+                                            isFromCurrentUser: message.senderID
+                                                == currentUserID
+                                        )
+                                        .id(message.id)
+                                    }
                                 }
                                 // TODO [PP-028]: Remove temporary uploading placeholder message
                                 // when real message with imageURL arrives from Firestore observer
