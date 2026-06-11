@@ -79,7 +79,7 @@ struct ProfileView: View {
                 .task {
                     if isOwner {
                         await profileVM.loadPreferences()
-                        await meetVM.loadSavedProfiles()
+                        await meetVM.loadSavedProfiles(currentUserID: authVM.currentUserID)
                     }
                 }
                 .task(id: selectedPhoto) {
@@ -190,7 +190,7 @@ struct ProfileView: View {
             ToolbarItem(placement: .topBarLeading) {
                 Button {
                     Task {
-                        await meetVM.toggleSave(targetID: user.id)
+                        await meetVM.toggleSave(targetID: user.id, currentUserID: authVM.currentUserID)
                     }
                 } label: {
                     Image(

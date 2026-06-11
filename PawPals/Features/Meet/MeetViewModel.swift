@@ -1,6 +1,4 @@
 import CoreLocation
-import FirebaseAuth
-import FirebaseFirestore
 import Foundation
 
 @Observable
@@ -17,9 +15,8 @@ final class MeetViewModel {
     var searchRadius: Double = 5.0
     var savedUserIDs: Set<String> = []
     var savedUsers: [User] = []
-    
-    var connectedUserIDs: Set<String> = []
 
+    var connectedUserIDs: Set<String> = []
 
     private let meetRepository: MeetRepository
     private let locationViewModel: LocationViewModel
@@ -35,29 +32,29 @@ final class MeetViewModel {
         self.chatRepository = chatRepository
     }
 
-    func loadWithLocation() async {
-        guard let userID = Auth.auth().currentUser?.uid else { return }
+    func loadWithLocation(currentUserID: String) async {
+        guard !currentUserID.isEmpty else { return }
 
         do {
-            let coordinate = try await locationViewModel.startLocating(userID: userID)
-            /// Convert CLLocation to GeoPoint — the repository layer speaks GeoPoint, not CLLocation
-            let geoPoint = GeoPoint(
-                latitude: coordinate.latitude,
-                longitude: coordinate.longitude
+            let coordinate = try await locationViewModel.startLocating(
+                userID: currentUserID
             )
-            /// Persist the user's current location to Firestore so others can find them/
-            try await meetRepository.updateLocation(geoPoint, userID: userID)
-            /// Now we have a location, fetch users nearby
-            await loadNearbyUsers()
+
+            try await meetRepository.updateLocation(
+                coordinate,
+                userID: currentUserID
+            )
+
+            await loadNearbyUsers(currentUserID: currentUserID)
 
         } catch LocationError.permissionDenied {
-            // locationViewModel already set locationStatus = .denied
+            /// locationViewModel already set locationStatus = .denied
         } catch {
             errorMessage = error.localizedDescription
         }
     }
 
-    func loadNearbyUsers() async {
+    func loadNearbyUsers(currentUserID: String) async {
         guard let currentLocation = locationViewModel.currentUserLocation else {
             return
         }
@@ -67,30 +64,32 @@ final class MeetViewModel {
 
         do {
 
-            let geoPoint = GeoPoint(
-                latitude: currentLocation.latitude,
-                longitude: currentLocation.longitude
-            )
             allNearbyUsers = try await meetRepository.fetchNearbyUsers(
-                location: geoPoint,
+                location: currentLocation,
                 radius: searchRadius,
-                excludingUserID: Auth.auth().currentUser?.uid ?? ""
+                excludingUserID: currentUserID
             )
-            let partnerIDs = try await chatRepository.fetchConnectedUserIDs(for: Auth.auth().currentUser?.uid ?? "")
+            let partnerIDs = try await chatRepository.fetchConnectedUserIDs(
+                for: currentUserID
+            )
 
             connectedUserIDs = partnerIDs
 
-            allNearbyUsers = allNearbyUsers.filter { !partnerIDs.contains($0.id) }
+            allNearbyUsers = allNearbyUsers.filter {
+                !partnerIDs.contains($0.id)
+            }
 
         } catch {
             errorMessage = error.localizedDescription
         }
     }
 
-    func loadSavedProfiles() async {
-        guard let userID = Auth.auth().currentUser?.uid else { return }
+    func loadSavedProfiles(currentUserID: String) async {
+        guard !currentUserID.isEmpty else { return }
         do {
-            let users = try await meetRepository.fetchSavedProfiles(for: userID)
+            let users = try await meetRepository.fetchSavedProfiles(
+                for: currentUserID
+            )
             savedUsers = users
             savedUserIDs = Set(users.map { $0.id })
         } catch {
@@ -98,14 +97,20 @@ final class MeetViewModel {
         }
     }
 
-    func toggleSave(targetID: String) async {
-        guard let userID = Auth.auth().currentUser?.uid else { return }
+    func toggleSave(targetID: String, currentUserID: String) async {
+        guard !currentUserID.isEmpty else { return }
         do {
             if savedUserIDs.contains(targetID) {
-                try await meetRepository.unsaveProfile(targetID, by: userID)
+                try await meetRepository.unsaveProfile(
+                    targetID,
+                    by: currentUserID
+                )
                 savedUserIDs.remove(targetID)
             } else {
-                try await meetRepository.saveProfile(targetID, by: userID)
+                try await meetRepository.saveProfile(
+                    targetID,
+                    by: currentUserID
+                )
                 savedUserIDs.insert(targetID)
             }
         } catch {

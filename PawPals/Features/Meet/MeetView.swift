@@ -4,6 +4,7 @@ import CoreLocation
 struct MeetView: View {
     @Binding var selectedTab: Tab
     @Environment(MeetViewModel.self) private var meetVM
+    @Environment(AuthViewModel.self) private var authVM
     @Environment(FilterViewModel.self) private var filterVM
     @Environment(LocationViewModel.self) private var locationVM
     @State private var showFilterSheet = false
@@ -97,7 +98,7 @@ struct MeetView: View {
                 TabBarView(selectedTab: $selectedTab)
             }
             
-            .task { await meetVM.loadWithLocation() }
+            .task { await meetVM.loadWithLocation(currentUserID: authVM.currentUserID) }
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
                     Button {
@@ -128,6 +129,7 @@ struct MeetView: View {
         .environment(MeetViewModel(locationViewModel: locationVM))
         .environment(FilterViewModel())
         .environment(locationVM)
+        .environment(AuthViewModel(repository: MockAuthRepository(), profileRepository: MockProfileRepository()))
 }
 
 #Preview("Active filters") {
@@ -139,4 +141,5 @@ struct MeetView: View {
         .environment(MeetViewModel(locationViewModel: locationVM))
         .environment(filterVM)
         .environment(locationVM)
+        .environment(AuthViewModel(repository: MockAuthRepository(), profileRepository: MockProfileRepository()))
 }
