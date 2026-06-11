@@ -6,14 +6,16 @@ struct ProfileView: View {
     let user: User
     let isOwner: Bool
     let cameFromMeet: Bool
+    
     @Binding var selectedTab: Tab
 
     @Environment(\.dismiss) private var dismiss
-    @Environment(ChatViewModel.self) private var chatViewModel
-    @Environment(AuthViewModel.self) private var authViewModel
-    @Environment(ProfileViewModel.self) private var profileViewModel
-    @Environment(MeetViewModel.self) private var meetViewModel
-    @State private var conversationViewModel = ConversationViewModel(
+    @Environment(ChatViewModel.self) private var chatVM
+    @Environment(AuthViewModel.self) private var authVM
+    @Environment(ProfileViewModel.self) private var profileVM
+    @Environment(MeetViewModel.self) private var meetVM
+    
+    @State private var conversationVM = ConversationViewModel(
         conversationRepository: ConversationService()
     )
     @State private var selectedPhoto: PhotosPickerItem?
@@ -24,11 +26,11 @@ struct ProfileView: View {
     @State private var selectedSavedUser: User?
 
     private var displayUser: User {
-        isOwner ? profileViewModel.user : user
+        isOwner ? profileVM.user : user
     }
 
     var body: some View {
-        @Bindable var chatVM = chatViewModel
+        @Bindable var chatVM = chatVM
 
         NavigationStack {
             ZStack(alignment: .trailing) {
@@ -47,7 +49,7 @@ struct ProfileView: View {
                     DogsSection(dogs: displayUser.dogs)
 
                     if isOwner {
-                        SavedProfilesSection(savedUsers: meetViewModel.savedUsers) { user in
+                        SavedProfilesSection(savedUsers: meetVM.savedUsers) { user in
                             selectedSavedUser = user
                         }
                     }
@@ -57,15 +59,15 @@ struct ProfileView: View {
                     if !isOwner && cameFromMeet {
                         StartChatButton {
                             Task {
-                                await chatViewModel.startConversation(
+                                await chatVM.startConversation(
                                     with: user,
-                                    currentUserID: authViewModel.currentUserID
+                                    currentUserID: authVM.currentUserID
                                 )
                                 /// If the conversation is new, configure ConversationViewModel for lazy creation.
-                                if chatViewModel.isActiveConversationNew {
-                                    conversationViewModel.isNew = true
-                                    conversationViewModel.onCreate = {
-                                        try await chatViewModel.createActiveConversation()
+                                if chatVM.isActiveConversationNew {
+                                    conversationVM.isNew = true
+                                    conversationVM.onCreate = {
+                                        try await chatVM.createActiveConversation()
                                     }
                                 }
                             }
@@ -76,15 +78,15 @@ struct ProfileView: View {
                 .scrollContentBackground(.hidden)
                 .task {
                     if isOwner {
-                        await profileViewModel.loadPreferences()
-                        await meetViewModel.loadSavedProfiles()
+                        await profileVM.loadPreferences()
+                        await meetVM.loadSavedProfiles()
                     }
                 }
                 .task(id: selectedPhoto) {
                     guard let selectedPhoto,
                         let data = try? await selectedPhoto.loadTransferable(type: Data.self)
                     else { return }
-                    await profileViewModel.uploadProfilePhoto(data)
+                    await profileVM.uploadProfilePhoto(data)
                 }
                 .safeAreaInset(edge: .bottom, spacing: Spacing.none) {
                     if isOwner {
@@ -113,31 +115,31 @@ struct ProfileView: View {
                 profileToolbar
             }
             .navigationDestination(isPresented: $showEditProfile) {
-                AddProfileSheet(user: profileViewModel.user)
+                AddProfileSheet(user: profileVM.user)
             }
             .sheet(item: $selectedSavedUser) { savedUser in
                 ProfileView(user: savedUser, isOwner: false, cameFromMeet: false, selectedTab: $selectedTab)
-                    .environment(meetViewModel)
+                    .environment(meetVM)
             }
             .navigationDestination(item: $chatVM.activeConversation) { conversation in
                 ConversationView(
                     conversation: conversation,
-                    currentUserID: authViewModel.currentUserID,
-                    otherUser: chatViewModel.otherUser(
+                    currentUserID: authVM.currentUserID,
+                    otherUser: chatVM.otherUser(
                         in: conversation,
-                        currentUserID: authViewModel.currentUserID
+                        currentUserID: authVM.currentUserID
                     ) ?? .mock,
                     isModal: true,
                     selectedTab: $selectedTab
                 )
-                .environment(conversationViewModel)
+                .environment(conversationVM)
             }
-            .onChange(of: chatViewModel.activeConversation) { _, newValue in
+            .onChange(of: chatVM.activeConversation) { _, newValue in
                 /// User navigated back without sending — clean up the draft state.
                 if newValue == nil {
-                    chatViewModel.isActiveConversationNew = false
-                    conversationViewModel.isNew = false
-                    conversationViewModel.onCreate = nil
+                    chatVM.isActiveConversationNew = false
+                    conversationVM.isNew = false
+                    conversationVM.onCreate = nil
                     if !isOwner {
                         selectedTab = .chat
                         dismiss()
@@ -152,14 +154,14 @@ struct ProfileView: View {
                 showDeleteConfirm: $showDeleteConfirm,
                 showLogoutConfirm: $showLogoutConfirm,
                 onDelete: {
-                    Task { await authViewModel.deleteAccount() }
+                    Task { await authVM.deleteAccount() }
                 },
                 onLogout: {
-                    authViewModel.signOut()
+                    authVM.signOut()
                 }
             )
         }
-        .environment(profileViewModel)
+        .environment(profileVM)
     }
 
     @ToolbarContentBuilder
@@ -188,11 +190,11 @@ struct ProfileView: View {
             ToolbarItem(placement: .topBarLeading) {
                 Button {
                     Task {
-                        await meetViewModel.toggleSave(targetID: user.id)
+                        await meetVM.toggleSave(targetID: user.id)
                     }
                 } label: {
                     Image(
-                        systemName: meetViewModel.savedUserIDs.contains(user.id)
+                        systemName: meetVM.savedUserIDs.contains(user.id)
                             ? "heart.fill" : "heart"
                     )
                     .foregroundStyle(Theme.terracotta)

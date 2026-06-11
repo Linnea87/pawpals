@@ -1,7 +1,7 @@
 import SwiftUI
 
 struct SignInView: View {
-    @Environment(AuthViewModel.self) private var viewModel
+    @Environment(AuthViewModel.self) private var authVM
     @Environment(\.dismiss) private var dismiss
 
     @State private var email = ""
@@ -21,16 +21,16 @@ struct SignInView: View {
             }
         }
         .presentationDetents([.fraction(AuthLayout.sheetFraction)])
-        .onChange(of: viewModel.isAuthenticated) { _, isAuthenticated in
+        .onChange(of: authVM.isAuthenticated) { _, isAuthenticated in
             if isAuthenticated { dismiss() }
         }
         .alert(
             String(localized: "common.error"),
-            isPresented: .constant(viewModel.errorMessage != nil)
+            isPresented: .constant(authVM.errorMessage != nil)
         ) {
             Button(String(localized: "common.ok")) {}
         } message: {
-            Text(viewModel.errorMessage ?? "")
+            Text(authVM.errorMessage ?? "")
         }
     }
 
@@ -74,10 +74,10 @@ struct SignInView: View {
         VStack(spacing: Spacing.medium) {
             Button {
                 Task {
-                    await viewModel.signIn(email: email, password: password)
+                    await authVM.signIn(email: email, password: password)
                 }
             } label: {
-                if viewModel.isLoading {
+                if authVM.isLoading {
                     ProgressView()
                         .tint(Theme.offWhite)
                         .frame(maxWidth: .infinity)
@@ -92,10 +92,10 @@ struct SignInView: View {
             }
             .background(Theme.terracotta)
             .clipShape(Capsule())
-            .disabled(viewModel.isLoading)
+            .disabled(authVM.isLoading)
 
             SocialAuthButtons(label: "auth.signin.google") {
-                await viewModel.signInWithGoogle()
+                await authVM.signInWithGoogle()
             }
         }
     }

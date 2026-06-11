@@ -1,7 +1,7 @@
 import SwiftUI
 
 struct AuthView: View {
-    @Environment(AuthViewModel.self) private var viewModel
+    @Environment(AuthViewModel.self) private var authVM
     @State private var showSignIn = false
     @State private var showSignUp = false
 
@@ -21,7 +21,7 @@ struct AuthView: View {
             }
             .padding(.horizontal, Spacing.large)
         }
-        // TODO: PP-002 — uncomment when SignInView and SignUpView are coded
+       
         .sheet(isPresented: $showSignIn) {
              SignInView()
         }
@@ -67,25 +67,25 @@ struct AuthView: View {
 
             HStack(spacing: Spacing.medium) {
                 Button(String(localized: "auth.sign.in")) {
-                    viewModel.activeOption = .signIn
+                    authVM.activeOption = .signIn
                     showSignIn = true
                 }
                 .frame(maxWidth: .infinity)
                 .padding(.vertical, Spacing.small)
-                .background(viewModel.activeOption == .signIn ? Theme.terracotta : Theme.offWhite)
-                .foregroundStyle(viewModel.activeOption == .signIn ? Theme.offWhite : Theme.darkBrown)
-                .fontWeight(viewModel.activeOption == .signIn ? .semibold : .regular)
+                .background(authVM.activeOption == .signIn ? Theme.terracotta : Theme.offWhite)
+                .foregroundStyle(authVM.activeOption == .signIn ? Theme.offWhite : Theme.darkBrown)
+                .fontWeight(authVM.activeOption == .signIn ? .semibold : .regular)
                 .clipShape(Capsule())
 
                 Button(String(localized: "auth.sign.up")) {
-                    viewModel.activeOption = .signUp
+                    authVM.activeOption = .signUp
                     showSignUp = true
                 }
                 .frame(maxWidth: .infinity)
                 .padding(.vertical, Spacing.small)
-                .background(viewModel.activeOption == .signUp ? Theme.terracotta : Theme.offWhite)
-                .foregroundStyle(viewModel.activeOption == .signUp ? Theme.offWhite : Theme.darkBrown)
-                .fontWeight(viewModel.activeOption == .signUp ? .semibold : .regular)
+                .background(authVM.activeOption == .signUp ? Theme.terracotta : Theme.offWhite)
+                .foregroundStyle(authVM.activeOption == .signUp ? Theme.offWhite : Theme.darkBrown)
+                .fontWeight(authVM.activeOption == .signUp ? .semibold : .regular)
                 .clipShape(Capsule())
             }
             .padding(.top, Spacing.large)

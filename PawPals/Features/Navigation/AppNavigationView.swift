@@ -3,10 +3,11 @@ import SwiftUI
 struct AppNavigationView: View {
 
     @Environment(AuthViewModel.self) private var authVM
-    @Environment(ChatViewModel.self) private var chatViewModel
+    @Environment(ChatViewModel.self) private var chatVM
     @Environment(NotificationService.self) private var notificationService
-    @Environment(LocationViewModel.self) private var locationViewModel
-    @Environment(ProfileViewModel.self) private var profileViewModel
+    @Environment(LocationViewModel.self) private var locationVM
+    @Environment(ProfileViewModel.self) private var profileVM
+    
     @State private var selectedTab: Tab = .meet
 
     var body: some View {
@@ -32,14 +33,14 @@ struct AppNavigationView: View {
             }
         }
         
-        .onChange(of: locationViewModel.resolvedCity) { _, city in
+        .onChange(of: locationVM.resolvedCity) { _, city in
             if let city {
-                profileViewModel.user.city = city
+                profileVM.user.city = city
             }
         }
         .onChange(of: notificationService.pendingConversationID) { _, conversationID in
             guard let conversationID else { return }
-            chatViewModel.pendingConversationID = conversationID
+            chatVM.pendingConversationID = conversationID
             selectedTab = .chat
             notificationService.pendingConversationID = nil
         }

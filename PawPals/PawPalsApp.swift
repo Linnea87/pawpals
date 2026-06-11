@@ -4,13 +4,13 @@ import GoogleSignIn
 
 @main
 struct PawPalsApp: App {
-    @State private var authViewModel: AuthViewModel
-    @State private var meetViewModel: MeetViewModel
-    @State private var chatViewModel: ChatViewModel
+    @State private var authVM: AuthViewModel
+    @State private var meetVM: MeetViewModel
+    @State private var chatVM: ChatViewModel
     @State private var notificationService: NotificationService
-    @State private var locationViewModel: LocationViewModel
-    @State private var profileViewModel: ProfileViewModel
-    @State private var filterViewModel: FilterViewModel
+    @State private var locationVM: LocationViewModel
+    @State private var profileVM: ProfileViewModel
+    @State private var filterVM: FilterViewModel
 
 
     init() {
@@ -20,32 +20,32 @@ struct PawPalsApp: App {
             GIDSignIn.sharedInstance.configuration = GIDConfiguration(clientID: clientID)
         }
 
-        let locationViewModel = LocationViewModel()
-        _locationViewModel = State(initialValue: locationViewModel)
-        _meetViewModel = State(initialValue: MeetViewModel(locationViewModel: locationViewModel))
-        _authViewModel = State(initialValue: AuthViewModel(repository: AuthService(), profileRepository: ProfileService()))
-        _chatViewModel = State(initialValue: ChatViewModel(chatRepository: ChatService(), profileRepository: ProfileService(), meetRepository: MeetService()))
+        let locationVM = LocationViewModel()
+        _locationVM = State(initialValue: locationVM)
+        _meetVM = State(initialValue: MeetViewModel(locationViewModel: locationVM))
+        _authVM = State(initialValue: AuthViewModel(repository: AuthService(), profileRepository: ProfileService()))
+        _chatVM = State(initialValue: ChatViewModel(chatRepository: ChatService(), profileRepository: ProfileService(), meetRepository: MeetService()))
         _notificationService = State(initialValue: NotificationService(profileRepository: ProfileService()))
-        _profileViewModel = State(initialValue: ProfileViewModel(profileRepository: ProfileService(), user: .mock))
-        _filterViewModel = State(initialValue: FilterViewModel())
+        _profileVM = State(initialValue: ProfileViewModel(profileRepository: ProfileService(), user: .mock))
+        _filterVM = State(initialValue: FilterViewModel())
     }
 
     var body: some Scene {
         WindowGroup {
             AppNavigationView()
-                .environment(authViewModel)
-                .environment(meetViewModel)
-                .environment(filterViewModel)
-                .environment(chatViewModel)
+                .environment(authVM)
+                .environment(meetVM)
+                .environment(filterVM)
+                .environment(chatVM)
                 .environment(notificationService)
-                .environment(locationViewModel)
-                .environment(profileViewModel)
-                .onChange(of: authViewModel.currentUser?.id) { _, _ in
-                     if let user = authViewModel.currentUser {
-                         profileViewModel.user = user
-                         Task { await profileViewModel.loadUser(userID: user.id) }
+                .environment(locationVM)
+                .environment(profileVM)
+                .onChange(of: authVM.currentUser?.id) { _, _ in
+                     if let user = authVM.currentUser {
+                         profileVM.user = user
+                         Task { await profileVM.loadUser(userID: user.id) }
                      } else {
-                         profileViewModel.user = .mock
+                         profileVM.user = .mock
                      }
                  }
 
