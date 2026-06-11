@@ -11,10 +11,21 @@ final class ConversationViewModel {
     var isNew: Bool = false
     /// True when this conversation hasn't been written to Firestore yet.
 
-    var onCreate: (() async throws -> Void)?
     /// Called once before the first message send to create the conversation in Firestore.
-
+    var onCreate: (() async throws -> Void)?
+    
+    var messageGroups: [(date: Date, messages: [Message])] {
+        let calendar = Calendar.current
+        let grouped = Dictionary(grouping: messages) { message in
+            calendar.startOfDay(for: message.timestamp)
+        }
+        return grouped
+            .map { (date: $0.key, messages: $0.value) }
+            .sorted { $0.date < $1.date }
+    }
+    
     private let conversationRepository: ConversationRepository
+    
     private var stopObserving: (() -> Void)?
 
     init(conversationRepository: ConversationRepository) {
@@ -61,8 +72,6 @@ final class ConversationViewModel {
             timestamp: Date()
         )
 
-        messageText = ""
-
         do {
             /// If this is a new conversation, create it in Firestore before sending.
             if isNew, let create = onCreate {
@@ -79,6 +88,7 @@ final class ConversationViewModel {
                 message,
                 to: conversation.id
             )
+            messageText = ""
         } catch {
             errorMessage = error.localizedDescription
         }
