@@ -102,15 +102,18 @@ struct FilterSheetView: View {
                             Slider(
                                 value: Binding(
                                     get: { filterVM.searchRadius },
-                                    set: {
-                                        filterVM.setRadius(
-                                            $0,
+                                    set: { filterVM.setRadius($0) }
+                                ),
+                                in: 1...50,
+                                step: 1,
+                                onEditingChanged: { editing in
+
+                                    if !editing {
+                                        filterVM.commitRadius(
                                             userID: authVM.currentUserID
                                         )
                                     }
-                                ),
-                                in: 1...50,
-                                step: 1
+                                }
                             )
                             .tint(Theme.terracotta)
 
