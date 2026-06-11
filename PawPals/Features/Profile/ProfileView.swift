@@ -172,7 +172,7 @@ struct ProfileView: View {
                     withAnimation { showSidebar.toggle() }
                 } label: {
                     Label(
-                        "menu",
+                        "common.menu",
                         systemImage: showSidebar ? "xmark" : "line.3.horizontal"
                     )
                     .labelStyle(.iconOnly)

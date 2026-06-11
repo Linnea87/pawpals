@@ -15,7 +15,7 @@ struct MeetView: View {
                 Theme.appBackground.ignoresSafeArea()
                 
                 VStack(alignment: .leading, spacing: Spacing.medium) {
-                    Text("Meet your new dog buddy!")
+                    Text("meet.header")
                         .font(.headline)
                         .fontWeight(.light)
                         .foregroundStyle(Theme.darkBrown)
@@ -27,7 +27,7 @@ struct MeetView: View {
                         Spacer()
                         VStack(spacing: Spacing.small) {
                             ProgressView()
-                            Text("Finding your location...")
+                            Text("meet.findingLocation")
                                 .font(.footnote)
                                 .foregroundStyle(Theme.warmBrown.opacity(Opacity.xSmall))
                         }
@@ -41,15 +41,15 @@ struct MeetView: View {
                             Image(systemName: "location.slash")
                                 .font(.largeTitle)
                                 .foregroundStyle(Theme.terracotta)
-                            Text("Location access is off")
+                            Text("meet.location.accessOff")
                                 .font(.headline)
                                 .foregroundStyle(Theme.warmBrown)
-                            Text("PawPals needs your location to find nearby dogs.")
+                            Text("meet.location.accessDescription")
                                 .font(.footnote)
                                 .foregroundStyle(Theme.darkBrown.opacity(Opacity.xSmall))
                                 .multilineTextAlignment(.center)
                                 .padding(.horizontal, Spacing.large)
-                            Button("Open Settings") {
+                            Button(String(localized: "meet.location.openSettings")) {
                                 if let url = URL(string: UIApplication.openSettingsURLString) {
                                     UIApplication.shared.open(url)
                                 }
@@ -76,7 +76,7 @@ struct MeetView: View {
                         Spacer()
                     } else if filterVM.applyFilters(to: meetVM.allNearbyUsers).isEmpty {
                         Spacer()
-                        Text("No matches nearby")
+                        Text("meet.noMatches")
                             .foregroundStyle(Theme.darkBrown.opacity(Opacity.xSmall))
                             .frame(maxWidth: .infinity)
                         Spacer()
