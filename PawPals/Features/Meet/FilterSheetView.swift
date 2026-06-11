@@ -8,8 +8,6 @@ struct FilterSheetView: View {
     @Environment(LocationViewModel.self) private var locationVM
     @Environment(\.dismiss) private var dismiss
 
-    @State private var debounceTask: Task<Void, Never>?
-
     var body: some View {
         NavigationStack {
             ZStack {
@@ -149,16 +147,10 @@ struct FilterSheetView: View {
             }
         }
         .onChange(of: filterVM.searchRadius) { _, newRadius in
-            debounceTask?.cancel()
-
-            debounceTask = Task {
-                try? await Task.sleep(for: .seconds(0.6))
-                guard !Task.isCancelled else { return }
-                await meetVM.loadNearbyUsers(
-                    currentUserID: authVM.currentUserID,
-                    radius: newRadius
-                )
-            }
+            meetVM.radiusChanged(
+                to: newRadius,
+                currentUserID: authVM.currentUserID
+            )
         }
     }
 

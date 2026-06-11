@@ -20,6 +20,7 @@ final class MeetViewModel {
     private let meetRepository: MeetRepository
     private let locationViewModel: LocationViewModel
     private let chatRepository: ChatRepository
+    private var radiusDebounce: Task<Void, Never>?
 
     init(
         meetRepository: MeetRepository = MeetService(),
@@ -52,7 +53,17 @@ final class MeetViewModel {
             errorMessage = error.localizedDescription
         }
     }
-
+    
+    func radiusChanged(to radius: Double, currentUserID: String) {
+        
+        radiusDebounce?.cancel()
+        
+        radiusDebounce = Task {
+            try? await Task.sleep(for: .seconds(0.6))
+            guard !Task.isCancelled else { return }
+            await loadNearbyUsers(currentUserID: currentUserID, radius: radius)
+        }
+    }
     func loadNearbyUsers(currentUserID: String, radius: Double) async {
         guard let currentLocation = locationViewModel.currentUserLocation else {
             return
