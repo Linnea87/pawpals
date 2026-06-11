@@ -15,7 +15,7 @@ struct MeetCardView: View {
                     .foregroundStyle(Theme.darkBrown)
                 
                 if let distance = user.distance {
-                    Label(String(format: "%.1f km", distance), systemImage: "pawprint")
+                    Label(String(format: String(localized: "meet.distance"), distance), systemImage: "pawprint")
                         .font(.caption)
                         .foregroundStyle(Theme.warmBrown)
                 }

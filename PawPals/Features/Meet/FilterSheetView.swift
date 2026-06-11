@@ -16,19 +16,19 @@ struct FilterSheetView: View {
 
                 VStack(alignment: .leading, spacing: Spacing.large) {
                     VStack(alignment: .leading, spacing: Spacing.small) {
-                        Text("Walk type")
+                        Text("meet.filter.walkType")
                             .font(.subheadline)
                             .fontWeight(.semibold)
                             .foregroundStyle(Theme.darkBrown)
 
                         ScrollView(.horizontal, showsIndicators: false) {
                             HStack(spacing: Spacing.small) {
-                                FilterChip(title: "All", isSelected: filterVM.activeFilters.isEmpty) {
+                                FilterChip(title: String(localized: "meet.filter.all"), isSelected: filterVM.activeFilters.isEmpty) {
                                     filterVM.clearFilters(userID: authVM.currentUserID)
                                 }
                                 ForEach(WalkType.allCases) { walkType in
                                     FilterChip(
-                                        title: walkType.rawValue,
+                                        title: walkType.displayName,
                                         isSelected: filterVM.activeFilters.contains(walkType.rawValue)
                                     ) {
                                         filterVM.toggleFilter(walkType.rawValue, userID: authVM.currentUserID)
@@ -38,7 +38,7 @@ struct FilterSheetView: View {
                             }
                         }
 
-                        Text("Dog size")
+                        Text("meet.filter.dogSize")
                             .font(.subheadline)
                             .fontWeight(.semibold)
                             .foregroundStyle(Theme.darkBrown)
@@ -46,12 +46,12 @@ struct FilterSheetView: View {
 
                         ScrollView(.horizontal, showsIndicators: false) {
                             HStack(spacing: Spacing.small) {
-                                FilterChip(title: "All sizes", isSelected: filterVM.activeSizeFilters.isEmpty) {
+                                FilterChip(title: String(localized: "meet.filter.allSizes"), isSelected: filterVM.activeSizeFilters.isEmpty) {
                                     filterVM.clearSizeFilters(userID: authVM.currentUserID)
                                 }
                                 ForEach(DogSize.allCases, id: \.self) { size in
                                     FilterChip(
-                                        title: size.rawValue.capitalized,
+                                        title: size.displayName,
                                         isSelected: filterVM.activeSizeFilters.contains(size.rawValue)
                                     ) {
                                         filterVM.toggleSizeFilter(size.rawValue, userID: authVM.currentUserID)

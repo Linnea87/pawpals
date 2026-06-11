@@ -26,6 +26,24 @@
               }
             }
           }
+        },
+        "sv" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld dag sedan"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld dagar sedan"
+                }
+              }
+            }
+          }
         }
       }
     },
@@ -41,6 +59,12 @@
             "state" : "translated",
             "value" : "Email address"
           }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "E-postadress"
+          }
         }
       }
     },
@@ -51,6 +75,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Invalid email or password"
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Felaktig e-post eller lösenord"
           }
         }
       }
@@ -63,6 +93,12 @@
             "state" : "translated",
             "value" : "Not implemented yet"
           }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Inte implementerat ännu"
+          }
         }
       }
     },
@@ -73,6 +109,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Something went wrong. Please try again"
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Något gick fel. Försök igen"
           }
         }
       }
@@ -85,6 +127,29 @@
             "state" : "translated",
             "value" : "Forgot password?"
           }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Glömt lösenordet?"
+          }
+        }
+      }
+    },
+    "auth.or" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Or"
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Eller"
+          }
         }
       }
     },
@@ -95,6 +160,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Password"
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lösenord"
           }
         }
       }
@@ -107,6 +178,12 @@
             "state" : "translated",
             "value" : "Sign in"
           }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Logga in"
+          }
         }
       }
     },
@@ -117,6 +194,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Sign up"
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Skapa konto"
           }
         }
       }
@@ -129,6 +212,12 @@
             "state" : "translated",
             "value" : "Sign in with Google"
           }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Logga in med Google"
+          }
         }
       }
     },
@@ -139,6 +228,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Sign up with Google"
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Registrera dig med Google"
           }
         }
       }
@@ -151,6 +246,12 @@
             "state" : "translated",
             "value" : "Your name"
           }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ditt namn"
+          }
         }
       }
     },
@@ -161,6 +262,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "By creating an account you agree to our Terms of Use and Privacy Policy."
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Genom att skapa ett konto godkänner du våra användarvillkor och vår integritetspolicy."
           }
         }
       }
@@ -173,6 +280,12 @@
             "state" : "translated",
             "value" : "Sign in or create an account to get started"
           }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Logga in eller skapa ett konto för att komma igång"
+          }
         }
       }
     },
@@ -183,6 +296,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Find new friends for your dog"
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hitta nya vänner till din hund"
           }
         }
       }
@@ -195,6 +314,12 @@
             "state" : "translated",
             "value" : "Welcome!"
           }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Välkommen!"
+          }
         }
       }
     },
@@ -205,6 +330,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "All"
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Alla"
           }
         }
       }
@@ -217,6 +348,12 @@
             "state" : "translated",
             "value" : "Favorite"
           }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Favoriter"
+          }
         }
       }
     },
@@ -227,6 +364,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Unread"
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Olästa"
           }
         }
       }
@@ -239,6 +382,12 @@
             "state" : "translated",
             "value" : "📷 Photo"
           }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "📷 Foto"
+          }
         }
       }
     },
@@ -249,6 +398,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Message..."
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Meddelande..."
           }
         }
       }
@@ -261,6 +416,12 @@
             "state" : "translated",
             "value" : "No conversations yet"
           }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Inga konversationer än"
+          }
         }
       }
     },
@@ -271,6 +432,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "CHAT"
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "CHATT"
           }
         }
       }
@@ -284,6 +451,12 @@
             "state" : "translated",
             "value" : "Done"
           }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Klar"
+          }
         }
       }
     },
@@ -295,6 +468,29 @@
             "state" : "translated",
             "value" : "Error"
           }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fel"
+          }
+        }
+      }
+    },
+    "common.menu" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Menu"
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Meny"
+          }
         }
       }
     },
@@ -302,6 +498,12 @@
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "OK"
+          }
+        },
+        "sv" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "OK"
@@ -317,6 +519,12 @@
             "state" : "translated",
             "value" : "Unknown"
           }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Okänd"
+          }
         }
       }
     },
@@ -327,6 +535,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Today"
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Idag"
           }
         }
       }
@@ -339,20 +553,11 @@
             "state" : "translated",
             "value" : "Yesterday"
           }
-        }
-      }
-    },
-    "Dog size" : {
-      "comment" : "A heading for the dog size filter options.",
-      "isCommentAutoGenerated" : true
-    },
-    "dog.add" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
+        },
+        "sv" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Add dog"
+            "value" : "Igår"
           }
         }
       }
@@ -365,6 +570,12 @@
             "state" : "translated",
             "value" : "Breed"
           }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ras"
+          }
         }
       }
     },
@@ -375,6 +586,29 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Dog name"
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hund namn"
+          }
+        }
+      }
+    },
+    "dog.remove" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Remove"
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ta bort"
           }
         }
       }
@@ -387,6 +621,12 @@
             "state" : "translated",
             "value" : "Save"
           }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Spara"
+          }
         }
       }
     },
@@ -397,6 +637,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "My dog"
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Min hund"
           }
         }
       }
@@ -409,6 +655,12 @@
             "state" : "translated",
             "value" : "Size"
           }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Storlek"
+          }
         }
       }
     },
@@ -420,23 +672,65 @@
             "state" : "translated",
             "value" : "Select size"
           }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Välj storlek"
+          }
         }
       }
     },
-    "dog.validation.required" : {
+    "dogSize.large" : {
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Name and breed are required"
+            "value" : "Large"
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Stor"
           }
         }
       }
     },
-    "Finding your location..." : {
-      "comment" : "A message displayed when the app is trying to find the user's location.",
-      "isCommentAutoGenerated" : true
+    "dogSize.medium" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Medium"
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mellan"
+          }
+        }
+      }
+    },
+    "dogSize.small" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Small"
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Liten"
+          }
+        }
+      }
     },
     "firestore.error.decodingFailed" : {
       "extractionState" : "manual",
@@ -445,6 +739,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Failed to load data."
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Det gick inte att läsa in data."
           }
         }
       }
@@ -457,6 +757,12 @@
             "state" : "translated",
             "value" : "Failed to save data."
           }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Det gick inte att spara data."
+          }
         }
       }
     },
@@ -468,18 +774,26 @@
             "state" : "translated",
             "value" : "The requested data could not be found."
           }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Den begärda informationen kunde inte hittas."
+          }
         }
       }
-    },
-    "Location access is off" : {
-      "comment" : "A message displayed when the user has denied location access.",
-      "isCommentAutoGenerated" : true
     },
     "location.1km" : {
       "comment" : "A label displayed in the filter sheet that indicates the minimum distance from the user's location.",
       "isCommentAutoGenerated" : true,
       "localizations" : {
         "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "1 km"
+          }
+        },
+        "sv" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "1 km"
@@ -496,6 +810,12 @@
             "state" : "translated",
             "value" : "50 km"
           }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "50 km"
+          }
         }
       }
     },
@@ -506,6 +826,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Location access is denied. Please enable it in Settings."
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Åtkomst till platstjänster är nekad. Vänligen aktivera det i Inställningar."
           }
         }
       }
@@ -518,6 +844,12 @@
             "state" : "translated",
             "value" : "Could not determine your location. Try again."
           }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Din plats kunde inte fastställas. Försök igen."
+          }
         }
       }
     },
@@ -529,11 +861,201 @@
             "state" : "translated",
             "value" : "location unavailable"
           }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "plats otillgänglig"
+          }
         }
       }
     },
-    "Meet your new dog buddy!" : {
-
+    "meet.distance" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%.1f km"
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%.1f km"
+          }
+        }
+      }
+    },
+    "meet.filter.all" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "All"
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Alla"
+          }
+        }
+      }
+    },
+    "meet.filter.allSizes" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "All sizes"
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Alla storlekar"
+          }
+        }
+      }
+    },
+    "meet.filter.dogSize" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dog size"
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hundstorlek"
+          }
+        }
+      }
+    },
+    "meet.filter.walkType" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Walk type"
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Promenadtyp"
+          }
+        }
+      }
+    },
+    "meet.findingLocation" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Finding your location..."
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hittar din plats..."
+          }
+        }
+      }
+    },
+    "meet.header" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Meet your new dog buddy!"
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Möt din nya hundkompis!"
+          }
+        }
+      }
+    },
+    "meet.location.accessDescription" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "PawPals needs your location to find nearby dogs."
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "PawPals behöver din plats för att hitta hundar i närheten."
+          }
+        }
+      }
+    },
+    "meet.location.accessOff" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Location access is off"
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Platsåtkomst är avstängd"
+          }
+        }
+      }
+    },
+    "meet.location.openSettings" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Open Settings"
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Öppna inställningar"
+          }
+        }
+      }
+    },
+    "meet.noMatches" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No matches nearby"
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Inga matchningar i närheten"
+          }
+        }
+      }
     },
     "meet.tab" : {
       "extractionState" : "manual",
@@ -543,41 +1065,17 @@
             "state" : "translated",
             "value" : "MEET"
           }
-        }
-      }
-    },
-    "menu" : {
-      "comment" : "A menu icon.",
-      "isCommentAutoGenerated" : true
-    },
-    "message.read" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
+        },
+        "sv" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Read"
+            "value" : "UPPTÄCK"
           }
         }
       }
     },
-    "No matches nearby" : {
-      "comment" : "A message displayed when there are no users nearby.",
-      "isCommentAutoGenerated" : true
-    },
-    "Open Settings" : {
-      "comment" : "A button that opens the app's settings.",
-      "isCommentAutoGenerated" : true
-    },
-    "Or" : {
-
-    },
     "PawPals" : {
 
-    },
-    "PawPals needs your location to find nearby dogs." : {
-      "comment" : "A description of the location access error.",
-      "isCommentAutoGenerated" : true
     },
     "profile.aboutUs" : {
       "extractionState" : "manual",
@@ -586,6 +1084,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "About us"
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Om oss"
           }
         }
       }
@@ -598,16 +1102,11 @@
             "state" : "translated",
             "value" : "Bio"
           }
-        }
-      }
-    },
-    "profile.city" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
+        },
+        "sv" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "City"
+            "value" : "Bio"
           }
         }
       }
@@ -620,6 +1119,12 @@
             "state" : "translated",
             "value" : "Delete Account"
           }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Radera konto"
+          }
         }
       }
     },
@@ -630,6 +1135,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Delete"
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Radera"
           }
         }
       }
@@ -642,6 +1153,12 @@
             "state" : "translated",
             "value" : "This will permanently delete your account and all your data. This action cannot be undone."
           }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Detta raderar permanent ditt konto och all din data. Åtgärden kan inte ångras."
+          }
         }
       }
     },
@@ -652,6 +1169,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Delete Account?"
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Radera konto?"
           }
         }
       }
@@ -664,16 +1187,11 @@
             "state" : "translated",
             "value" : "My dog"
           }
-        }
-      }
-    },
-    "profile.dogInfo" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
+        },
+        "sv" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Dog info"
+            "value" : "Min hund"
           }
         }
       }
@@ -686,6 +1204,12 @@
             "state" : "translated",
             "value" : "My dogs"
           }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mina hundar"
+          }
         }
       }
     },
@@ -696,6 +1220,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Edit profile"
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Redigera profil"
           }
         }
       }
@@ -708,6 +1238,12 @@
             "state" : "translated",
             "value" : "Log out"
           }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Logga ut"
+          }
         }
       }
     },
@@ -718,6 +1254,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Log out"
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Logga ut"
           }
         }
       }
@@ -730,6 +1272,12 @@
             "state" : "translated",
             "value" : "Are you sure you want to log out?"
           }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Är du säker på att du vill logga ut?"
+          }
         }
       }
     },
@@ -740,6 +1288,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Log out?"
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Logga ut?"
           }
         }
       }
@@ -752,6 +1306,12 @@
             "state" : "translated",
             "value" : "Name"
           }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Namn"
+          }
         }
       }
     },
@@ -762,6 +1322,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Liked profiles"
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gillade profiler"
           }
         }
       }
@@ -774,6 +1340,12 @@
             "state" : "translated",
             "value" : "Start chat"
           }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Starta chatt"
+          }
         }
       }
     },
@@ -785,6 +1357,12 @@
             "state" : "translated",
             "value" : "PROFILE"
           }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "PROFIL"
+          }
         }
       }
     },
@@ -795,6 +1373,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Walk preferences"
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Promenadpreferenser"
           }
         }
       }
@@ -808,6 +1392,12 @@
             "state" : "translated",
             "value" : "Search radius"
           }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sökradie"
+          }
         }
       }
     },
@@ -819,48 +1409,99 @@
             "state" : "translated",
             "value" : "Cancel"
           }
-        }
-      }
-    },
-    "Ta bort" : {
-
-    },
-    "tab.chat" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
+        },
+        "sv" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "CHAT"
+            "value" : "Avbryt"
           }
         }
       }
     },
-    "tab.meet" : {
-      "extractionState" : "stale",
+    "walkType.city" : {
+      "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "MEET"
+            "value" : "City walk"
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Stadspromenad"
           }
         }
       }
     },
-    "tab.profile" : {
-      "extractionState" : "stale",
+    "walkType.evening" : {
+      "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "PROFILE"
+            "value" : "Evening walk"
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kvällspromenad"
           }
         }
       }
     },
-    "Walk type" : {
-      "comment" : "A label displayed above a list of walk types.",
-      "isCommentAutoGenerated" : true
+    "walkType.forest" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Forest walk"
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Skogspromenad"
+          }
+        }
+      }
+    },
+    "walkType.long" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Long walk"
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lång promenad"
+          }
+        }
+      }
+    },
+    "walkType.morning" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Morning walk"
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Morgonpromenad"
+          }
+        }
+      }
     }
   },
   "version" : "1.2"
