@@ -94,21 +94,18 @@ final class MeetService: MeetRepository {
             .document(targetID)
             .delete()
     }
-
+    
     func fetchSavedProfiles(for userID: String) async throws -> [User] {
-             let snapshot = try await db.collection("users")
-                 .document(userID)
-                 .collection("savedProfiles")
-                 .getDocuments()
-
-             var users: [User] = []
-             for doc in snapshot.documents {
-                 if let user = try? await profileRepository.fetchUser(userID: doc.documentID) {
-                     users.append(user)
-                 }
-             }
-             return users
-         }
+        let ids = try await fetchSavedProfileIDs(for: userID)
+        
+        var users: [User] = []
+        for id in ids {
+            if let user = try? await profileRepository.fetchUser(userID: id) {
+                users.append(user)
+            }
+        }
+        return users
+    }
 
     func fetchSavedProfileIDs(for userID: String) async throws -> Set<String> {
         let snapshot = try await db.collection("users")
