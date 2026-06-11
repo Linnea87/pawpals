@@ -21,6 +21,7 @@ struct ProfileView: View {
     @State private var showEditProfile = false
     @State private var showDeleteConfirm = false
     @State private var showLogoutConfirm = false
+    @State private var selectedSavedUser: User?
 
     private var displayUser: User {
         isOwner ? profileViewModel.user : user
@@ -46,7 +47,9 @@ struct ProfileView: View {
                     DogsSection(dogs: displayUser.dogs)
 
                     if isOwner {
-                        SavedProfilesSection(savedUsers: meetViewModel.savedUsers)
+                        SavedProfilesSection(savedUsers: meetViewModel.savedUsers) { user in
+                            selectedSavedUser = user
+                        }
                     }
 
                     /// Only show when arriving from Meet (new contact) — hidden when
@@ -111,6 +114,10 @@ struct ProfileView: View {
             }
             .navigationDestination(isPresented: $showEditProfile) {
                 AddProfileSheet(user: profileViewModel.user)
+            }
+            .sheet(item: $selectedSavedUser) { savedUser in
+                ProfileView(user: savedUser, isOwner: false, cameFromMeet: false, selectedTab: $selectedTab)
+                    .environment(meetViewModel)
             }
             .navigationDestination(item: $chatVM.activeConversation) { conversation in
                 ConversationView(
