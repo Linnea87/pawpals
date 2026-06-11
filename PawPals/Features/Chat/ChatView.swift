@@ -141,38 +141,7 @@ struct ChatView: View {
 
 }
 
-private func makePreviewChatViewModel() -> ChatViewModel {
-    let viewModel = ChatViewModel(
-        chatRepository: MockChatRepository(),
-        profileRepository: MockProfileRepository(),
-        meetRepository: MockMeetRepository()
-    )
-    viewModel.conversations = [
-        Conversation(
-            id: "1",
-            participantIDs: ["Anna", "Patrik"],
-            lastMessage: "Hey, want to go for a walk?",
-            lastMessageTimestamp: Date(),
-            unreadCounts: ["Patrik": 3]
-        ),
-        Conversation(
-            id: "2",
-            participantIDs: ["Sara", "Patrik"],
-            lastMessage: "My dog loved meeting yours!",
-            lastMessageTimestamp: Date().addingTimeInterval(-3600),
-            unreadCounts: ["Patrik": 1]
-        ),
-        Conversation(
-            id: "3",
-            participantIDs: ["Johan", "Patrik"],
-            lastMessage: "See you at the park!",
-            lastMessageTimestamp: Date().addingTimeInterval(-7200)
-        ),
-    ]
-    return viewModel
-}
-
 #Preview {
     ChatView(selectedTab: .constant(.chat), currentUserID: "Patrik")
-        .environment(makePreviewChatViewModel())
+        .environment(ChatViewModel.preview)
 }
