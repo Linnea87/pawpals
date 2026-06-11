@@ -2,6 +2,7 @@ import SwiftUI
 
 struct SavedProfilesSection: View {
     let savedUsers: [User]
+    let onSelect: (User) -> Void
 
     var body: some View {
         if !savedUsers.isEmpty {
@@ -21,6 +22,10 @@ struct SavedProfilesSection: View {
                         }
                     }
                     .listRowBackground(Theme.offWhite.opacity(Opacity.xSmall))
+                    .contentShape(Rectangle())
+                    .onTapGesture {
+                        onSelect(savedUser)
+                    }
                 }
             } header: {
                 SectionHeader(title: "profile.savedProfiles")
