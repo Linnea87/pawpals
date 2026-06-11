@@ -34,7 +34,7 @@ extension User {
 
 #if DEBUG
 import UIKit
-import FirebaseFirestore
+import CoreLocation
 
 // =========== Mock Users ==================================
  
@@ -138,9 +138,9 @@ struct MockAuthRepository: AuthRepository {
   // =========== MockMeetRepository =============================
 
   struct MockMeetRepository: MeetRepository {
-      func fetchNearbyUsers(location: GeoPoint, radius: Double, excludingUserID: String) async
+      func fetchNearbyUsers(location: CLLocationCoordinate2D, radius: Double, excludingUserID: String) async
   throws -> [User] { [] }
-      func updateLocation(_ location: GeoPoint, userID: String) async throws {}
+      func updateLocation(_ location: CLLocationCoordinate2D, userID: String) async throws {}
       func saveProfile(_ targetID: String, by userID: String) async throws {}
       func unsaveProfile(_ targetID: String, by userID: String) async throws {}
       func fetchSavedProfiles(for userID: String) async throws -> [User] { [] }

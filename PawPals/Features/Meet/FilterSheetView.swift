@@ -16,29 +16,38 @@ struct FilterSheetView: View {
 
                 VStack(alignment: .leading, spacing: Spacing.large) {
                     VStack(alignment: .leading, spacing: Spacing.small) {
-                        Text("Walk type")
+                        Text("meet.filter.walkType")
                             .font(.subheadline)
                             .fontWeight(.semibold)
                             .foregroundStyle(Theme.darkBrown)
 
                         ScrollView(.horizontal, showsIndicators: false) {
                             HStack(spacing: Spacing.small) {
-                                FilterChip(title: "All", isSelected: filterVM.activeFilters.isEmpty) {
-                                    filterVM.clearFilters(userID: authVM.currentUserID)
+                                FilterChip(
+                                    title: String(localized: "meet.filter.all"),
+                                    isSelected: filterVM.activeFilters.isEmpty
+                                ) {
+                                    filterVM.clearFilters(
+                                        userID: authVM.currentUserID
+                                    )
                                 }
                                 ForEach(WalkType.allCases) { walkType in
                                     FilterChip(
-                                        title: walkType.rawValue,
-                                        isSelected: filterVM.activeFilters.contains(walkType.rawValue)
+                                        title: walkType.displayName,
+                                        isSelected: filterVM.activeFilters
+                                            .contains(walkType.rawValue)
                                     ) {
-                                        filterVM.toggleFilter(walkType.rawValue, userID: authVM.currentUserID)
+                                        filterVM.toggleFilter(
+                                            walkType.rawValue,
+                                            userID: authVM.currentUserID
+                                        )
 
                                     }
                                 }
                             }
                         }
 
-                        Text("Dog size")
+                        Text("meet.filter.dogSize")
                             .font(.subheadline)
                             .fontWeight(.semibold)
                             .foregroundStyle(Theme.darkBrown)
@@ -46,15 +55,27 @@ struct FilterSheetView: View {
 
                         ScrollView(.horizontal, showsIndicators: false) {
                             HStack(spacing: Spacing.small) {
-                                FilterChip(title: "All sizes", isSelected: filterVM.activeSizeFilters.isEmpty) {
-                                    filterVM.clearSizeFilters(userID: authVM.currentUserID)
+                                FilterChip(
+                                    title: String(
+                                        localized: "meet.filter.allSizes"
+                                    ),
+                                    isSelected: filterVM.activeSizeFilters
+                                        .isEmpty
+                                ) {
+                                    filterVM.clearSizeFilters(
+                                        userID: authVM.currentUserID
+                                    )
                                 }
                                 ForEach(DogSize.allCases, id: \.self) { size in
                                     FilterChip(
-                                        title: size.rawValue.capitalized,
-                                        isSelected: filterVM.activeSizeFilters.contains(size.rawValue)
+                                        title: size.displayName,
+                                        isSelected: filterVM.activeSizeFilters
+                                            .contains(size.rawValue)
                                     ) {
-                                        filterVM.toggleSizeFilter(size.rawValue, userID: authVM.currentUserID)
+                                        filterVM.toggleSizeFilter(
+                                            size.rawValue,
+                                            userID: authVM.currentUserID
+                                        )
                                     }
                                 }
                             }
@@ -81,7 +102,8 @@ struct FilterSheetView: View {
                             Slider(
                                 value: Binding(
                                     get: { filterVM.searchRadius },
-                                    set: { filterVM.setRadius(
+                                    set: {
+                                        filterVM.setRadius(
                                             $0,
                                             userID: authVM.currentUserID
                                         )
@@ -103,7 +125,6 @@ struct FilterSheetView: View {
                             }
                         }
 
-                    
                         Divider()
 
                         /// Map fills the rest of the card
@@ -124,6 +145,12 @@ struct FilterSheetView: View {
                     .foregroundStyle(Theme.terracotta)
                 }
             }
+        }
+        .onChange(of: filterVM.searchRadius) { _, newRadius in
+            meetVM.radiusChanged(
+                to: newRadius,
+                currentUserID: authVM.currentUserID
+            )
         }
     }
 
@@ -146,12 +173,14 @@ struct FilterSheetView: View {
             ) {
                 UserAnnotation()
 
-                
                 ForEach(usersInRadius) { user in
                     if let lat = user.latitude, let lon = user.longitude {
                         Annotation(
                             user.name,
-                            coordinate: CLLocationCoordinate2D(latitude: lat, longitude: lon)
+                            coordinate: CLLocationCoordinate2D(
+                                latitude: lat,
+                                longitude: lon
+                            )
                         ) {
                             PawPinView()
                         }
@@ -182,7 +211,7 @@ struct FilterSheetView: View {
         .background(Theme.offWhite.opacity(Opacity.xSmall))
         .clipShape(RoundedRectangle(cornerRadius: Radius.medium))
     }
-    
+
     private struct PawPinView: View {
         var body: some View {
             Image(systemName: "pawprint.fill")
@@ -199,11 +228,17 @@ struct FilterSheetView: View {
 #Preview {
     let locationVM: LocationViewModel = {
         let vm = LocationViewModel()
-        vm.currentUserLocation = CLLocationCoordinate2D(latitude: 59.3293, longitude: 18.0686)
+        vm.currentUserLocation = CLLocationCoordinate2D(
+            latitude: 59.3293,
+            longitude: 18.0686
+        )
         return vm
     }()
     let meetVM: MeetViewModel = {
-        let vm = MeetViewModel(meetRepository: MockMeetRepository(), locationViewModel: locationVM)
+        let vm = MeetViewModel(
+            meetRepository: MockMeetRepository(),
+            locationViewModel: locationVM
+        )
         vm.allNearbyUsers = User.mockUsers
         return vm
     }()
@@ -212,5 +247,10 @@ struct FilterSheetView: View {
         .environment(meetVM)
         .environment(locationVM)
         .environment(FilterViewModel())
-        .environment(AuthViewModel(repository: AuthService(), profileRepository: ProfileService()))
+        .environment(
+            AuthViewModel(
+                repository: AuthService(),
+                profileRepository: ProfileService()
+            )
+        )
 }

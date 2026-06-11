@@ -5,16 +5,19 @@ import Foundation
 final class MeetService: MeetRepository {
     private let db = Firestore.firestore()
     private let profileRepository: ProfileRepository
+    private let errorHandler = FirestoreErrorHandler.shared
     
     init(profileRepository: ProfileRepository = ProfileService()) {
              self.profileRepository = profileRepository
          }
     
     
-    func fetchNearbyUsers(location: GeoPoint, radius: Double, excludingUserID: String) async throws
+    func fetchNearbyUsers(location: CLLocationCoordinate2D, radius: Double, excludingUserID: String) async throws
         -> [User]
     {
-        let snapshot = try await db.collection("users").getDocuments()
+        let snapshot = try await errorHandler.execute {
+            try await self.db.collection("users").getDocuments()
+        }
 
         let currentLocation = CLLocation(
             latitude: location.latitude,
@@ -66,25 +69,26 @@ final class MeetService: MeetRepository {
         }
     }
     
-    func updateLocation(_ location: GeoPoint, userID: String) async throws {
-        /// Store lat/long as top-level Double fields so they match the User model's - latitude and longitude properties when decoded by Firestore
-        try await db.collection("users")
-            .document(userID)
-            .setData(
-                [
+    func updateLocation(_ location: CLLocationCoordinate2D, userID: String) async throws{
+        
+        try await errorHandler.execute {
+            try await self.db.collection("users")
+                .document(userID)
+                .setData([
                     "latitude": location.latitude,
                     "longitude": location.longitude,
-                ],
-                merge: true
-            )
+                ], merge: true)
+        }
     }
     
     func saveProfile(_ targetID: String, by userID: String) async throws {
-        try await db.collection("users")
-            .document(userID)
-            .collection("savedProfiles")
-            .document(targetID)
-            .setData(["savedAt": Date()])
+        try await errorHandler.execute {
+            try await self.db.collection("users")
+                .document(userID)
+                .collection("savedProfiles")
+                .document(targetID)
+                .setData(["savedAt": Date()])
+        }
     }
 
     func unsaveProfile(_ targetID: String, by userID: String) async throws {

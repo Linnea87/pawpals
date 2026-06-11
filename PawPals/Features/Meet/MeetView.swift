@@ -1,56 +1,66 @@
-import SwiftUI
 import CoreLocation
+import SwiftUI
 
 struct MeetView: View {
     @Binding var selectedTab: Tab
     @Environment(MeetViewModel.self) private var meetVM
+    @Environment(AuthViewModel.self) private var authVM
     @Environment(FilterViewModel.self) private var filterVM
     @Environment(LocationViewModel.self) private var locationVM
     @State private var showFilterSheet = false
-    
+
     var body: some View {
         @Bindable var meetVM = meetVM
         NavigationStack {
             ZStack {
                 Theme.appBackground.ignoresSafeArea()
-                
+
                 VStack(alignment: .leading, spacing: Spacing.medium) {
-                    Text("Meet your new dog buddy!")
+                    Text("meet.header")
                         .font(.headline)
                         .fontWeight(.light)
                         .foregroundStyle(Theme.darkBrown)
                         .padding(.horizontal, Spacing.large)
                         .padding(.top, Spacing.large)
                         .padding(.bottom, Spacing.medium)
-                    
+
                     if locationVM.isLocating {
                         Spacer()
                         VStack(spacing: Spacing.small) {
                             ProgressView()
-                            Text("Finding your location...")
+                            Text("meet.findingLocation")
                                 .font(.footnote)
-                                .foregroundStyle(Theme.warmBrown.opacity(Opacity.xSmall))
+                                .foregroundStyle(
+                                    Theme.warmBrown.opacity(Opacity.xSmall)
+                                )
                         }
                         .frame(maxWidth: .infinity)
                         Spacer()
-                        
-                    } else if
-                        locationVM.locationStatus == .denied || locationVM.locationStatus == .restricted {
+
+                    } else if locationVM.locationStatus == .denied
+                        || locationVM.locationStatus == .restricted
+                    {
                         Spacer()
                         VStack(spacing: Spacing.medium) {
                             Image(systemName: "location.slash")
                                 .font(.largeTitle)
                                 .foregroundStyle(Theme.terracotta)
-                            Text("Location access is off")
+                            Text("meet.location.accessOff")
                                 .font(.headline)
                                 .foregroundStyle(Theme.warmBrown)
-                            Text("PawPals needs your location to find nearby dogs.")
+                            Text("meet.location.accessDescription")
                                 .font(.footnote)
-                                .foregroundStyle(Theme.darkBrown.opacity(Opacity.xSmall))
+                                .foregroundStyle(
+                                    Theme.darkBrown.opacity(Opacity.xSmall)
+                                )
                                 .multilineTextAlignment(.center)
                                 .padding(.horizontal, Spacing.large)
-                            Button("Open Settings") {
-                                if let url = URL(string: UIApplication.openSettingsURLString) {
+                            Button(
+                                String(localized: "meet.location.openSettings")
+                            ) {
+                                if let url = URL(
+                                    string: UIApplication.openSettingsURLString
+                                ) {
                                     UIApplication.shared.open(url)
                                 }
                             }
@@ -60,10 +70,9 @@ struct MeetView: View {
                         }
                         .frame(maxWidth: .infinity)
                         Spacer()
-                        
-                        
+
                     } else if meetVM.isLoading {
-                        
+
                         Spacer()
                         ProgressView()
                             .frame(maxWidth: .infinity)
@@ -74,18 +83,31 @@ struct MeetView: View {
                             .foregroundStyle(Theme.warmBrown)
                             .frame(maxWidth: .infinity)
                         Spacer()
-                    } else if filterVM.applyFilters(to: meetVM.allNearbyUsers).isEmpty {
+                    } else if filterVM.applyFilters(to: meetVM.allNearbyUsers)
+                        .isEmpty
+                    {
                         Spacer()
-                        Text("No matches nearby")
-                            .foregroundStyle(Theme.darkBrown.opacity(Opacity.xSmall))
+                        Text("meet.noMatches")
+                            .foregroundStyle(
+                                Theme.darkBrown.opacity(Opacity.xSmall)
+                            )
                             .frame(maxWidth: .infinity)
                         Spacer()
                     } else {
                         ScrollView {
                             LazyVStack(spacing: Spacing.medium) {
-                                ForEach(filterVM.applyFilters(to: meetVM.allNearbyUsers)) { user in
-                                    MeetCardView(user: user, isSaved: meetVM.savedUserIDs.contains(user.id))
-                                        .onTapGesture { meetVM.selectedUser = user }
+                                ForEach(
+                                    filterVM.applyFilters(
+                                        to: meetVM.allNearbyUsers
+                                    )
+                                ) { user in
+                                    MeetCardView(
+                                        user: user,
+                                        isSaved: meetVM.savedUserIDs.contains(
+                                            user.id
+                                        )
+                                    )
+                                    .onTapGesture { meetVM.selectedUser = user }
                                 }
                             }
                             .padding(.horizontal, Spacing.xLarge)
@@ -96,8 +118,14 @@ struct MeetView: View {
             .safeAreaInset(edge: .bottom, spacing: Spacing.none) {
                 TabBarView(selectedTab: $selectedTab)
             }
-            
-            .task { await meetVM.loadWithLocation() }
+
+            .task {
+                await filterVM.loadPreferences(userID: authVM.currentUserID)
+                await meetVM.loadWithLocation(
+                    currentUserID: authVM.currentUserID,
+                    radius: filterVM.searchRadius
+                )
+            }
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
                     Button {
@@ -108,10 +136,15 @@ struct MeetView: View {
                     }
                 }
             }
-            
+
             .sheet(item: $meetVM.selectedUser) { user in
-                ProfileView(user: user, isOwner: false, cameFromMeet: true, selectedTab: $selectedTab)
-                    .environment(meetVM)
+                ProfileView(
+                    user: user,
+                    isOwner: false,
+                    cameFromMeet: true,
+                    selectedTab: $selectedTab
+                )
+                .environment(meetVM)
             }
             .sheet(isPresented: $showFilterSheet) {
                 FilterSheetView()
@@ -128,6 +161,12 @@ struct MeetView: View {
         .environment(MeetViewModel(locationViewModel: locationVM))
         .environment(FilterViewModel())
         .environment(locationVM)
+        .environment(
+            AuthViewModel(
+                repository: MockAuthRepository(),
+                profileRepository: MockProfileRepository()
+            )
+        )
 }
 
 #Preview("Active filters") {
@@ -139,4 +178,10 @@ struct MeetView: View {
         .environment(MeetViewModel(locationViewModel: locationVM))
         .environment(filterVM)
         .environment(locationVM)
+        .environment(
+            AuthViewModel(
+                repository: MockAuthRepository(),
+                profileRepository: MockProfileRepository()
+            )
+        )
 }

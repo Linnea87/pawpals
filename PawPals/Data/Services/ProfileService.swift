@@ -7,9 +7,9 @@ enum ProfileServiceError: Error {
     case notFound
 }
 
-
 final class ProfileService: ProfileRepository {
     private let db = Firestore.firestore()
+    private let errorHandler = FirestoreErrorHandler.shared
   
     func updateProfile(_ user: User) async throws {
         var data: [String: Any] = [
@@ -20,38 +20,44 @@ final class ProfileService: ProfileRepository {
         if let photoURL = user.photoURL {
             data["photoURL"] = photoURL
         }
-        try await db.collection("users").document(user.id).setData(
-            data,
-            merge: true
-        )
+        try await errorHandler.execute {
+            try await self.db.collection("users").document(user.id).setData(data, merge: true)
+        }
     }
-
+    
     func saveDog(_ dog: Dog, userID: String) async throws {
-        try db.collection("users")
-            .document(userID)
-            .collection("dogs")
-            .document(dog.id)
-            .setData(from: dog)
+        try await errorHandler.execute {
+            try self.db.collection("users")
+                .document(userID)
+                .collection("dogs")
+                .document(dog.id)
+                .setData(from: dog)
+        }
     }
-
+    
     func removeDog(dogID: String, userID: String) async throws {
-        try await db.collection("users")
-            .document(userID)
-            .collection("dogs")
-            .document(dogID)
-            .delete()
+        try await errorHandler.execute {
+            try await self.db.collection("users")
+                .document(userID)
+                .collection("dogs")
+                .document(dogID)
+                .delete()
+        }
     }
     
     
     func fetchUser(userID: String) async throws -> User {
-        let doc = try await db.collection("users").document(userID)
-            .getDocument()
+        let doc = try await errorHandler.execute {
+            try await self.db.collection("users").document(userID).getDocument()
+        }
         guard let data = doc.data() else { throw ProfileServiceError.notFound }
-
-        let dogsSnapshot = try await db.collection("users")
-            .document(userID)
-            .collection("dogs")
-            .getDocuments()
+        
+        let dogsSnapshot = try await errorHandler.execute {
+            try await self.db.collection("users")
+                .document(userID)
+                .collection("dogs")
+                .getDocuments()
+        }
         let dogs = dogsSnapshot.documents.compactMap {
             try? $0.data(as: Dog.self)
         }
@@ -90,17 +96,17 @@ final class ProfileService: ProfileRepository {
                 "searchRadius": prefs.searchRadius,
             ]
         ]
-        try await db.collection("users").document(userID).setData(
-            data,
-            merge: true
-        )
+        try await errorHandler.execute {
+            try await self.db.collection("users").document(userID).setData(data, merge: true)
+        }
     }
-
+    
     func loadPreferences(userID: String) async throws -> UserPreferences {
-        let doc = try await db.collection("users").document(userID)
-            .getDocument()
+        let doc = try await errorHandler.execute {
+            try await self.db.collection("users").document(userID).getDocument()
+        }
         guard let data = doc.data(),
-            let prefsData = data["preferences"] as? [String: Any]
+              let prefsData = data["preferences"] as? [String: Any]
         else {
             return UserPreferences(
                 walkTypes: [],
@@ -123,33 +129,43 @@ final class ProfileService: ProfileRepository {
 
     func savePushNotificationToken(_ token: String, userID: String) async throws
     {
-        try await db.collection("users")
-            .document(userID)
-            .setData(["pushNotificationToken": token], merge: true)
+        try await errorHandler.execute {
+            try await self.db.collection("users")
+                .document(userID)
+                .setData(["pushNotificationToken": token], merge: true)
+        }
     }
 
     func deleteUserData(userID: String) async throws {
         let batch = db.batch()
-        let dogsSnapshot = try await db.collection("users").document(userID)
-            .collection("dogs").getDocuments()
+        let dogsSnapshot = try await errorHandler.execute {
+            try await self.db.collection("users").document(userID).collection("dogs").getDocuments()
+        }
         for doc in dogsSnapshot.documents {
             batch.deleteDocument(doc.reference)
         }
         batch.deleteDocument(db.collection("users").document(userID))
-        try await batch.commit()
+        try await errorHandler.execute {
+            try await batch.commit()
+        }
 
-        let conversationsSnapshot = try await db.collection("conversations")
-            .whereField("participantIDs", arrayContains: userID)
-            .getDocuments()
+        let conversationsSnapshot = try await errorHandler.execute {
+            try await self.db.collection("conversations")
+                .whereField("participantIDs", arrayContains: userID)
+                .getDocuments()
+        }
         for conversationDoc in conversationsSnapshot.documents {
-            let messagesSnapshot = try await conversationDoc.reference
-                .collection("messages").getDocuments()
+            let messagesSnapshot = try await errorHandler.execute {
+                try await conversationDoc.reference.collection("messages").getDocuments()
+            }
             let messageBatch = db.batch()
             for messageDoc in messagesSnapshot.documents {
                 messageBatch.deleteDocument(messageDoc.reference)
             }
             messageBatch.deleteDocument(conversationDoc.reference)
-            try await messageBatch.commit()
+            try await errorHandler.execute {
+                try await messageBatch.commit()
+            }
         }
     }
 
@@ -166,9 +182,8 @@ final class ProfileService: ProfileRepository {
     }
     
     func updateCity(_ city: String, userID: String) async throws {
-        try await db.collection("users").document(userID).setData(
-            ["city": city],
-            merge: true
-        )
+        try await errorHandler.execute {
+            try await self.db.collection("users").document(userID).setData(["city": city], merge: true)
+        }
     }
 }
