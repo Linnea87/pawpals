@@ -13,7 +13,11 @@ final class FilterViewModel {
     }
 
     func loadPreferences(userID: String) async {
-        guard let prefs = try? await filterRepository.fetchFilterPreferences(userID: userID) else { return }
+        guard
+            let prefs = try? await filterRepository.fetchFilterPreferences(
+                userID: userID
+            )
+        else { return }
         searchRadius = prefs.searchRadius
         activeFilters = prefs.activeFilters
         activeSizeFilters = prefs.activeSizeFilters
@@ -25,7 +29,12 @@ final class FilterViewModel {
             activeFilters: activeFilters,
             activeSizeFilters: activeSizeFilters
         )
-        Task { try? await filterRepository.saveFilterPreferences(prefs, userID: userID) }
+        Task {
+            try? await filterRepository.saveFilterPreferences(
+                prefs,
+                userID: userID
+            )
+        }
     }
 
     func toggleFilter(_ filter: String, userID: String) {
@@ -66,15 +75,16 @@ final class FilterViewModel {
 
         if !activeFilters.isEmpty {
             result = result.filter { user in
-                let userWalkTypes = Set(user.preferences.walkTypes.map { $0.rawValue })
+                let userWalkTypes = Set(
+                    user.preferences.walkTypes.map { $0.rawValue }
+                )
                 return !activeFilters.isDisjoint(with: userWalkTypes)
             }
         }
 
         if !activeSizeFilters.isEmpty {
             result = result.filter { user in
-                guard let size = user.dogs.first?.size else { return false }
-                return activeSizeFilters.contains(size.rawValue)
+                activeSizeFilters.contains(user.preferences.dogSize.rawValue)
             }
         }
 
