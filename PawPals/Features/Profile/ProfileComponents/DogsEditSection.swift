@@ -25,7 +25,7 @@ struct DogsEditSection: View {
                     Button(role: .destructive) {
                         onRemove(dog)
                     } label: {
-                        Label("Ta bort", systemImage: "trash")
+                        Label("dog.remove", systemImage: "trash")
                     }
                 }
             }
@@ -54,7 +54,7 @@ struct DogsEditSection: View {
                 Picker("dog.size", selection: $size) {
                     Text("dog.size.placeholder").tag(Optional<DogSize>.none)
                     ForEach(DogSize.allCases, id: \.self) { size in
-                        Text(size.rawValue.capitalized).tag(Optional(size))
+                        Text(size.displayName).tag(Optional(size))
                     }
                 }
                 .listRowBackground(Theme.offWhite.opacity(Opacity.xSmall))

@@ -10,7 +10,7 @@ struct SocialAuthButtons: View {
                 Rectangle()
                     .fill(Theme.creamWhite)
                     .frame(height: AuthLayout.borderWidth)
-                Text("Or")
+                Text("auth.or")
                     .font(.footnote)
                     .foregroundStyle(Theme.creamWhite)
                 Rectangle()

@@ -4,7 +4,7 @@ struct WalkTypeTag: View {
     let walkType: WalkType
 
     var body: some View {
-        Text(walkType.rawValue)
+        Text(walkType.displayName)
             .font(.caption)
             .padding(.horizontal, Spacing.small)
             .padding(.vertical, Spacing.xSmall)

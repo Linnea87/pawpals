@@ -14,7 +14,7 @@ struct WalkPrefsSection: View {
                     }
                 } label: {
                     HStack {
-                        Text(walkType.rawValue)
+                        Text(walkType.displayName)
                             .foregroundStyle(Theme.darkBrown)
                         Spacer()
                         if selectedWalkTypes.contains(walkType) {
