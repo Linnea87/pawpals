@@ -2,9 +2,9 @@ import SwiftUI
 
 struct ChatView: View {
     @Binding var selectedTab: Tab
-    @Environment(ChatViewModel.self) private var chatViewModel
+    @Environment(ChatViewModel.self) private var chatVM
     @State private var navigationPath = NavigationPath()
-    @State private var conversationViewModel = ConversationViewModel(
+    @State private var conversationVM = ConversationViewModel(
         conversationRepository: ConversationService()
     )
     var currentUserID: String = ""
@@ -18,26 +18,26 @@ struct ChatView: View {
                 VStack(spacing: Spacing.none) {
                     filterTabs
 
-                    if chatViewModel.isLoading {
+                    if chatVM.isLoading {
                         ProgressView()
                             .frame(maxWidth: .infinity, maxHeight: .infinity)
-                    } else if chatViewModel.filteredConversations.isEmpty {
+                    } else if chatVM.filteredConversations.isEmpty {
                         ContentUnavailableView(
                             "chat.noConversations",
                             systemImage: "bubble.left.and.bubble.right"
                         )
                         .frame(maxWidth: .infinity, maxHeight: .infinity)
                     } else {
-                        List(chatViewModel.filteredConversations) {
+                        List(chatVM.filteredConversations) {
                             conversation in
                             NavigationLink(value: conversation) {
                                 ConversationRowView(
                                     conversation: conversation,
                                     timestampText:
-                                        chatViewModel.formattedTimeStamp(
+                                        chatVM.formattedTimeStamp(
                                             for: conversation
                                         ),
-                                    otherUser: chatViewModel.otherUser(
+                                    otherUser: chatVM.otherUser(
                                         in: conversation,
                                         currentUserID: currentUserID
                                     ),
@@ -69,46 +69,46 @@ struct ChatView: View {
                 ConversationView(
                     conversation: conversation,
                     currentUserID: currentUserID,
-                    otherUser: chatViewModel.otherUser(
+                    otherUser: chatVM.otherUser(
                         in: conversation,
                         currentUserID: currentUserID
                     ) ?? .mock
                 )
-                .environment(conversationViewModel)
+                .environment(conversationVM)
             }
             .safeAreaInset(edge: .bottom, spacing: Spacing.none) {
                 TabBarView(
                     selectedTab: $selectedTab,
-                    chatUnreadCount: chatViewModel.totalUnread
+                    chatUnreadCount: chatVM.totalUnread
                 )
             }
             .alert(
                 "common.error",
                 isPresented: Binding(
-                    get: { chatViewModel.errorMessage != nil },
-                    set: { if !$0 { chatViewModel.errorMessage = nil } }
+                    get: { chatVM.errorMessage != nil },
+                    set: { if !$0 { chatVM.errorMessage = nil } }
                 )
             ) {
                 Button("common.ok") {
-                    chatViewModel.errorMessage = nil
+                    chatVM.errorMessage = nil
                 }
             } message: {
-                Text(chatViewModel.errorMessage ?? "")
+                Text(chatVM.errorMessage ?? "")
             }
         }
         .task {
-            chatViewModel.observeConversations(for: currentUserID)
-            await chatViewModel.loadFavorites(for: currentUserID)
+            chatVM.observeConversations(for: currentUserID)
+            await chatVM.loadFavorites(for: currentUserID)
         }
         .onDisappear {
-            chatViewModel.stopObservingConversations()
+            chatVM.stopObservingConversations()
         }
         /// Handles the case where the notification tap arrives while the app is already open.
-        .onChange(of: chatViewModel.pendingConversationID) { _, _ in
+        .onChange(of: chatVM.pendingConversationID) { _, _ in
             navigateToPendingConversationIfNeeded()
         }
         /// Handles the case where the notification tap arrived before conversations were loaded.
-        .onChange(of: chatViewModel.conversations) { _, _ in
+        .onChange(of: chatVM.conversations) { _, _ in
             navigateToPendingConversationIfNeeded()
         }
     }
@@ -118,9 +118,9 @@ struct ChatView: View {
             ForEach(ChatFilter.allCases, id: \.self) { filter in
                 FilterChip(
                     title: NSLocalizedString(filter.label, comment: ""),
-                    isSelected: chatViewModel.selectedFilter == filter
+                    isSelected: chatVM.selectedFilter == filter
                 ) {
-                    chatViewModel.selectedFilter = filter
+                    chatVM.selectedFilter = filter
                 }
             }
         }
@@ -130,13 +130,13 @@ struct ChatView: View {
 
     // Navigates to the pending conversation if one is waiting AND conversations are loaded.
     private func navigateToPendingConversationIfNeeded() {
-        guard let pendingID = chatViewModel.pendingConversationID,
-            let conversation = chatViewModel.conversations.first(where: {
+        guard let pendingID = chatVM.pendingConversationID,
+            let conversation = chatVM.conversations.first(where: {
                 $0.id == pendingID
             })
         else { return }
         navigationPath.append(conversation)
-        chatViewModel.pendingConversationID = nil
+        chatVM.pendingConversationID = nil
     }
 
 }

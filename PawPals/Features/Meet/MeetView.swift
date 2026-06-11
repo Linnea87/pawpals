@@ -3,13 +3,13 @@ import CoreLocation
 
 struct MeetView: View {
     @Binding var selectedTab: Tab
-    @Environment(MeetViewModel.self) private var viewModel
-    @Environment(FilterViewModel.self) private var filterViewModel
-    @Environment(LocationViewModel.self) private var locationViewModel
+    @Environment(MeetViewModel.self) private var meetVM
+    @Environment(FilterViewModel.self) private var filterVM
+    @Environment(LocationViewModel.self) private var locationVM
     @State private var showFilterSheet = false
     
     var body: some View {
-        @Bindable var vm = viewModel
+        @Bindable var meetVM = meetVM
         NavigationStack {
             ZStack {
                 Theme.appBackground.ignoresSafeArea()
@@ -23,7 +23,7 @@ struct MeetView: View {
                         .padding(.top, Spacing.large)
                         .padding(.bottom, Spacing.medium)
                     
-                    if locationViewModel.isLocating {
+                    if locationVM.isLocating {
                         Spacer()
                         VStack(spacing: Spacing.small) {
                             ProgressView()
@@ -35,7 +35,7 @@ struct MeetView: View {
                         Spacer()
                         
                     } else if
-                        locationViewModel.locationStatus == .denied || locationViewModel.locationStatus == .restricted {
+                        locationVM.locationStatus == .denied || locationVM.locationStatus == .restricted {
                         Spacer()
                         VStack(spacing: Spacing.medium) {
                             Image(systemName: "location.slash")
@@ -62,19 +62,19 @@ struct MeetView: View {
                         Spacer()
                         
                         
-                    } else if vm.isLoading {
+                    } else if meetVM.isLoading {
                         
                         Spacer()
                         ProgressView()
                             .frame(maxWidth: .infinity)
                         Spacer()
-                    } else if let error = vm.errorMessage {
+                    } else if let error = meetVM.errorMessage {
                         Spacer()
                         Text(error)
                             .foregroundStyle(Theme.warmBrown)
                             .frame(maxWidth: .infinity)
                         Spacer()
-                    } else if filterViewModel.applyFilters(to: vm.allNearbyUsers).isEmpty {
+                    } else if filterVM.applyFilters(to: meetVM.allNearbyUsers).isEmpty {
                         Spacer()
                         Text("No matches nearby")
                             .foregroundStyle(Theme.darkBrown.opacity(Opacity.xSmall))
@@ -83,9 +83,9 @@ struct MeetView: View {
                     } else {
                         ScrollView {
                             LazyVStack(spacing: Spacing.medium) {
-                                ForEach(filterViewModel.applyFilters(to: vm.allNearbyUsers)) { user in
-                                    MeetCardView(user: user, isSaved: vm.savedUserIDs.contains(user.id))
-                                        .onTapGesture { vm.selectedUser = user }
+                                ForEach(filterVM.applyFilters(to: meetVM.allNearbyUsers)) { user in
+                                    MeetCardView(user: user, isSaved: meetVM.savedUserIDs.contains(user.id))
+                                        .onTapGesture { meetVM.selectedUser = user }
                                 }
                             }
                             .padding(.horizontal, Spacing.xLarge)
@@ -97,7 +97,7 @@ struct MeetView: View {
                 TabBarView(selectedTab: $selectedTab)
             }
             
-            .task { await vm.loadWithLocation() }
+            .task { await meetVM.loadWithLocation() }
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
                     Button {
@@ -109,14 +109,14 @@ struct MeetView: View {
                 }
             }
             
-            .sheet(item: $vm.selectedUser) { user in
+            .sheet(item: $meetVM.selectedUser) { user in
                 ProfileView(user: user, isOwner: false, cameFromMeet: true, selectedTab: $selectedTab)
-                    .environment(viewModel)
+                    .environment(meetVM)
             }
             .sheet(isPresented: $showFilterSheet) {
                 FilterSheetView()
-                    .environment(viewModel)
-                    .environment(filterViewModel)
+                    .environment(meetVM)
+                    .environment(filterVM)
             }
         }
     }

@@ -1,7 +1,7 @@
 import SwiftUI
 
 struct SignUpView: View {
-    @Environment(AuthViewModel.self) private var viewModel
+    @Environment(AuthViewModel.self) private var authVM
     @Environment(\.dismiss) private var dismiss
 
     @State private var name = ""
@@ -22,16 +22,16 @@ struct SignUpView: View {
             }
         }
         .presentationDetents([.fraction(AuthLayout.sheetFraction)])
-        .onChange(of: viewModel.isAuthenticated) { _, isAuthenticated in
+        .onChange(of: authVM.isAuthenticated) { _, isAuthenticated in
             if isAuthenticated { dismiss() }
         }
         .alert(
             String(localized: "common.error"),
-            isPresented: .constant(viewModel.errorMessage != nil)
+            isPresented: .constant(authVM.errorMessage != nil)
         ) {
             Button(String(localized: "common.ok")) {}
         } message: {
-            Text(viewModel.errorMessage ?? "")
+            Text(authVM.errorMessage ?? "")
         }
     }
 
@@ -80,14 +80,14 @@ struct SignUpView: View {
         VStack(spacing: Spacing.medium) {
             Button {
                 Task {
-                    await viewModel.signUp(
+                    await authVM.signUp(
                         name: name,
                         email: email,
                         password: password
                     )
                 }
             } label: {
-                if viewModel.isLoading {
+                if authVM.isLoading {
                     ProgressView()
                         .tint(Theme.offWhite)
                         .frame(maxWidth: .infinity)
@@ -102,10 +102,10 @@ struct SignUpView: View {
             }
             .background(Theme.terracotta)
             .clipShape(Capsule())
-            .disabled(viewModel.isLoading)
+            .disabled(authVM.isLoading)
 
             SocialAuthButtons(label: "auth.signup.google") {
-                await viewModel.signUpWithGoogle()
+                await authVM.signUpWithGoogle()
             }
         }
     }

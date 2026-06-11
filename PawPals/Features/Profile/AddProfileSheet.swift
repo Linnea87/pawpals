@@ -4,9 +4,8 @@ struct AddProfileSheet: View {
 
     let user: User?
 
-    @Environment(ProfileViewModel.self) private var profileViewModel
+    @Environment(ProfileViewModel.self) private var profileVM
     @Environment(\.dismiss) private var dismiss
-    @Environment(AuthViewModel.self) private var authViewModel
 
     @State private var name = ""
     @State private var bio = ""
@@ -29,15 +28,15 @@ struct AddProfileSheet: View {
                 AboutInfoForm(name: $name, bio: $bio)
 
                 DogsEditSection(
-                    dogs: profileViewModel.user.dogs,
+                    dogs: profileVM.user.dogs,
                     onRemove: { dog in
                         Task {
-                            await profileViewModel.removeDog(dog.id)
+                            await profileVM.removeDog(dog.id)
                         }
                     },
                     onSave: { dog in
                         Task {
-                            await profileViewModel.saveDog(dog)
+                            await profileVM.saveDog(dog)
                         }
                     }
                 )
@@ -47,7 +46,7 @@ struct AddProfileSheet: View {
                 Button {
                     guard isFormValid else { return }
                     Task {
-                        await profileViewModel.saveProfileInfo(
+                        await profileVM.saveProfileInfo(
                             name: name,
                             bio: bio,
                             walkTypes: Array(selectedWalkTypes)

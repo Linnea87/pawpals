@@ -2,10 +2,10 @@ import MapKit
 import SwiftUI
 
 struct FilterSheetView: View {
-    @Environment(MeetViewModel.self) private var viewModel
+    @Environment(MeetViewModel.self) private var meetVM
     @Environment(AuthViewModel.self) private var authVM
-    @Environment(FilterViewModel.self) private var filterViewModel
-    @Environment(LocationViewModel.self) private var locationViewModel
+    @Environment(FilterViewModel.self) private var filterVM
+    @Environment(LocationViewModel.self) private var locationVM
     @Environment(\.dismiss) private var dismiss
 
     var body: some View {
@@ -23,15 +23,15 @@ struct FilterSheetView: View {
 
                         ScrollView(.horizontal, showsIndicators: false) {
                             HStack(spacing: Spacing.small) {
-                                FilterChip(title: "All", isSelected: filterViewModel.activeFilters.isEmpty) {
-                                    filterViewModel.clearFilters(userID: authVM.currentUserID)
+                                FilterChip(title: "All", isSelected: filterVM.activeFilters.isEmpty) {
+                                    filterVM.clearFilters(userID: authVM.currentUserID)
                                 }
                                 ForEach(WalkType.allCases) { walkType in
                                     FilterChip(
                                         title: walkType.rawValue,
-                                        isSelected: filterViewModel.activeFilters.contains(walkType.rawValue)
+                                        isSelected: filterVM.activeFilters.contains(walkType.rawValue)
                                     ) {
-                                        filterViewModel.toggleFilter(walkType.rawValue, userID: authVM.currentUserID)
+                                        filterVM.toggleFilter(walkType.rawValue, userID: authVM.currentUserID)
 
                                     }
                                 }
@@ -46,15 +46,15 @@ struct FilterSheetView: View {
 
                         ScrollView(.horizontal, showsIndicators: false) {
                             HStack(spacing: Spacing.small) {
-                                FilterChip(title: "All sizes", isSelected: filterViewModel.activeSizeFilters.isEmpty) {
-                                    filterViewModel.clearSizeFilters(userID: authVM.currentUserID)
+                                FilterChip(title: "All sizes", isSelected: filterVM.activeSizeFilters.isEmpty) {
+                                    filterVM.clearSizeFilters(userID: authVM.currentUserID)
                                 }
                                 ForEach(DogSize.allCases, id: \.self) { size in
                                     FilterChip(
                                         title: size.rawValue.capitalized,
-                                        isSelected: filterViewModel.activeSizeFilters.contains(size.rawValue)
+                                        isSelected: filterVM.activeSizeFilters.contains(size.rawValue)
                                     ) {
-                                        filterViewModel.toggleSizeFilter(size.rawValue, userID: authVM.currentUserID)
+                                        filterVM.toggleSizeFilter(size.rawValue, userID: authVM.currentUserID)
                                     }
                                 }
                             }
@@ -73,15 +73,15 @@ struct FilterSheetView: View {
                                 .fontWeight(.semibold)
                                 .foregroundStyle(Theme.darkBrown)
 
-                            Text("\(Int(filterViewModel.searchRadius)) km")
+                            Text("\(Int(filterVM.searchRadius)) km")
                                 .font(.title2)
                                 .fontWeight(.bold)
                                 .foregroundStyle(Theme.terracotta)
 
                             Slider(
                                 value: Binding(
-                                    get: { filterViewModel.searchRadius },
-                                    set: { filterViewModel.setRadius(
+                                    get: { filterVM.searchRadius },
+                                    set: { filterVM.setRadius(
                                             $0,
                                             userID: authVM.currentUserID
                                         )
@@ -129,18 +129,18 @@ struct FilterSheetView: View {
 
     @ViewBuilder
     private var mapSection: some View {
-        if let center = locationViewModel.currentUserLocation {
+        if let center = locationVM.currentUserLocation {
             /// radius-only filter — walk type and size prefs do NOT affect the map
-            let usersInRadius = viewModel.allNearbyUsers.filter {
-                ($0.distance ?? 0) <= filterViewModel.searchRadius
+            let usersInRadius = meetVM.allNearbyUsers.filter {
+                ($0.distance ?? 0) <= filterVM.searchRadius
             }
 
             Map(
                 initialPosition: .region(
                     MKCoordinateRegion(
                         center: center,
-                        latitudinalMeters: filterViewModel.searchRadius * 1000 * 2,
-                        longitudinalMeters: filterViewModel.searchRadius * 1000 * 2
+                        latitudinalMeters: filterVM.searchRadius * 1000 * 2,
+                        longitudinalMeters: filterVM.searchRadius * 1000 * 2
                     )
                 )
             ) {
