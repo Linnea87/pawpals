@@ -56,6 +56,12 @@ final class ProfileService: ProfileRepository {
             try? $0.data(as: Dog.self)
         }
 
+        // Decode stored preferences, falling back to defaults if missing/invalid
+        let prefsData = data["preferences"] as? [String: Any]
+        let walkTypes = (prefsData?["walkTypes"] as? [String] ?? []).compactMap(WalkType.init(rawValue:))
+        let dogSize = DogSize(rawValue: prefsData?["dogSize"] as? String ?? "") ?? .medium
+        let searchRadius = prefsData?["searchRadius"] as? Double ?? 10.0
+
         return User(
             id: userID,
             name: data["name"] as? String ?? "",
@@ -64,9 +70,9 @@ final class ProfileService: ProfileRepository {
             city: data["city"] as? String ?? "",
             dogs: dogs,
             preferences: UserPreferences(
-                walkTypes: [],
-                dogSize: .medium,
-                searchRadius: 10.0
+                walkTypes: walkTypes,
+                dogSize: dogSize,
+                searchRadius: searchRadius
             ),
             distance: nil,
             latitude: data["latitude"] as? Double,
