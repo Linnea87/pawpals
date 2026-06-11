@@ -140,6 +140,7 @@ final class ChatViewModel {
 
 
     /// Fetches Firestore user documents for all participants we don't have cached yet.
+    @MainActor  
     private func loadParticipants(for conversations: [Conversation], currentUserID: String) async {
         let otherIDs = Set(
             conversations.flatMap { $0.participantIDs.filter { $0 != currentUserID } }
