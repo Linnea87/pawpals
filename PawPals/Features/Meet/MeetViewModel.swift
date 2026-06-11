@@ -5,9 +5,6 @@ import Foundation
 final class MeetViewModel {
     var selectedUser: User?
     var allNearbyUsers: [User] = []
-    var filteredUsers: [User] = []
-    var activeFilters: Set<String> = []
-    var activeSizeFilters: Set<String> = []
     var isLoading = false
 
     var errorMessage: String? = nil
