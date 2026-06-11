@@ -12,7 +12,7 @@ final class MeetService: MeetRepository {
          }
     
     
-    func fetchNearbyUsers(location: GeoPoint, radius: Double, excludingUserID: String) async throws
+    func fetchNearbyUsers(location: CLLocationCoordinate2D, radius: Double, excludingUserID: String) async throws
         -> [User]
     {
         let snapshot = try await errorHandler.execute {
@@ -69,8 +69,8 @@ final class MeetService: MeetRepository {
         }
     }
     
-    func updateLocation(_ location: GeoPoint, userID: String) async throws {
-        /// Store lat/long as top-level Double fields so they match the User model's - latitude and longitude properties when decoded by Firestore
+    func updateLocation(_ location: CLLocationCoordinate2D, userID: String) async throws{
+        
         try await errorHandler.execute {
             try await self.db.collection("users")
                 .document(userID)
