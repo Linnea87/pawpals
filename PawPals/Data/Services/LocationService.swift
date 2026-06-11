@@ -33,9 +33,9 @@ enum LocationError: LocalizedError {
     var errorDescription: String? {
         switch self {
         case .permissionDenied:
-            return "Location access is denied. Please enable it in Settings."
+            return String(localized: "location.error.permissionDenied")
         case .unavailable:
-            return "Could not determine your location. Try again."
+            return String(localized: "location.error.unavailable")
         }
     }
 }
