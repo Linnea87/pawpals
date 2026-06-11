@@ -48,7 +48,13 @@ final class ProfileViewModel {
         errorMessage = nil
         do {
             try await profileRepository.saveDog(dog, userID: user.id)
-            user.dogs.append(dog)
+            if let index = user.dogs.firstIndex(where: { $0.id == dog.id }) {
+                user.dogs[index] = dog
+            } else {
+                user.dogs.append(dog)
+            }
+            user.preferences.dogSize = dog.size
+            try await profileRepository.savePreferences(user.preferences, userID: user.id)
         } catch {
             errorMessage = error.localizedDescription
         }
