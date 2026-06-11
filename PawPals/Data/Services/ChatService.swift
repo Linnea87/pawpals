@@ -3,12 +3,15 @@ import Foundation
 
 final class ChatService: ChatRepository {
     private let db = Firestore.firestore()
+    private let errorHandler = FirestoreErrorHandler.shared
 
     func createOrFetchConversation(between userID1: String, and userID2: String) async throws -> Conversation {
         /// Sorting guarantees the same ID regardless of which user initiates.
         let conversationID = [userID1, userID2].sorted().joined(separator: "_")
         let ref = db.collection("conversations").document(conversationID)
-        let snapshot = try await ref.getDocument()
+        let snapshot = try await errorHandler.execute {
+            try await ref.getDocument()
+        }
 
         /// Conversation already in Firestore — decode and return it.
         if snapshot.exists {
@@ -22,13 +25,17 @@ final class ChatService: ChatRepository {
             lastMessage: "",
             lastMessageTimestamp: Date()
         )
-        try ref.setData(from: conversation)
+        try await errorHandler.execute {
+                    try ref.setData(from: conversation)
+                }
         return conversation
     }
 
     func fetchConversationIfExists(between userID1: String, and userID2: String) async throws -> Conversation? {
         let conversationID = [userID1, userID2].sorted().joined(separator: "_")
-        let snapshot = try await db.collection("conversations").document(conversationID).getDocument()
+        let snapshot = try await errorHandler.execute {
+            try await self.db.collection("conversations").document(conversationID).getDocument()
+        }
         guard snapshot.exists else { return nil }
         return try snapshot.data(as: Conversation.self)
     }
@@ -56,9 +63,11 @@ final class ChatService: ChatRepository {
     }
     
     func fetchConnectedUserIDs(for userID: String) async throws -> Set<String> {
-        let snapshot = try await db.collection("conversations")
-            .whereField("participantIDs", arrayContains: userID)
-            .getDocuments()
+        let snapshot = try await errorHandler.execute {
+            try await self.db.collection("conversations")
+                .whereField("participantIDs", arrayContains: userID)
+                .getDocuments()
+        }
         let partnerIDs = snapshot.documents.compactMap { doc -> String? in
             let ids = doc.data()["participantIDs"] as? [String] ?? []
             return ids.first { $0 != userID }
