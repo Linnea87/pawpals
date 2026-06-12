@@ -87,8 +87,7 @@ final class FilterViewModel {
 
         if !activeSizeFilters.isEmpty {
             result = result.filter { user in
-                guard let size = user.dogs.first?.size else { return false }
-                return activeSizeFilters.contains(size.rawValue)
+                activeSizeFilters.contains(user.preferences.dogSize.rawValue)
             }
         }
 

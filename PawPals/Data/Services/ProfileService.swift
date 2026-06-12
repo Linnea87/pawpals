@@ -27,11 +27,13 @@ final class ProfileService: ProfileRepository {
     
     func saveDog(_ dog: Dog, userID: String) async throws {
         try await errorHandler.execute {
-            try self.db.collection("users")
-                .document(userID)
-                .collection("dogs")
-                .document(dog.id)
-                .setData(from: dog)
+                // setData(from:) has no async overload — encode manually to await the write
+                let data = try Firestore.Encoder().encode(dog)
+                try await self.db.collection("users")
+                    .document(userID)
+                    .collection("dogs")
+                    .document(dog.id)
+                    .setData(data)
         }
     }
     
