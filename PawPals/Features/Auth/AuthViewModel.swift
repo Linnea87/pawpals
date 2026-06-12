@@ -16,6 +16,10 @@ final class AuthViewModel {
         self.repository = repository
         self.profileRepository = profileRepository
     }
+    
+    func dismissError() {
+        errorMessage = nil
+    }
 
     func signUp(name: String, email: String, password: String) async {
         isLoading = true
