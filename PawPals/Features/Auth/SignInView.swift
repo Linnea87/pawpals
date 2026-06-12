@@ -24,14 +24,7 @@ struct SignInView: View {
         .onChange(of: authVM.isAuthenticated) { _, isAuthenticated in
             if isAuthenticated { dismiss() }
         }
-        .alert(
-            String(localized: "common.error"),
-            isPresented: .constant(authVM.errorMessage != nil)
-        ) {
-            Button(String(localized: "common.ok")) {}
-        } message: {
-            Text(authVM.errorMessage ?? "")
-        }
+        .authAlerts(errorMessage: authVM.errorMessage, onDismiss: authVM.dismissError)
     }
 
     private var fieldsSection: some View {
