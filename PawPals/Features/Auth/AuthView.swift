@@ -1,0 +1,108 @@
+import SwiftUI
+
+struct AuthView: View {
+    @Environment(AuthViewModel.self) private var authVM
+    @State private var showSignIn = false
+    @State private var showSignUp = false
+
+    var body: some View {
+        ZStack {
+            Theme.appBackground.ignoresSafeArea()
+
+            VStack(spacing: Spacing.none) {
+                Spacer()
+                    .frame(minHeight: AuthLayout.topSpacing)
+                logoSection
+                Spacer()
+                    .frame(minHeight: AuthLayout.middleSpacing)
+                welcomeCard
+                Spacer()
+                    .frame(minHeight: AuthLayout.bottomSpacing)
+            }
+            .padding(.horizontal, Spacing.large)
+        }
+       
+        .sheet(isPresented: $showSignIn) {
+             SignInView()
+        }
+        .sheet(isPresented: $showSignUp) {
+             SignUpView()
+         }
+    }
+
+    private var logoSection: some View {
+        VStack(spacing: Spacing.small) {
+            Circle()
+                .fill(Theme.offWhite.opacity(AuthLayout.circleOpacity))
+                .frame(width: IconSize.avatar, height: IconSize.avatar)
+                .overlay {
+                    Image(systemName: "pawprint.fill")
+                        .font(.system(size: IconSize.logoIcon))
+                        .foregroundStyle(Theme.terracotta)
+                }
+
+            Text("PawPals")
+                .font(.title)
+                .fontWeight(.bold)
+                .foregroundStyle(Theme.darkBrown)
+
+            Text(String(localized: "auth.tagline"))
+                .font(.caption)
+                .foregroundStyle(Theme.creamWhite)
+        }
+    }
+
+    private var welcomeCard: some View {
+        VStack(spacing: Spacing.small) {
+            VStack(spacing: Spacing.small) {
+                Text(String(localized: "auth.welcome"))
+                    .font(.title3)
+                    .fontWeight(.bold)
+                    .foregroundStyle(Theme.darkBrown)
+
+                Text(String(localized: "auth.subtitle"))
+                    .font(.subheadline)
+                    .foregroundStyle(Theme.darkBrown)
+            }
+
+            HStack(spacing: Spacing.medium) {
+                Button(String(localized: "auth.sign.in")) {
+                    authVM.activeOption = .signIn
+                    showSignIn = true
+                }
+                .frame(maxWidth: .infinity)
+                .padding(.vertical, Spacing.small)
+                .background(authVM.activeOption == .signIn ? Theme.terracotta : Theme.offWhite)
+                .foregroundStyle(authVM.activeOption == .signIn ? Theme.offWhite : Theme.darkBrown)
+                .fontWeight(authVM.activeOption == .signIn ? .semibold : .regular)
+                .clipShape(Capsule())
+
+                Button(String(localized: "auth.sign.up")) {
+                    authVM.activeOption = .signUp
+                    showSignUp = true
+                }
+                .frame(maxWidth: .infinity)
+                .padding(.vertical, Spacing.small)
+                .background(authVM.activeOption == .signUp ? Theme.terracotta : Theme.offWhite)
+                .foregroundStyle(authVM.activeOption == .signUp ? Theme.offWhite : Theme.darkBrown)
+                .fontWeight(authVM.activeOption == .signUp ? .semibold : .regular)
+                .clipShape(Capsule())
+            }
+            .padding(.top, Spacing.large)
+        }
+        .padding(Spacing.large)
+        .background(Theme.offWhite.opacity(AuthLayout.cardOpacity))
+        .clipShape(RoundedRectangle(cornerRadius: Radius.large))
+        .overlay(
+            RoundedRectangle(cornerRadius: Radius.large)
+                .stroke(Theme.creamWhite, lineWidth: AuthLayout.borderWidth)
+        )
+        .shadow(color: .black.opacity(AuthLayout.shadowOpacity), radius: AuthLayout.shadowRadius, x: Spacing.none, y: AuthLayout.shadowY)
+    }
+}
+
+
+#Preview {
+    AuthView()
+        .environment(AuthViewModel(repository: MockAuthRepository(), profileRepository: MockProfileRepository()))
+}

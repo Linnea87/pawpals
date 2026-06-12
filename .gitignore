@@ -52,8 +52,6 @@ GoogleService-Info.plist
 # SPM artifact cache
 .swiftpm/xcode/package-artifacts/
 
-# Asset catalog compilations
-*.xcassets
 
 # Environment files
 .env

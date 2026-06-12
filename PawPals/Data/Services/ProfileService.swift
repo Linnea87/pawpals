@@ -1,0 +1,191 @@
+import CoreLocation
+import FirebaseFirestore
+import FirebaseStorage
+import Foundation
+
+enum ProfileServiceError: Error {
+    case notFound
+}
+
+final class ProfileService: ProfileRepository {
+    private let db = Firestore.firestore()
+    private let errorHandler = FirestoreErrorHandler.shared
+  
+    func updateProfile(_ user: User) async throws {
+        var data: [String: Any] = [
+            "name": user.name,
+            "bio": user.bio,
+            "city": user.city,
+        ]
+        if let photoURL = user.photoURL {
+            data["photoURL"] = photoURL
+        }
+        try await errorHandler.execute {
+            try await self.db.collection("users").document(user.id).setData(data, merge: true)
+        }
+    }
+    
+    func saveDog(_ dog: Dog, userID: String) async throws {
+        try await errorHandler.execute {
+                // setData(from:) has no async overload — encode manually to await the write
+                let data = try Firestore.Encoder().encode(dog)
+                try await self.db.collection("users")
+                    .document(userID)
+                    .collection("dogs")
+                    .document(dog.id)
+                    .setData(data)
+        }
+    }
+    
+    func removeDog(dogID: String, userID: String) async throws {
+        try await errorHandler.execute {
+            try await self.db.collection("users")
+                .document(userID)
+                .collection("dogs")
+                .document(dogID)
+                .delete()
+        }
+    }
+    
+    
+    func fetchUser(userID: String) async throws -> User {
+        let doc = try await errorHandler.execute {
+            try await self.db.collection("users").document(userID).getDocument()
+        }
+        guard let data = doc.data() else { throw ProfileServiceError.notFound }
+        
+        let dogsSnapshot = try await errorHandler.execute {
+            try await self.db.collection("users")
+                .document(userID)
+                .collection("dogs")
+                .getDocuments()
+        }
+        let dogs = dogsSnapshot.documents.compactMap {
+            try? $0.data(as: Dog.self)
+        }
+
+        // Decode stored preferences, falling back to defaults if missing/invalid
+        let prefsData = data["preferences"] as? [String: Any]
+        let walkTypes = (prefsData?["walkTypes"] as? [String] ?? []).compactMap(WalkType.init(rawValue:))
+        let dogSize = DogSize(rawValue: prefsData?["dogSize"] as? String ?? "") ?? .medium
+        let searchRadius = prefsData?["searchRadius"] as? Double ?? 10.0
+
+        return User(
+            id: userID,
+            name: data["name"] as? String ?? "",
+            photoURL: data["photoURL"] as? String,
+            bio: data["bio"] as? String ?? "",
+            city: data["city"] as? String ?? "",
+            dogs: dogs,
+            preferences: UserPreferences(
+                walkTypes: walkTypes,
+                dogSize: dogSize,
+                searchRadius: searchRadius
+            ),
+            distance: nil,
+            latitude: data["latitude"] as? Double,
+            longitude: data["longitude"] as? Double
+        )
+    }
+
+    
+    func savePreferences(_ prefs: UserPreferences, userID: String) async throws
+    {
+        let data: [String: Any] = [
+            "preferences": [
+                "walkTypes": prefs.walkTypes.map { $0.rawValue },
+                "dogSize": prefs.dogSize.rawValue,
+                "searchRadius": prefs.searchRadius,
+            ]
+        ]
+        try await errorHandler.execute {
+            try await self.db.collection("users").document(userID).setData(data, merge: true)
+        }
+    }
+    
+    func loadPreferences(userID: String) async throws -> UserPreferences {
+        let doc = try await errorHandler.execute {
+            try await self.db.collection("users").document(userID).getDocument()
+        }
+        guard let data = doc.data(),
+              let prefsData = data["preferences"] as? [String: Any]
+        else {
+            return UserPreferences(
+                walkTypes: [],
+                dogSize: .medium,
+                searchRadius: 10.0
+            )
+        }
+        let walkTypes = (prefsData["walkTypes"] as? [String] ?? []).compactMap(
+            WalkType.init(rawValue:)
+        )
+        let dogSize =
+            DogSize(rawValue: prefsData["dogSize"] as? String ?? "") ?? .medium
+        let searchRadius = prefsData["searchRadius"] as? Double ?? 10.0
+        return UserPreferences(
+            walkTypes: walkTypes,
+            dogSize: dogSize,
+            searchRadius: searchRadius
+        )
+    }
+
+    func savePushNotificationToken(_ token: String, userID: String) async throws
+    {
+        try await errorHandler.execute {
+            try await self.db.collection("users")
+                .document(userID)
+                .setData(["pushNotificationToken": token], merge: true)
+        }
+    }
+
+    func deleteUserData(userID: String) async throws {
+        let batch = db.batch()
+        let dogsSnapshot = try await errorHandler.execute {
+            try await self.db.collection("users").document(userID).collection("dogs").getDocuments()
+        }
+        for doc in dogsSnapshot.documents {
+            batch.deleteDocument(doc.reference)
+        }
+        batch.deleteDocument(db.collection("users").document(userID))
+        try await errorHandler.execute {
+            try await batch.commit()
+        }
+
+        let conversationsSnapshot = try await errorHandler.execute {
+            try await self.db.collection("conversations")
+                .whereField("participantIDs", arrayContains: userID)
+                .getDocuments()
+        }
+        for conversationDoc in conversationsSnapshot.documents {
+            let messagesSnapshot = try await errorHandler.execute {
+                try await conversationDoc.reference.collection("messages").getDocuments()
+            }
+            let messageBatch = db.batch()
+            for messageDoc in messagesSnapshot.documents {
+                messageBatch.deleteDocument(messageDoc.reference)
+            }
+            messageBatch.deleteDocument(conversationDoc.reference)
+            try await errorHandler.execute {
+                try await messageBatch.commit()
+            }
+        }
+    }
+
+    func uploadProfilePhoto(_ data: Data, userID: String) async throws -> String
+    {
+        let ref = Storage.storage().reference().child(
+            "profile_photos/\(userID).jpg"
+        )
+        let metadata = StorageMetadata()
+        metadata.contentType = "image/jpeg"
+        _ = try await ref.putDataAsync(data, metadata: metadata)
+        let url = try await ref.downloadURL()
+        return url.absoluteString
+    }
+    
+    func updateCity(_ city: String, userID: String) async throws {
+        try await errorHandler.execute {
+            try await self.db.collection("users").document(userID).setData(["city": city], merge: true)
+        }
+    }
+}
