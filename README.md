@@ -257,11 +257,110 @@ Covers the safety features that let users control who they interact with: blocki
 
 ### Implemented User Stories
 
-<!-- TODO: list closed issues here, similar to Nudge -->
+84 out of 91 user stories were successfully implemented across all six epics — Setup, Auth, Profile, Meet, Chat and Safety. The remaining 7 are listed under Not Implemented User Stories below.
+
+<details>
+<summary>Show all 84 implemented user stories</summary>
+
+- [[PP-001] Initial Xcode project setup & folder structure](https://github.com/Linnea87/pawpals/issues/1)
+- [[PP-002] Sign up with email & password](https://github.com/Linnea87/pawpals/issues/2)
+- [[PP-003] Sign in with Email and Password or Google SSO](https://github.com/Linnea87/pawpals/issues/3)
+- [[PP-004] Log out](https://github.com/Linnea87/pawpals/issues/4)
+- [[PP-005] Delete account](https://github.com/Linnea87/pawpals/issues/5)
+- [[PP-006] Add my dog information](https://github.com/Linnea87/pawpals/issues/6)
+- [[PP-007] Add owner name & photo to profile](https://github.com/Linnea87/pawpals/issues/7)
+- [[PP-008] Set walk preferences](https://github.com/Linnea87/pawpals/issues/8)
+- [[PP-009] Edit profile & dog info](https://github.com/Linnea87/pawpals/issues/9)
+- [[PP-011] View another user's full profile](https://github.com/Linnea87/pawpals/issues/11)
+- [[PP-012] Add multiple dogs to profile](https://github.com/Linnea87/pawpals/issues/12)
+- [[PP-013] Request location permission](https://github.com/Linnea87/pawpals/issues/13)
+- [[PP-014] Set search radius](https://github.com/Linnea87/pawpals/issues/14)
+- [[PP-015] Scrollable list of nearby profile suggestions](https://github.com/Linnea87/pawpals/issues/15)
+- [[PP-016] Filter suggestions with quick-select pills](https://github.com/Linnea87/pawpals/issues/16)
+- [[PP-017] Show distance to other dog owners](https://github.com/Linnea87/pawpals/issues/17)
+- [[PP-018] Map view of nearby dog owners](https://github.com/Linnea87/pawpals/issues/18)
+- [[PP-019] Filter by dog breed or size](https://github.com/Linnea87/pawpals/issues/19)
+- [[PP-020] Start a conversation from a profile](https://github.com/Linnea87/pawpals/issues/20)
+- [[PP-021] Chat list — see all active conversations](https://github.com/Linnea87/pawpals/issues/21)
+- [[PP-022] Send and receive text messages in real time](https://github.com/Linnea87/pawpals/issues/22)
+- [[PP-023] Unread message badge count](https://github.com/Linnea87/pawpals/issues/23)
+- [[PP-024] Timestamp on last sent message in chat list](https://github.com/Linnea87/pawpals/issues/24)
+- [[PP-025] Read receipts](https://github.com/Linnea87/pawpals/issues/25)
+- [[PP-026] Push notifications for new messages](https://github.com/Linnea87/pawpals/issues/26)
+- [[PP-028] Share images in chat](https://github.com/Linnea87/pawpals/issues/28)
+- [[PP-031] App navigation shell (tab bar)](https://github.com/Linnea87/pawpals/issues/31)
+- [[PP-034] Save/like a profile](https://github.com/Linnea87/pawpals/issues/34)
+- [[PP-036] Rename User.displayName to name across codebase](https://github.com/Linnea87/pawpals/issues/49)
+- [[PP-037] Rename color assets to descriptive, self-explanatory names](https://github.com/Linnea87/pawpals/issues/51)
+- [[PP-038] Implement ChatView real design — filter tabs, gradient and conversation row cards](https://github.com/Linnea87/pawpals/issues/56)
+- [[PP-039] Tab navigation shell to follow clean navigation flow](https://github.com/Linnea87/pawpals/issues/62)
+- [[PP-040] Fix sign-in flow blocking taps after authentication](https://github.com/Linnea87/pawpals/issues/78)
+- [[PP-041] Handle errors in AuthViewModel.signOut](https://github.com/Linnea87/pawpals/issues/79)
+- [[PP-042] Message delivered state](https://github.com/Linnea87/pawpals/issues/81)
+- [[PP-043] Complete location permission flow](https://github.com/Linnea87/pawpals/issues/85)
+- [[PP-044] Persist user data across logout and login](https://github.com/Linnea87/pawpals/issues/93)
+- [[PP-045] Save profile photo from picker and show user name on profile card](https://github.com/Linnea87/pawpals/issues/94)
+- [[PP-046] Reflect preferences in ProfileView immediately after save](https://github.com/Linnea87/pawpals/issues/95)
+- [[PP-047] Add logout confirmation alert](https://github.com/Linnea87/pawpals/issues/96)
+- [[PP-048] Move filter pills into FilterSheetView](https://github.com/Linnea87/pawpals/issues/92)
+- [[PP-049] Match ConversationView to Figma design](https://github.com/Linnea87/pawpals/issues/99)
+- [[PP-050] Fix nearby users not loading from Firebase in MeetView](https://github.com/Linnea87/pawpals/issues/102)
+- [[PP-051] Refactor Localizable.strings keys — replace underscores with dots](https://github.com/Linnea87/pawpals/issues/109)
+- [[PP-052] Fix chat real-time listener, navigation bugs, and MeetView freeze](https://github.com/Linnea87/pawpals/issues/112)
+- [[PP-053] Extract AvatarView, SocialAuthButtons, and SectionHeader as reusable components](https://github.com/Linnea87/pawpals/issues/113)
+- [[PP-054] Extract WalkTypeTag and FilterChip as reusable components](https://github.com/Linnea87/pawpals/issues/116)
+- [[PP-055] Extract FilterViewModel and implement FilterRepository for filter state](https://github.com/Linnea87/pawpals/issues/117)
+- [[PP-056] Consolidate mock repositories into Core/Mocks/Mocks.swift](https://github.com/Linnea87/pawpals/issues/120)
+- [[PP-057] Notifications: code review](https://github.com/Linnea87/pawpals/issues/122)
+- [[PP-058] Remove empty DTOs folder from project](https://github.com/Linnea87/pawpals/issues/124)
+- [[PP-059] Chat cleanup: localization, conversation ID, and filter logic](https://github.com/Linnea87/pawpals/issues/125)
+- [[PP-060] Extract ConversationViewModel from ChatViewModel](https://github.com/Linnea87/pawpals/issues/126)
+- [[PP-061] Extract location state into LocationViewModel](https://github.com/Linnea87/pawpals/issues/129)
+- [[PP-062] Auto-fill city from GPS using reverse geocoding](https://github.com/Linnea87/pawpals/issues/130)
+- [[PP-063] Extract magic numbers in TabBarView into named constants](https://github.com/Linnea87/pawpals/issues/131)
+- [[PP-064] Add function comments and fix spacing in Repository protocols](https://github.com/Linnea87/pawpals/issues/135)
+- [[PP-065] Remove "Filter" and "Chat" navigation titles](https://github.com/Linnea87/pawpals/issues/138)
+- [[PP-066] Split UserRepository into ProfileRepository and MeetRepository](https://github.com/Linnea87/pawpals/issues/141)
+- [[PP-067] Clean up Constants — remove empty enum, add opacity tokens, fix magic numbers](https://github.com/Linnea87/pawpals/issues/143)
+- [[PP-068] Replace ChatView filter buttons with shared FilterChip component](https://github.com/Linnea87/pawpals/issues/145)
+- [[PP-069] Fix MeetCardView cards to have a fixed width](https://github.com/Linnea87/pawpals/issues/147)
+- [[PP-070] Show favorite conversations in ChatView](https://github.com/Linnea87/pawpals/issues/149)
+- [[PP-071] Rename id parameters to ID for consistency](https://github.com/Linnea87/pawpals/issues/153)
+- [[PP-072] Hide profiles in Meet once a conversation has been started](https://github.com/Linnea87/pawpals/issues/156)
+- [[PP-073] Fix: Close ConversationView opened from Profile sheet X dismiss and switch to Chat tab](https://github.com/Linnea87/pawpals/issues/157)
+- [[PP-074] Refactor: Extract CardStyle modifier and simplify ConversationRowView params](https://github.com/Linnea87/pawpals/issues/162)
+- [[PP-075] Refactor: Extract subviews from ProfileView and AddProfileSheet](https://github.com/Linnea87/pawpals/issues/163)
+- [[PP-076] Refactor: Extract sub-views from ConversationView into ConversationComponents](https://github.com/Linnea87/pawpals/issues/165)
+- [[PP-077] Open profile when tapping a saved profile card](https://github.com/Linnea87/pawpals/issues/169)
+- [[PP-078] Fix chat & conversation correctness bugs](https://github.com/Linnea87/pawpals/issues/170)
+- [[PP-079] Standardize ViewModel naming to xxxVM across all views](https://github.com/Linnea87/pawpals/issues/173)
+- [[PP-080] Add Swedish localization and clean up unused string keys](https://github.com/Linnea87/pawpals/issues/175)
+- [[PP-081] Fix fetchUser hardcoding empty preferences instead of decoding stored values](https://github.com/Linnea87/pawpals/issues/176)
+- [[PP-082] Decouple Meet repository & ViewModel from Firebase](https://github.com/Linnea87/pawpals/issues/177)
+- [[PP-083] Build out FirestoreService as centralized error handler and localize LocationService error strings](https://github.com/Linnea87/pawpals/issues/179)
+- [[PP-084] Make the radius slider drive the Meet fetch query](https://github.com/Linnea87/pawpals/issues/182)
+- [[PP-085] Move ChatView preview helper into Mocks](https://github.com/Linnea87/pawpals/issues/185)
+- [[PP-086] Refactor fetchSavedProfiles to reuse fetchSavedProfileIDs](https://github.com/Linnea87/pawpals/issues/186)
+- [[PP-087] Meet cleanup: slider save debounce + dead props](https://github.com/Linnea87/pawpals/issues/189)
+- [[PP-088] Fix Meet size filter and missing dog in profile detail](https://github.com/Linnea87/pawpals/issues/191)
+
+</details>
+
+[Back to top](#pawpals)
 
 ### Not Implemented User Stories
 
-<!-- TODO: list open / wont-have issues here -->
+The following 7 user stories remain open — they were not implemented within the scope of this project, as we decided they weren't needed right now:
+
+- [[PP-010] Dismiss profile view with X button](https://github.com/Linnea87/pawpals/issues/10)
+- [[PP-027] Suggest a walk in chat](https://github.com/Linnea87/pawpals/issues/27)
+- [[PP-029] Block a user](https://github.com/Linnea87/pawpals/issues/29)
+- [[PP-030] Report a profile](https://github.com/Linnea87/pawpals/issues/30)
+- [[PP-032] Activity feed](https://github.com/Linnea87/pawpals/issues/32)
+- [[PP-033] Leave a review after a walk](https://github.com/Linnea87/pawpals/issues/33)
+- [[PP-035] Reset password](https://github.com/Linnea87/pawpals/issues/35)
+
+[Back to top](#pawpals)
 
 ### MoSCoW Prioritization
 
