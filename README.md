@@ -352,6 +352,9 @@ Covers the safety features that let users control who they interact with: blocki
 
 The following 7 user stories remain open — they were not implemented within the scope of this project, as we decided they weren't needed right now:
 
+<details>
+<summary>Show all 7 not implemented user stories</summary>
+
 - [[PP-010] Dismiss profile view with X button](https://github.com/Linnea87/pawpals/issues/10)
 - [[PP-027] Suggest a walk in chat](https://github.com/Linnea87/pawpals/issues/27)
 - [[PP-029] Block a user](https://github.com/Linnea87/pawpals/issues/29)
@@ -359,6 +362,8 @@ The following 7 user stories remain open — they were not implemented within th
 - [[PP-032] Activity feed](https://github.com/Linnea87/pawpals/issues/32)
 - [[PP-033] Leave a review after a walk](https://github.com/Linnea87/pawpals/issues/33)
 - [[PP-035] Reset password](https://github.com/Linnea87/pawpals/issues/35)
+
+</details>
 
 [Back to top](#pawpals)
 
